@@ -1,12 +1,20 @@
 var THREE = require('three');
 var OrbitControls = require('three-orbit-controls')(THREE);
 
+var Container = require('./container');
+
+
 var Terrarium = function() {
     this.initThree();
+    this.initScene();
     window.addEventListener('resize', this.onResize.bind(this), false);
     this.onResize();
     this.animate();
 };
+
+Terrarium.prototype.initScene = function() {
+    this.container = new Container(this.scene);
+}
 
 Terrarium.prototype.initThree = function() {
     var width = window.innerWidth;

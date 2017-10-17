@@ -1,3 +1,3 @@
-var Terrarium = require('./terrarium');
+var Terrarium = require('./src/terrarium');
 
 var terrarium = new Terrarium();
