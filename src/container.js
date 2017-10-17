@@ -1,20 +1,28 @@
 var THREE = require('three');
 
 var Container = function(scene, eventMediator, TWEEN) {
-    var geometry = new THREE.IcosahedronGeometry(1, 1);
-    var material = new THREE.MeshBasicMaterial({
+    const geometry = new THREE.IcosahedronGeometry(1, 1);
+    const material = new THREE.MeshBasicMaterial({
         color: 0x000000
     });
     material.wireframe = true;
-    this.mesh = new THREE.Mesh(geometry, material);
-    this.mesh.scale.set(.01,.01,.01);
-    scene.add(this.mesh);
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
 
-    this.inTween = new TWEEN.Tween(this.mesh.scale);
-    this.inTween.to({x: 1, y: 1, z: 1}, 1000);
+    mesh.scale.set(.001,.001,.001);
+    const inTween = new TWEEN.Tween(mesh.scale)
+        .to({x: 1, y: 1, z: 1}, 1250)
+        .easing(TWEEN.Easing.Cubic.Out);
 
-    const start = this.inTween.start.bind(this.inTween);
-    eventMediator.on('start', start);
+    mesh.rotation.y = 0;
+    const spinTween = new TWEEN.Tween(mesh.rotation)
+        .to({y: Math.PI}, 1500)
+        .easing(TWEEN.Easing.Cubic.Out);
+
+    eventMediator.on('start', function() {
+        inTween.start();
+        spinTween.start();
+    });
 };
 
 module.exports = Container;

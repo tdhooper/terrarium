@@ -31,7 +31,7 @@ Terrarium.prototype.initThree = function() {
     var height = window.innerHeight;
 
     this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    this.camera.position.x = 5;
+    this.camera.position.set(3, 2, 0);
     this.cameraControls = new OrbitControls(this.camera);
 
     this.renderer = new THREE.WebGLRenderer({
