@@ -21,7 +21,9 @@ Terrarium.prototype.initScene = function() {
     class Emitter extends EventEmitter {}
     const eventMediator = new Emitter();
 
-    this.container = new Container(this.scene, eventMediator, TWEEN);
+    const container = new Container(this.scene, eventMediator, TWEEN);
+
+    // const soilCursor = new SoilCursor(this.scene, eventMediator);
 
     eventMediator.emit('start');
 };
