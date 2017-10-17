@@ -1,0 +1,61 @@
+container geometry
+soil geometry
+crystal geometry
+
+
+interactions
+
+soil cursor
+crystal grower
+crystal remover
+camera movement
+restart
+
+sounds, event based?
+
+animate in container
+restart new container
+
+
+load sounds
+load images
+
+animate in container
+animate in soil
+ - show instruction
+
+
+Container(scene)
+	- update updates attributes
+
+Soil(scene)
+	publish over, out, move, down, up
+	- update updates attributes
+
+SoilCursor(scene, soil, events)
+	listen to soil over
+	listen to soil out
+	listen to soil move
+	- update updates attributes
+
+CrystalPlanter(scene, events)
+	listen to soil down
+	listen to soil up
+	* manages srystals in the scene
+
+Audio(events)
+	plays sounds on events
+
+Controls(scene, events)
+
+
+Scene
+	sets up Threejs Scene, Camera
+	creates Container, Soil, SoilCursor, CrystalPlanter
+
+	render loop
+		soil.update()
+		soilCursor.update()
+		crystalPlanter.update()
+		render()
+
