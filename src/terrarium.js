@@ -6,6 +6,7 @@ const OrbitControls = require('three-orbit-controls')(THREE);
 var TWEEN = require('@tweenjs/tween.js');
 
 const Container = require('./container');
+const InteractionPublisher = require('./interaction-publisher');
 
 
 const Terrarium = function() {
@@ -20,9 +21,15 @@ Terrarium.prototype.initScene = function() {
 
     class Emitter extends EventEmitter {}
     const eventMediator = new Emitter();
+    const interactionPublisher = new InteractionPublisher(this.camera, eventMediator);
 
-    const container = new Container(this.scene, eventMediator, TWEEN);
+    const app = {
+        TWEEN: TWEEN,
+        eventMediator: eventMediator,
+        interactionPublisher: interactionPublisher
+    };
 
+    const container = new Container(this.scene, app);
     // const soilCursor = new SoilCursor(this.scene, eventMediator);
 
     eventMediator.emit('start');

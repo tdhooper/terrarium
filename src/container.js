@@ -3,9 +3,9 @@ const THREE = require('three');
 const Soil = require('./soil.js');
 
 
-const Container = function(scene, eventMediator, TWEEN) {
+const Container = function(parent, app) {
     const group = new THREE.Group();
-    scene.add(group);
+    parent.add(group);
 
     const geometry = new THREE.IcosahedronGeometry(1, 1);
     const material = new THREE.MeshBasicMaterial({
@@ -16,9 +16,11 @@ const Container = function(scene, eventMediator, TWEEN) {
 
     group.add(mesh);
 
-    const soil = new Soil(group, geometry);
+    const soil = new Soil(group, geometry, app);
 
     // Animations
+
+    const TWEEN = app.TWEEN;
 
     group.scale.set(.001,.001,.001);
     const inTween = new TWEEN.Tween(group.scale)
@@ -30,7 +32,7 @@ const Container = function(scene, eventMediator, TWEEN) {
         .to({y: Math.PI}, 1500)
         .easing(TWEEN.Easing.Cubic.Out);
 
-    eventMediator.on('start', function() {
+    app.eventMediator.on('start', function() {
         inTween.start();
         spinTween.start();
     });

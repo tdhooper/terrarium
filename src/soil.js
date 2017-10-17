@@ -1,8 +1,7 @@
 const THREE = require('three');
 const ThreeBSP = require('./lib/three-js-csg')(THREE);
 
-
-const Soil = function(parent, container) {
+const Soil = function(parent, container, app) {
 
     container.computeBoundingBox()
     const size = container.boundingBox.getSize();
@@ -27,9 +26,25 @@ const Soil = function(parent, container) {
 
     parent.add(mesh);
 
-    var clickableBSP = surfaceBSP.cut(containerBSP);
-    var clickableGeom = clickableBSP.toGeometry();
+    var interactiveBSP = surfaceBSP.cut(containerBSP);
+    var interactiveGeom = interactiveBSP.toGeometry();
+    var interactiveMesh = new THREE.Mesh(interactiveGeom, material);
 
+    parent.add(interactiveMesh)
+
+    app.interactionPublisher.add(interactiveMesh, 'soil');
+
+    app.eventMediator.on('soil.mouseover', function() {
+        console.log('over');
+    });
+
+    app.eventMediator.on('soil.mousemove', function() {
+        console.log('move');
+    });
+
+    app.eventMediator.on('soil.mouseout', function() {
+        console.log('out');
+    });
 };
 
 Soil.prototype.generate = function(u, v) {
