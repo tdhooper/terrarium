@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tweenjs/tween.js": "^17.1.1",
     "benchmark": "^2.1.4",
     "budo": "^9.4.7",
     "cga": "^1.0.8",
