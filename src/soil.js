@@ -33,18 +33,6 @@ const Soil = function(parent, container, app) {
     parent.add(interactiveMesh)
 
     app.interactionPublisher.add(interactiveMesh, 'soil');
-
-    app.eventMediator.on('soil.mouseover', function() {
-        console.log('over');
-    });
-
-    app.eventMediator.on('soil.mousemove', function() {
-        console.log('move');
-    });
-
-    app.eventMediator.on('soil.mouseout', function() {
-        console.log('out');
-    });
 };
 
 Soil.prototype.generate = function(u, v) {

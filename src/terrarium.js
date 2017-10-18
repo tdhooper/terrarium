@@ -6,6 +6,7 @@ const OrbitControls = require('three-orbit-controls')(THREE);
 var TWEEN = require('@tweenjs/tween.js');
 
 const Container = require('./container');
+const SoilCursor = require('./soil-cursor');
 const InteractionPublisher = require('./interaction-publisher');
 
 
@@ -30,7 +31,7 @@ Terrarium.prototype.initScene = function() {
     };
 
     const container = new Container(this.scene, app);
-    // const soilCursor = new SoilCursor(this.scene, eventMediator);
+    const soilCursor = new SoilCursor(this.scene, app);
 
     eventMediator.emit('start');
 };
