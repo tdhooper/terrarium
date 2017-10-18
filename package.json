@@ -12,13 +12,13 @@
   "license": "ISC",
   "dependencies": {
     "@tweenjs/tween.js": "^17.1.1",
+    "ThreeCSG": "github:tdhooper/ThreeCSG",
     "benchmark": "^2.1.4",
     "budo": "^9.4.7",
     "cga": "^1.0.8",
     "gl-matrix": "^2.4.0",
     "mda": "^1.1.1",
     "three": "^0.87.1",
-    "three-js-csg": "^72.0.0",
     "three-orbit-controls": "^82.1.0",
     "threejs-slice-geometry": "^0.1.1"
   }

@@ -1,4 +1,4 @@
-InitThreeBSP = require('three-js-csg')
+InitThreeBSP = require('ThreeCSG')
 
 module.exports = function(THREE) {
     const ThreeBSP = InitThreeBSP(THREE);
