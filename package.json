@@ -17,6 +17,7 @@
     "budo": "^9.4.7",
     "cga": "^1.0.8",
     "gl-matrix": "^2.4.0",
+    "jquery": "^3.2.1",
     "mda": "^1.1.1",
     "three": "^0.87.1",
     "three-orbit-controls": "^82.1.0",
