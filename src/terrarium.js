@@ -3,7 +3,7 @@ const THREE = require('three');
 const Container = require('./container');
 const Soil = require('./soil');
 const SoilCursor = require('./soil-cursor');
-
+const CrystalPlanter = require('./crystal-planter');
 
 const Terrarium = function(parent, app) {
     const group = new THREE.Group();
@@ -11,7 +11,8 @@ const Terrarium = function(parent, app) {
 
     const container = new Container(group, app);
     const soil = new Soil(group, container.geometry, app);
-    const soilCursor = new SoilCursor(parent, app);
+    const soilCursor = new SoilCursor(group, app);
+    const crystalPlanter = new CrystalPlanter(group, app);
 
     // Animations
 

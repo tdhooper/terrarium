@@ -16,7 +16,9 @@ const SoilCursor = function(parent, app) {
     });
 
     app.eventMediator.on('soil.mousemove', function(intersect) {
-        mesh.position.copy(intersect.point);
+        var position = intersect.point.clone();
+        parent.worldToLocal(position);
+        mesh.position.copy(position);
     });
 
     app.eventMediator.on('soil.mouseout', function() {
