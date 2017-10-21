@@ -29,7 +29,7 @@ CrystalPlanter.prototype.onMouseUp = function() {
 
 
 const Crystal = function(parent, app, position, top) {
-    var width = .1;
+    var width = .2;
     var height = 1;
 
     const geometry = new THREE.BoxGeometry(width, width, height);
@@ -46,9 +46,9 @@ const Crystal = function(parent, app, position, top) {
     this.mesh = mesh;
 
     var TWEEN = app.TWEEN;
-    this.mesh.scale.setZ(0);
+    this.mesh.scale.set(.25, .25, 0);
     this.growTween = new TWEEN.Tween(this.mesh.scale)
-        .to({z: 1}, 1500)
+        .to({x: 1, y: 1, z: 1}, 1500)
         .easing(TWEEN.Easing.Quadratic.In)
         .start();
 };
