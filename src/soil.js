@@ -11,6 +11,8 @@ const Soil = function(parent, container, app) {
     this.height = size.y * .1;
     this.offset = size.y * .2;
 
+    const material = new THREE.MeshNormalMaterial();
+
     const surface = new THREE.ParametricGeometry(
         this.generate.bind(this),
         25, 25
@@ -18,21 +20,35 @@ const Soil = function(parent, container, app) {
 
     const containerBSP = new ThreeBSP(container);
     const surfaceBSP = new ThreeBSP(surface);
+
+
+    // Visible soil
+
     const geomBSP = containerBSP.intersect(surfaceBSP);
     const geometry = geomBSP.toGeometry();
-
-    const material = new THREE.MeshNormalMaterial();
     const mesh = new THREE.Mesh(geometry, material);
-
     parent.add(mesh);
+
+
+    // Interactive area of the soil
 
     var interactiveBSP = surfaceBSP.cut(containerBSP);
     var interactiveGeom = interactiveBSP.toGeometry();
     var interactiveMesh = new THREE.Mesh(interactiveGeom, material);
+    interactiveMesh.visible = false;
+    parent.add(interactiveMesh);
 
-    parent.add(interactiveMesh)
+    app.interactionPublisher.add(interactiveMesh, 'soil-area', true);
 
-    app.interactionPublisher.add(interactiveMesh, 'soil');
+
+    // Clean normals for the soil
+
+    surface.computeFaceNormals();
+    var normalMesh = new THREE.Mesh(surface, material);
+    normalMesh.visible = false;
+    parent.add(normalMesh);
+
+    app.interactionPublisher.add(normalMesh, 'soil-normals', true);
 };
 
 Soil.prototype.generate = function(u, v) {

@@ -2,36 +2,63 @@ const THREE = require('three');
 
 const SoilCursor = function(parent, app) {
 
-    const geometry = new THREE.SphereGeometry(.05);
+    const geometry = new THREE.CircleGeometry(.5, 32);
     const material = new THREE.MeshBasicMaterial({
-        color: 0xff0000
+        color: 0xff0000,
+        side: THREE.DoubleSide
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.visible = false;
 
     parent.add(mesh);
 
-    app.eventMediator.on('soil.mouseover', function() {
-        mesh.visible = true;
-    });
+    this.parent = parent;
+    this.mesh = mesh;
+    this.material = material;
 
-    app.eventMediator.on('soil.mousemove', function(intersect) {
-        var position = intersect.point.clone();
-        parent.worldToLocal(position);
-        mesh.position.copy(position);
-    });
+    app.eventMediator.on('soil-area.mouseover', this.show.bind(this));
+    app.eventMediator.on('soil-area.touchstart', this.show.bind(this));
 
-    app.eventMediator.on('soil.mouseout', function() {
-        mesh.visible = false;
-    });
+    app.eventMediator.on('soil-normals.mousemove', this.position.bind(this));
+    app.eventMediator.on('soil-normals.touchstart', this.position.bind(this));
 
-    app.eventMediator.on('soil.mousedown', function() {
-        material.color.setHex(0x00ff00);
-    });
+    app.eventMediator.on('soil-area.mouseout', this.hide.bind(this));
+    app.eventMediator.on('soil-area.touchend', this.hide.bind(this));
+    app.eventMediator.on('soil-area.touchmove', this.hide.bind(this));
 
-    app.eventMediator.on('soil.mouseup', function() {
-        material.color.setHex(0xff0000);
-    });
+    app.eventMediator.on('soil-area.mousedown', this.highlightOn.bind(this));
+    app.eventMediator.on('soil-area.touchholddown', this.highlightOn.bind(this));
+
+    app.eventMediator.on('soil-area.mouseup', this.highlightOff.bind(this));
+    app.eventMediator.on('soil-area.touchend', this.highlightOff.bind(this));
+};
+
+
+SoilCursor.prototype.show = function() {
+    this.mesh.visible = true;
+};
+
+SoilCursor.prototype.position = function(intersect) {
+    var position = intersect.point.clone();
+    this.parent.worldToLocal(position);
+
+    var normal = intersect.face.normal;
+    var top = position.clone().add(normal);
+
+    this.mesh.position.copy(position);
+    this.mesh.lookAt(top);
+};
+
+SoilCursor.prototype.hide = function() {
+    this.mesh.visible = false;
+};
+
+SoilCursor.prototype.highlightOn = function() {
+    this.material.color.setHex(0x00ff00);
+};
+
+SoilCursor.prototype.highlightOff = function() {
+    this.material.color.setHex(0xff0000);
 };
 
 module.exports = SoilCursor;

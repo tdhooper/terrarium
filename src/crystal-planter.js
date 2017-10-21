@@ -4,8 +4,12 @@ var THREE = require('three');
 const CrystalPlanter = function(parent, app) {
     this.parent = parent;
     this.app = app;
-    app.eventMediator.on('soil.mousedown', this.onMouseDown.bind(this));
-    app.eventMediator.on('soil.mouseup', this.onMouseUp.bind(this));
+
+    app.eventMediator.on('soil-area.mousedown', this.onMouseDown.bind(this));
+    app.eventMediator.on('soil-area.touchholddown', this.onMouseDown.bind(this));
+
+    app.eventMediator.on('soil-area.mouseup', this.onMouseUp.bind(this));
+    app.eventMediator.on('soil-area.touchend', this.onMouseUp.bind(this));
 };
 
 CrystalPlanter.prototype.onMouseDown = function(intersect) {
