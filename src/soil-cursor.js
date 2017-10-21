@@ -22,6 +22,14 @@ const SoilCursor = function(parent, app) {
     app.eventMediator.on('soil.mouseout', function() {
         mesh.visible = false;
     });
+
+    app.eventMediator.on('soil.mousedown', function() {
+        material.color.setHex(0x00ff00);
+    });
+
+    app.eventMediator.on('soil.mouseup', function() {
+        material.color.setHex(0xff0000);
+    });
 };
 
 module.exports = SoilCursor;
