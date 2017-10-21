@@ -113,6 +113,7 @@ InteractionPublisher.prototype.touchEnd = function(event) {
         return;
     }
     clearInterval(this.touchHoldTimeout);
+    this.mouseUp(event);
 };
 
 InteractionPublisher.prototype.findIntersections = function(event) {
