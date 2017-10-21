@@ -36,8 +36,8 @@ Main.prototype.initScene = function() {
 };
 
 Main.prototype.initThree = function() {
-    var width = window.innerWidth;
-    var height = window.innerHeight;
+    var width = document.body.clientWidth;
+    var height = document.body.clientHeight;
 
     this.camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
     this.camera.position.set(3, 2, 0);
@@ -68,8 +68,8 @@ Main.prototype.animate = function() {
 };
 
 Main.prototype.onResize = function() {
-    var width = window.innerWidth;
-    var height = window.innerHeight;
+    var width = document.body.clientWidth;
+    var height = document.body.clientHeight;
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
