@@ -10,16 +10,21 @@ const InteractionPublisher = function(
     this.rayCaster = new THREE.Raycaster();
     this.mousePosition = new THREE.Vector2();
     this.objects = [];
-    this.objectMap = {};
+    this.objectStates = [];
+    this.objectStateMap = {};
     document.addEventListener('mousemove', this.mouseMove.bind(this), false);
+    document.addEventListener('mousedown', this.mouseDown.bind(this), false);
+    document.addEventListener('mouseup', this.mouseUp.bind(this), false);
 };
 
 InteractionPublisher.prototype.add = function(object, namespace) {
     this.objects.push(object);
-    this.objectMap[object.id] = {
+    var state = {
         namespace: namespace,
         isOver: false
     };
+    this.objectStates.push(state);
+    this.objectStateMap[object.id] = state;
 };
 
 InteractionPublisher.prototype.mouseMove = function(event) {
@@ -34,23 +39,39 @@ InteractionPublisher.prototype.mouseMove = function(event) {
     intersects.forEach(function(intersect) {
         const object = intersect.object;
         touched.push(object.id.toString());
-        const spec = this.objectMap[object.id];
-        if ( ! spec.isOver) {
-            this.eventMediator.emit(spec.namespace + '.mouseover', intersect);
-            spec.isOver = true;
+        const state = this.objectStateMap[object.id];
+        state.intersect = intersect;
+        if ( ! state.isOver) {
+            this.eventMediator.emit(state.namespace + '.mouseover', intersect);
+            state.isOver = true;
         }
-        this.eventMediator.emit(spec.namespace + '.mousemove', intersect);
+        this.eventMediator.emit(state.namespace + '.mousemove', intersect);
     }.bind(this));
 
-    Object.entries(this.objectMap).forEach(function(kv) {
+    Object.entries(this.objectStateMap).forEach(function(kv) {
         const id = kv[0];
-        const spec = kv[1];
-        if (touched.indexOf(id) == -1 && spec.isOver) {
-            this.eventMediator.emit(spec.namespace + '.mouseout');
-            spec.isOver = false;
+        const state = kv[1];
+        if (touched.indexOf(id) == -1 && state.isOver) {
+            this.eventMediator.emit(state.namespace + '.mouseout');
+            state.isOver = false;
         }
     }.bind(this));
+};
 
+InteractionPublisher.prototype.mouseDown = function(event) {
+    this.objectStates.forEach(function(state) {
+        if (state.isOver) {
+            this.eventMediator.emit(state.namespace + '.mousedown', state.intersect);
+        }
+    }.bind(this));
+};
+
+InteractionPublisher.prototype.mouseUp = function(event) {
+    this.objectStates.forEach(function(state) {
+        if (state.isOver) {
+            this.eventMediator.emit(state.namespace + '.mouseup', state.intersect);
+        }
+    }.bind(this));
 };
 
 module.exports = InteractionPublisher;
