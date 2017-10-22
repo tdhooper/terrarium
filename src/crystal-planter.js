@@ -5,6 +5,8 @@ const CrystalPlanter = function(parent, app) {
     this.parent = parent;
     this.app = app;
 
+    app.eventMediator.on('soil-normals.mousemove', this.storeIntersection.bind(this));
+
     app.eventMediator.on('soil-area.mousedown', this.onMouseDown.bind(this));
     app.eventMediator.on('soil-area.touchholddown', this.onMouseDown.bind(this));
 
@@ -12,14 +14,17 @@ const CrystalPlanter = function(parent, app) {
     app.eventMediator.on('soil-area.touchend', this.onMouseUp.bind(this));
 };
 
-CrystalPlanter.prototype.onMouseDown = function(intersect) {
-    var position = intersect.point.clone();
+CrystalPlanter.prototype.storeIntersection = function(intersection) {
+    this.intersection = intersection;
+};
+
+CrystalPlanter.prototype.onMouseDown = function(intersection) {
+    var position = this.intersection.point.clone();
     this.parent.worldToLocal(position);
 
-    var normal = intersect.face.vertexNormals[0];
+    var normal = this.intersection.face.normal.clone();
     this.parent.worldToLocal(normal);
-    normal.multiplyScalar(.5);
-    var top = intersect.point.clone().add(normal);
+    var top = this.intersection.point.clone().add(normal);
     this.parent.worldToLocal(top);
 
     this.activeCrystal = new Crystal(this.parent, this.app, position, top);
