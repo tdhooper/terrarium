@@ -36,7 +36,6 @@ const SoilCursor = function(parent, app) {
 
     app.eventMediator.on('soil-normals.mousemove', this.position.bind(this));
     app.eventMediator.on('soil-normals.touchstart', this.position.bind(this)); // TODO make touch/mouse over/move behave the same
-    app.eventMediator.on('soil-normals.touchmove', this.position.bind(this));
 
     app.eventMediator.on('soil-area.touchholdstart', this.startCountdown.bind(this));
     app.eventMediator.on('soil-area.touchholdend', this.resetCountdown.bind(this));
@@ -89,6 +88,8 @@ SoilCursor.prototype.setPosition = function() {
         return;
     }
 
+    this.positionIntersect = this.intersect;
+
     var position = this.intersect.point.clone();
 
     var normal = this.intersect.face.normal.clone();
@@ -116,7 +117,7 @@ SoilCursor.prototype.highlightOn = function() {
     // this.log.log('Done');
     this.isHeld = true;
     this.material.color.setHex(0x00ff00);
-    this.app.eventMediator.emit('soil-cursor.down');
+    this.app.eventMediator.emit('soil-cursor.down', this.positionIntersect);
 };
 
 SoilCursor.prototype.highlightOff = function() {
