@@ -11,18 +11,16 @@ const CrystalPlanter = function(parent, app) {
     app.eventMediator.on('soil-normals.touchstart', this.storeIntersection.bind(this));
     app.eventMediator.on('soil-normals.touchmove', this.storeIntersection.bind(this));
 
-    app.eventMediator.on('soil-area.mousedown', this.onMouseDown.bind(this));
-    app.eventMediator.on('soil-area.touchholddown', this.onMouseDown.bind(this));
+    app.eventMediator.on('soil-cursor.down', this.onMouseDown.bind(this));
 
-    app.eventMediator.on('soil-area.mouseup', this.onMouseUp.bind(this));
-    app.eventMediator.on('soil-area.touchend', this.onMouseUp.bind(this));
+    app.eventMediator.on('soil-cursor.up', this.onMouseUp.bind(this));
 };
 
 CrystalPlanter.prototype.storeIntersection = function(intersection) {
     this.intersection = intersection;
 };
 
-CrystalPlanter.prototype.onMouseDown = function(intersection) {
+CrystalPlanter.prototype.onMouseDown = function() {
     var position = this.intersection.point.clone();
     this.parent.worldToLocal(position);
 

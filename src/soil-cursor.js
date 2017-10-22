@@ -60,6 +60,10 @@ const SoilCursor = function(parent, app) {
 };
 
 SoilCursor.prototype.startCountdown = function() {
+    if (this.isHeld) {
+        return;
+    }
+
     // this.log.log(this.scale);
     this.mesh.scale.set(this.scale, this.scale, this.scale);
     this.countdownTween.start();
@@ -71,14 +75,24 @@ SoilCursor.prototype.resetCountdown = function() {
 };
 
 SoilCursor.prototype.show = function() {
+    this.isOver = true;
     this.mesh.visible = true;
 };
 
 SoilCursor.prototype.position = function(intersect) {
-    var position = intersect.point.clone();
+    this.intersect = intersect;
+    this.setPosition();
+};
 
-    var normal = intersect.face.normal.clone();
-    intersect.object.localToWorld(normal);
+SoilCursor.prototype.setPosition = function() {
+    if (this.isHeld) {
+        return;
+    }
+
+    var position = this.intersect.point.clone();
+
+    var normal = this.intersect.face.normal.clone();
+    this.intersect.object.localToWorld(normal);
 
     var top = position.clone().add(normal);
 
@@ -91,16 +105,28 @@ SoilCursor.prototype.position = function(intersect) {
 };
 
 SoilCursor.prototype.hide = function() {
+    this.isOver = false;
+    if (this.isHeld) {
+        return;
+    }
     this.mesh.visible = false;
 };
 
 SoilCursor.prototype.highlightOn = function() {
     // this.log.log('Done');
+    this.isHeld = true;
     this.material.color.setHex(0x00ff00);
+    this.app.eventMediator.emit('soil-cursor.down');
 };
 
 SoilCursor.prototype.highlightOff = function() {
+    this.isHeld = false;
+    this.setPosition();
+    if ( ! this.isOver) {
+        this.hide();
+    }
     this.material.color.setHex(0xff0000);
+    this.app.eventMediator.emit('soil-cursor.up');
 };
 
 module.exports = SoilCursor;
