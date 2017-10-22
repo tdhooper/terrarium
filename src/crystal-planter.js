@@ -1,11 +1,15 @@
 var THREE = require('three');
 
+const InlineLog = require('./inline-log');
+
 
 const CrystalPlanter = function(parent, app) {
     this.parent = parent;
     this.app = app;
 
     app.eventMediator.on('soil-normals.mousemove', this.storeIntersection.bind(this));
+    app.eventMediator.on('soil-normals.touchstart', this.storeIntersection.bind(this));
+    app.eventMediator.on('soil-normals.touchmove', this.storeIntersection.bind(this));
 
     app.eventMediator.on('soil-area.mousedown', this.onMouseDown.bind(this));
     app.eventMediator.on('soil-area.touchholddown', this.onMouseDown.bind(this));

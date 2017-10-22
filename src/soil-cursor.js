@@ -1,5 +1,8 @@
 const THREE = require('three');
 
+const InlineLog = require('./inline-log');
+
+
 const SoilCursor = function(parent, app) {
 
     const height = 1.;
@@ -26,29 +29,45 @@ const SoilCursor = function(parent, app) {
     this.app = app;
     this.mesh = mesh;
     this.material = material;
+    this.scale = 1;
 
     app.eventMediator.on('soil-area.mouseover', this.show.bind(this));
     app.eventMediator.on('soil-area.touchstart', this.show.bind(this));
 
     app.eventMediator.on('soil-normals.mousemove', this.position.bind(this));
-    app.eventMediator.on('soil-normals.touchstart', this.position.bind(this));
+    app.eventMediator.on('soil-normals.touchstart', this.position.bind(this)); // TODO make touch/mouse over/move behave the same
+    app.eventMediator.on('soil-normals.touchmove', this.position.bind(this));
+
+    app.eventMediator.on('soil-area.touchholdstart', this.startCountdown.bind(this));
+    app.eventMediator.on('soil-area.touchholdend', this.resetCountdown.bind(this));
 
     app.eventMediator.on('soil-area.mouseout', this.hide.bind(this));
     app.eventMediator.on('soil-area.touchend', this.hide.bind(this));
-    app.eventMediator.on('soil-area.touchmove', this.hide.bind(this));
 
     app.eventMediator.on('soil-area.mousedown', this.highlightOn.bind(this));
     app.eventMediator.on('soil-area.touchholddown', this.highlightOn.bind(this));
 
     app.eventMediator.on('soil-area.mouseup', this.highlightOff.bind(this));
     app.eventMediator.on('soil-area.touchend', this.highlightOff.bind(this));
+
+    this.countdownTween = new app.TWEEN.Tween(this.mesh.scale)
+        .to(
+            {x: 1, y: 1, z: 0},
+            app.interactionPublisher.TOUCH_HOLD_DELAY
+        );
+
+    // this.log = new InlineLog();
 };
 
-SoilCursor.prototype.scaleToZoom = function() {
-    const position = this.mesh.position.clone();
-    const dist = this.app.camera.position.distanceTo(position);
-    const scale = dist * .5;
-    this.mesh.scale.set(scale, scale, scale);
+SoilCursor.prototype.startCountdown = function() {
+    // this.log.log(this.scale);
+    this.mesh.scale.set(this.scale, this.scale, this.scale);
+    this.countdownTween.start();
+};
+
+SoilCursor.prototype.resetCountdown = function() {
+     // this.log.log('reset');
+    this.countdownTween && this.countdownTween.stop();
 };
 
 SoilCursor.prototype.show = function() {
@@ -66,7 +85,9 @@ SoilCursor.prototype.position = function(intersect) {
     this.mesh.position.copy(position);
     this.mesh.lookAt(top);
 
-    this.scaleToZoom();
+    const dist = this.app.camera.position.distanceTo(position);
+    this.scale = dist * .5;
+    // this.mesh.scale.set(this.scale, this.scale, this.scale);
 };
 
 SoilCursor.prototype.hide = function() {
@@ -74,6 +95,7 @@ SoilCursor.prototype.hide = function() {
 };
 
 SoilCursor.prototype.highlightOn = function() {
+    // this.log.log('Done');
     this.material.color.setHex(0x00ff00);
 };
 
