@@ -2,12 +2,14 @@ const THREE = require('three');
 
 const SoilCursor = function(parent, app) {
 
-    const geometry = new THREE.CircleGeometry(.5, 32);
+    const geometry = new THREE.RingGeometry(.4, .5, 32);
     const material = new THREE.MeshBasicMaterial({
         color: 0xff0000,
         side: THREE.DoubleSide
     });
+    material.depthTest = false;
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.renderOrder = 1;
     mesh.visible = false;
 
     parent.add(mesh);
