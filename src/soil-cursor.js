@@ -49,13 +49,25 @@ const SoilCursor = function(parent, app) {
     app.eventMediator.on('soil-area.mouseup', this.highlightOff.bind(this));
     app.eventMediator.on('soil-area.touchend', this.highlightOff.bind(this));
 
-    this.countdownTween = new app.TWEEN.Tween(this.mesh.scale)
+    this.countdownProgess = {
+        t: 0
+    };
+
+    this.countdownTween = new app.TWEEN.Tween(this.countdownProgess)
         .to(
-            {x: 1, y: 1, z: 0},
+            {t: 1},
             app.interactionPublisher.TOUCH_HOLD_DELAY
         );
 
-    // this.log = new InlineLog();
+    // var log = new InlineLog();
+
+    this.inactiveColor = new THREE.Color(0xff0000);
+    this.highlightColor = new THREE.Color(0x00ff00);
+
+    this.countdownTween.onUpdate(function(value) {
+        this.material.color.copy(this.inactiveColor);
+        this.material.color.lerp(this.highlightColor, value.t);
+    }.bind(this));
 };
 
 SoilCursor.prototype.startCountdown = function() {
@@ -64,13 +76,16 @@ SoilCursor.prototype.startCountdown = function() {
     }
 
     // this.log.log(this.scale);
-    this.mesh.scale.set(this.scale, this.scale, this.scale);
     this.countdownTween.start();
 };
 
 SoilCursor.prototype.resetCountdown = function() {
+    if (this.isHeld) {
+        return;
      // this.log.log('reset');
+    }
     this.countdownTween && this.countdownTween.stop();
+    this.countdownProgess.t = 0;
 };
 
 SoilCursor.prototype.show = function() {
@@ -102,7 +117,7 @@ SoilCursor.prototype.setPosition = function() {
 
     const dist = this.app.camera.position.distanceTo(position);
     this.scale = dist * .5;
-    // this.mesh.scale.set(this.scale, this.scale, this.scale);
+    this.mesh.scale.set(this.scale, this.scale, this.scale);
 };
 
 SoilCursor.prototype.hide = function() {
@@ -116,7 +131,7 @@ SoilCursor.prototype.hide = function() {
 SoilCursor.prototype.highlightOn = function() {
     // this.log.log('Done');
     this.isHeld = true;
-    this.material.color.setHex(0x00ff00);
+    this.material.color.copy(this.highlightColor);
     this.app.eventMediator.emit('soil-cursor.down', this.positionIntersect);
 };
 
@@ -126,7 +141,7 @@ SoilCursor.prototype.highlightOff = function() {
     if ( ! this.isOver) {
         this.hide();
     }
-    this.material.color.setHex(0xff0000);
+    this.material.color.copy(this.inactiveColor);
     this.app.eventMediator.emit('soil-cursor.up');
 };
 
