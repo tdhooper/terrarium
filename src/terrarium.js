@@ -11,7 +11,7 @@ const Terrarium = function(parent, app) {
 
     const container = new Container(group, app);
     const soil = new Soil(group, container.geometry, app);
-    const soilCursor = new SoilCursor(group, app);
+    const soilCursor = new SoilCursor(parent, app);
     const crystalPlanter = new CrystalPlanter(group, app);
 
     // Animations

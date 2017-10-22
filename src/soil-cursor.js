@@ -2,19 +2,28 @@ const THREE = require('three');
 
 const SoilCursor = function(parent, app) {
 
-    const geometry = new THREE.RingGeometry(.4, .5, 32);
+    const height = 1.;
+
+    const ring = new THREE.RingGeometry(.4, .5, 32);
+    const spike = new THREE.CylinderGeometry(.05, .0, height);
+    spike.rotateX(Math.PI * .5);
+    spike.translate(0, 0, height / 2);
+    ring.merge(spike);
+    const geometry = ring;
+
     const material = new THREE.MeshBasicMaterial({
         color: 0xff0000,
         side: THREE.DoubleSide
     });
-    material.depthTest = false;
+    // material.depthTest = false;
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.renderOrder = 1;
+    // mesh.renderOrder = 1;
     mesh.visible = false;
 
     parent.add(mesh);
 
     this.parent = parent;
+    this.app = app;
     this.mesh = mesh;
     this.material = material;
 
@@ -35,6 +44,12 @@ const SoilCursor = function(parent, app) {
     app.eventMediator.on('soil-area.touchend', this.highlightOff.bind(this));
 };
 
+SoilCursor.prototype.scaleToZoom = function() {
+    const position = this.mesh.position.clone();
+    const dist = this.app.camera.position.distanceTo(position);
+    const scale = dist * .5;
+    this.mesh.scale.set(scale, scale, scale);
+};
 
 SoilCursor.prototype.show = function() {
     this.mesh.visible = true;
@@ -42,13 +57,16 @@ SoilCursor.prototype.show = function() {
 
 SoilCursor.prototype.position = function(intersect) {
     var position = intersect.point.clone();
-    this.parent.worldToLocal(position);
 
-    var normal = intersect.face.normal;
+    var normal = intersect.face.normal.clone();
+    intersect.object.localToWorld(normal);
+
     var top = position.clone().add(normal);
 
     this.mesh.position.copy(position);
     this.mesh.lookAt(top);
+
+    this.scaleToZoom();
 };
 
 SoilCursor.prototype.hide = function() {

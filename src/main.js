@@ -26,7 +26,8 @@ Main.prototype.initApp = function() {
     this.app = {
         TWEEN: TWEEN,
         eventMediator: eventMediator,
-        interactionPublisher: interactionPublisher
+        interactionPublisher: interactionPublisher,
+        camera: this.camera
     };
 };
 
@@ -63,6 +64,7 @@ Main.prototype.render = function() {
 
 Main.prototype.animate = function() {
     requestAnimationFrame(this.animate.bind(this));
+    this.app.eventMediator.emit('update');
     TWEEN.update();
     this.render();
 };
