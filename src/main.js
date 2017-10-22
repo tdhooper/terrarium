@@ -41,7 +41,7 @@ Main.prototype.initThree = function() {
     var height = document.body.clientHeight;
 
     this.camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
-    this.camera.position.set(3, 2, 0);
+    this.camera.position.set(2.5, 1.5, 0);
     this.cameraControls = new OrbitControls(this.camera);
     this.cameraControls.enableDamping = true;
     this.cameraControls.dampingFactor = 0.25;
