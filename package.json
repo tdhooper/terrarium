@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "budo index.js --css /styles/main.css --live --force-default-index",
-    "build": "mkdir js; browserify index.js -o js/index.js"
+    "build": "mkdir js; browserify index.js | uglifyjs > js/index.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +14,7 @@
   "dependencies": {
     "@tweenjs/tween.js": "^17.1.1",
     "ThreeCSG": "github:tdhooper/ThreeCSG",
+    "babel-preset-env": "^1.6.1",
     "benchmark": "^2.1.4",
     "budo": "^9.4.7",
     "cga": "^1.0.8",
@@ -22,6 +23,23 @@
     "mda": "^1.1.1",
     "three": "^0.87.1",
     "three-orbit-controls": "^82.1.0",
-    "threejs-slice-geometry": "^0.1.1"
+    "threejs-slice-geometry": "^0.1.1",
+    "uglify-js": "^3.1.5"
+  },
+  "devDependencies": {
+    "babelify": "^7.3.0"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "comments": false,
+          "presets": [
+            "env"
+          ]
+        }
+      ]
+    ]
   }
 }
