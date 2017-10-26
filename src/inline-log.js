@@ -6,7 +6,9 @@ const InlineLog = function() {
     this.$el.appendTo('body');
 };
 
-InlineLog.prototype.log = function(message) {
+InlineLog.prototype.log = function() {
+    const args = Array.from(arguments);
+    const message = args.join(', ');
     this.$el.text(this.$el.text() + message + '\n');
     this.$el.scrollTop(this.$el[0].scrollHeight);
 };

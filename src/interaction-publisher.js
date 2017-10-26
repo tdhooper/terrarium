@@ -3,34 +3,25 @@ const InlineLog = require('./inline-log');
 
 
 const InteractionPublisher = function(
+    element,
     camera,
-    eventMediator
+    eventMediator,
+    log
 ) {
     this.camera = camera;
     this.eventMediator = eventMediator;
+    this.log = log;
     this.rayCaster = new THREE.Raycaster();
     this.objects = [];
     this.objectStates = [];
     this.objectStateMap = {};
     this.showObjects = [];
-    document.addEventListener('mousemove', this.mouseMove.bind(this), false);
-    document.addEventListener('mousedown', this.mouseDown.bind(this), false);
-    document.addEventListener('mouseup', this.mouseUp.bind(this), false);
-    document.addEventListener('touchstart', this.touchStart.bind(this), false);
-    document.addEventListener('touchmove', this.touchMove.bind(this), false);
-    document.addEventListener('touchend', this.touchEnd.bind(this), false);
-    
-    // var log = new InlineLog();
-
-    // var em = this.eventMediator;
-    // this.eventMediator = {
-    //     emit: function(name, message) {
-    //         log.log(name);
-    //         log.log(message);
-    //         em.emit(name, message);
-    //     }
-    // }
-    // this.log = log;
+    element.addEventListener('mousemove', this.mouseMove.bind(this), false);
+    element.addEventListener('mousedown', this.mouseDown.bind(this), false);
+    element.addEventListener('mouseup', this.mouseUp.bind(this), false);
+    element.addEventListener('touchstart', this.touchStart.bind(this), false);
+    element.addEventListener('touchmove', this.touchMove.bind(this), false);
+    element.addEventListener('touchend', this.touchEnd.bind(this), false);
 };
 
 InteractionPublisher.prototype.TOUCH_HOLD_DELAY = 500;
@@ -42,7 +33,8 @@ InteractionPublisher.prototype.add = function(object, namespace, alwaysVisible) 
         namespace: namespace,
         isOver: false,
         isDown: false,
-        isTouchDown: false
+        isTouchDown: false,
+        isTouchHoldDown: false
     };
     this.objectStates.push(state);
     this.objectStateMap[object.id] = state;
@@ -80,6 +72,8 @@ InteractionPublisher.prototype.mouseMove = function(event) {
 };
 
 InteractionPublisher.prototype.mouseDown = function(event) {
+    this.log.log('mousdown');
+
     var intersections = this.findIntersections(event);
 
     intersections.forEach(function(state) {
@@ -103,10 +97,13 @@ InteractionPublisher.prototype.mouseUp = function(event) {
 };
 
 InteractionPublisher.prototype.touchHoldDown = function(state) {
+    this.log.log('touchHoldDown', state.namespace);
+    state.isTouchHoldDown = true;
     this.eventMediator.emit(state.namespace + '.touchholddown', state.intersect);
 };
 
 InteractionPublisher.prototype.touchStart = function(event) {
+    this.log.log('touchStart');
     if (event.touches.length > 1) {
         return;
     }
@@ -116,19 +113,23 @@ InteractionPublisher.prototype.touchStart = function(event) {
     intersections.forEach(function(state) {
         this.eventMediator.emit(state.namespace + '.touchstart', state.intersect);
         state.isTouchDown = true;
-        this.initTouchHold(event, state);
+        if ( ! state.isTouchHoldDown) {
+            this.initTouchHold(event, state);
+        }
     }.bind(this));
 };
 
 InteractionPublisher.prototype.initTouchHold = function(event, state) {
-
-    this.eventMediator.emit(state.namespace + '.touchholdstart', state.intersect);
+    this.log.log('initTouchHold', state.namespace);
     state.touchStartPosition = this.eventPositionPx(event);
     var touchHoldDown = this.touchHoldDown.bind(this, state);
     state.touchHoldTimeout = setTimeout(touchHoldDown, this.TOUCH_HOLD_DELAY);
+    this.eventMediator.emit(state.namespace + '.touchholdstart', state.intersect);
 }
 
 InteractionPublisher.prototype.touchMove = function(event) {
+    this.log.log('touchMove');
+    
     var event = event.touches[0];
 
     var intersections = this.findIntersections(event);
@@ -137,7 +138,7 @@ InteractionPublisher.prototype.touchMove = function(event) {
     }.bind(this));
 
     this.objectStates.forEach(function(state) {
-        if (state.touchHoldTimeout) {
+        if ( ! state.isTouchHoldDown && state.touchHoldTimeout) {
 
             var position = this.eventPositionPx(event);
             var distance = state.touchStartPosition.distanceTo(position);
@@ -146,6 +147,7 @@ InteractionPublisher.prototype.touchMove = function(event) {
                 return;
             }
 
+            this.log.log('clearTouchHold', state.namespace);
             clearTimeout(state.touchHoldTimeout);
 
             this.eventMediator.emit(state.namespace + '.touchholdend');
@@ -162,9 +164,14 @@ InteractionPublisher.prototype.touchEnd = function(event) {
             this.eventMediator.emit(state.namespace + '.touchend');
             state.isTouchDown = false;
         }
+        if (state.touchHoldTimeout || state.isTouchHoldDown) {
+            this.eventMediator.emit(state.namespace + '.touchholdend');
+        }
+        if (state.isTouchHoldDown) {
+            state.isTouchHoldDown = false;
+        }
         if (state.touchHoldTimeout) {
             clearTimeout(state.touchHoldTimeout);
-            this.eventMediator.emit(state.namespace + '.touchholdend');
         }
     }.bind(this));
 };

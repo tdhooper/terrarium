@@ -1,7 +1,5 @@
 var THREE = require('three');
 
-const InlineLog = require('./inline-log');
-
 
 const CrystalPlanter = function(parent, app) {
     this.parent = parent;
