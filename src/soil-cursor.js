@@ -111,9 +111,11 @@ SoilCursor.prototype.setPosition = function() {
 
     this.positionIntersect = this.intersect;
 
+    this.intersect.normal = this.normalIntersection(this.intersect);
+
     var position = this.intersect.point.clone();
 
-    var normal = this.intersect.face.normal.clone();
+    var normal = this.intersect.normal.clone();
     this.intersect.object.localToWorld(normal);
 
     var top = position.clone().add(normal);
@@ -171,6 +173,35 @@ SoilCursor.prototype.iterateFaceVertexUvs = function(geometry, callback) {
             callback(face, vertex, uv);
         })
     });
+};
+
+SoilCursor.prototype.normalIntersection = function(intersect){
+    var object = intersect.object;
+    var geometry = object.geometry;
+    var point = intersect.point.clone();
+    var face = intersect.face;
+
+    object.worldToLocal(point);
+
+    var p1 = geometry.vertices[face.a];
+    var p2 = geometry.vertices[face.b];
+    var p3 = geometry.vertices[face.c];
+
+    var normal1 = face.vertexNormals[0].clone();
+    var normal2 = face.vertexNormals[1].clone();
+    var normal3 = face.vertexNormals[2].clone();
+
+    var barycoord = new THREE.Vector3();
+
+    THREE.Triangle.barycoordFromPoint(point, p1, p2, p3, barycoord);
+
+    normal1.multiplyScalar(barycoord.x);
+    normal2.multiplyScalar(barycoord.y);
+    normal3.multiplyScalar(barycoord.z);
+
+    normal1.add(normal2).add(normal3);
+
+    return normal1;
 };
 
 module.exports = SoilCursor;

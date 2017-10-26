@@ -14,7 +14,7 @@ CrystalPlanter.prototype.onMouseDown = function(intersection) {
     var position = intersection.point.clone();
     this.parent.worldToLocal(position);
 
-    var normal = intersection.face.normal.clone();
+    var normal = intersection.normal.clone();
     this.parent.worldToLocal(normal);
     var top = intersection.point.clone().add(normal);
     this.parent.worldToLocal(top);
