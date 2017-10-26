@@ -49,7 +49,6 @@ const SoilCursor = function(parent, app) {
     this.app = app;
     this.mesh = mesh;
     this.material = material;
-    this.scale = 1;
 
     app.eventMediator.on('soil-area.mouseover', this.show.bind(this));
     app.eventMediator.on('soil-area.touchstart', this.show.bind(this));
@@ -122,9 +121,13 @@ SoilCursor.prototype.setPosition = function() {
     this.mesh.position.copy(position);
     this.mesh.lookAt(top);
 
-    const dist = this.app.camera.position.distanceTo(position);
-    this.scale = dist * .5;
-    this.mesh.scale.set(this.scale, this.scale, this.scale);
+    if (this.app.interactionPublisher.isTouchDevice) {
+        const dist = this.app.camera.position.distanceTo(position);
+        const scale = dist * .5;
+        this.mesh.scale.set(scale, scale, scale);
+    } else {
+        this.mesh.scale.set(1, 1, 1);
+    }
 };
 
 SoilCursor.prototype.hide = function() {
