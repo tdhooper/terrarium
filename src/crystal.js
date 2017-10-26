@@ -1,4 +1,5 @@
 const THREE = require('three');
+const crystalGen = require('crystal-gen');
 
 
 const Crystal = function(parent, app, position, top) {
@@ -25,10 +26,15 @@ const Crystal = function(parent, app, position, top) {
 };
 
 Crystal.prototype.createGeometry = function() {
-    const width = .2;
-    const height = 1;
-    const geometry = new THREE.BoxGeometry(width, width, height);
-    geometry.translate(0, 0, height / 2);
+    const geometry = crystalGen.create({
+        sides: 5,
+        diameter: .125,
+        height: 1.25,
+        topSlope: .7,
+        topFacets: 3,
+        topScale: 1.5,
+        seed: Math.random()
+    });
     return geometry;
 };
 
