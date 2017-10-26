@@ -16,6 +16,7 @@ const InteractionPublisher = function(
     this.objectStates = [];
     this.objectStateMap = {};
     this.showObjects = [];
+    this.isTouchDevice = false;
     element.addEventListener('mousemove', this.mouseMove.bind(this), false);
     element.addEventListener('mousedown', this.mouseDown.bind(this), false);
     element.addEventListener('mouseup', this.mouseUp.bind(this), false);
@@ -48,6 +49,10 @@ InteractionPublisher.prototype.show = function(object) {
 };
 
 InteractionPublisher.prototype.mouseMove = function(event) {
+    if (this.isTouchDevice) {
+        return;
+    }
+
     var intersections = this.findIntersections(event);
 
     this.objectStates.forEach(function(state) {
@@ -72,6 +77,10 @@ InteractionPublisher.prototype.mouseMove = function(event) {
 };
 
 InteractionPublisher.prototype.mouseDown = function(event) {
+    if (this.isTouchDevice) {
+        return;
+    }
+
     this.log.log('mousdown');
 
     var intersections = this.findIntersections(event);
@@ -85,6 +94,9 @@ InteractionPublisher.prototype.mouseDown = function(event) {
 };
 
 InteractionPublisher.prototype.mouseUp = function(event) {
+    if (this.isTouchDevice) {
+        return;
+    }
 
     this.objectStates.forEach(function(state) {
 
@@ -103,6 +115,8 @@ InteractionPublisher.prototype.touchHoldDown = function(state) {
 };
 
 InteractionPublisher.prototype.touchStart = function(event) {
+    this.isTouchDevice = true;
+
     this.log.log('touchStart');
     if (event.touches.length > 1) {
         return;
