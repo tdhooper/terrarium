@@ -1,5 +1,4 @@
 const THREE = require('three');
-const InlineLog = require('./inline-log');
 
 
 const InteractionPublisher = function(
@@ -81,8 +80,6 @@ InteractionPublisher.prototype.mouseDown = function(event) {
         return;
     }
 
-    this.log.log('mousdown');
-
     var intersections = this.findIntersections(event);
 
     intersections.forEach(function(state) {
@@ -109,7 +106,6 @@ InteractionPublisher.prototype.mouseUp = function(event) {
 };
 
 InteractionPublisher.prototype.touchHoldDown = function(state) {
-    this.log.log('touchHoldDown', state.namespace);
     state.isTouchHoldDown = true;
     this.eventMediator.emit(state.namespace + '.touchholddown', state.intersect);
 };
@@ -117,7 +113,6 @@ InteractionPublisher.prototype.touchHoldDown = function(state) {
 InteractionPublisher.prototype.touchStart = function(event) {
     this.isTouchDevice = true;
 
-    this.log.log('touchStart');
     if (event.touches.length > 1) {
         return;
     }
@@ -134,7 +129,6 @@ InteractionPublisher.prototype.touchStart = function(event) {
 };
 
 InteractionPublisher.prototype.initTouchHold = function(event, state) {
-    this.log.log('initTouchHold', state.namespace);
     state.touchStartPosition = this.eventPositionPx(event);
     var touchHoldDown = this.touchHoldDown.bind(this, state);
     state.touchHoldTimeout = setTimeout(touchHoldDown, this.TOUCH_HOLD_DELAY);
@@ -142,8 +136,6 @@ InteractionPublisher.prototype.initTouchHold = function(event, state) {
 }
 
 InteractionPublisher.prototype.touchMove = function(event) {
-    this.log.log('touchMove');
-    
     var event = event.touches[0];
 
     var intersections = this.findIntersections(event);
@@ -161,7 +153,6 @@ InteractionPublisher.prototype.touchMove = function(event) {
                 return;
             }
 
-            this.log.log('clearTouchHold', state.namespace);
             clearTimeout(state.touchHoldTimeout);
 
             this.eventMediator.emit(state.namespace + '.touchholdend');

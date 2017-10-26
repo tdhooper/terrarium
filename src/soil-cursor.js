@@ -1,8 +1,6 @@
 const THREE = require('three');
 var glslify = require('glslify')
 
-const InlineLog = require('./inline-log');
-
 const SoilCursor = function(parent, app) {
 
     const height = 1.;
@@ -86,14 +84,12 @@ SoilCursor.prototype.startCountdown = function() {
         return;
     }
 
-    // this.log.log(this.scale);
     this.countdownTween.start();
 };
 
 SoilCursor.prototype.resetCountdown = function() {
     if (this.isHeld) {
         return;
-     // this.log.log('reset');
     }
     this.countdownTween && this.countdownTween.stop();
     this.material.uniforms.t1.value = 0;
