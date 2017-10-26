@@ -53,6 +53,7 @@ Main.prototype.initThree = function() {
         alpha: true,
         antialias: true
     });
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(width, height);
     document.body.appendChild(this.renderer.domElement);
 
