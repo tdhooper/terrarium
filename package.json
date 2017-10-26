@@ -14,6 +14,7 @@
   "dependencies": {
     "@tweenjs/tween.js": "github:tdhooper/tween.js",
     "ThreeCSG": "github:tdhooper/ThreeCSG",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "benchmark": "^2.1.4",
     "budo": "^9.4.7",
