@@ -1,23 +1,45 @@
 const THREE = require('three');
+var glslify = require('glslify')
 
 const InlineLog = require('./inline-log');
-
 
 const SoilCursor = function(parent, app) {
 
     const height = 1.;
+    const ringInner = .4;
+    const ringOuter = .5;
 
-    const ring = new THREE.RingGeometry(.4, .5, 32);
+    const ring = new THREE.RingGeometry(ringInner, ringOuter, 32);
     const spike = new THREE.CylinderGeometry(.05, .0, height);
+
+    this.iterateFaceVertexUvs(ring, function(face, vertex, uv) {
+        var vertex2d = new THREE.Vector2(vertex.x, vertex.y);
+        var angle = vertex2d.angle() / (Math.PI * 2);
+        var length = vertex2d.length();
+        length = (length - ringInner) / (ringOuter - ringInner);
+        uv.set(angle, length);
+    });
+
+    this.iterateFaceVertexUvs(spike, function(face, vertex, uv) {
+        if (face.normal.y > .9) {
+            uv.set(.999, .999);
+        }
+    });
+
     spike.rotateX(Math.PI * .5);
     spike.translate(0, 0, height / 2);
     ring.merge(spike);
     const geometry = ring;
 
-    const material = new THREE.MeshBasicMaterial({
-        color: 0xff0000,
-        side: THREE.DoubleSide
+    const material = new THREE.ShaderMaterial({
+        uniforms: {
+            t1: {value: 0},
+            t2: {value: 0}
+        },
+        vertexShader: glslify('./shaders/cursor.vert'),
+        fragmentShader: glslify('./shaders/cursor.frag')
     });
+
     // material.depthTest = false;
     const mesh = new THREE.Mesh(geometry, material);
     // mesh.renderOrder = 1;
@@ -49,25 +71,14 @@ const SoilCursor = function(parent, app) {
     app.eventMediator.on('soil-area.mouseup', this.highlightOff.bind(this));
     app.eventMediator.on('soil-area.touchend', this.highlightOff.bind(this));
 
-    this.countdownProgess = {
-        t: 0
-    };
+    app.eventMediator.on('crystal.growth', this.showProgress.bind(this));
 
-    this.countdownTween = new app.TWEEN.Tween(this.countdownProgess)
+    this.countdownTween = new app.TWEEN.Tween(material.uniforms.t1)
         .to(
-            {t: 1},
+            {value: 1},
             app.interactionPublisher.TOUCH_HOLD_DELAY
-        );
-
-    // var log = new InlineLog();
-
-    this.inactiveColor = new THREE.Color(0xff0000);
-    this.highlightColor = new THREE.Color(0x00ff00);
-
-    this.countdownTween.onUpdate(function(value) {
-        this.material.color.copy(this.inactiveColor);
-        this.material.color.lerp(this.highlightColor, value.t);
-    }.bind(this));
+        )
+        .easing(app.TWEEN.Easing.Quadratic.In);
 };
 
 SoilCursor.prototype.startCountdown = function() {
@@ -85,7 +96,7 @@ SoilCursor.prototype.resetCountdown = function() {
      // this.log.log('reset');
     }
     this.countdownTween && this.countdownTween.stop();
-    this.countdownProgess.t = 0;
+    this.material.uniforms.t1.value = 0;
 };
 
 SoilCursor.prototype.show = function() {
@@ -129,9 +140,8 @@ SoilCursor.prototype.hide = function() {
 };
 
 SoilCursor.prototype.highlightOn = function() {
-    // this.log.log('Done');
     this.isHeld = true;
-    this.material.color.copy(this.highlightColor);
+    this.material.uniforms.t1.value = 1;
     this.app.eventMediator.emit('soil-cursor.down', this.positionIntersect);
 };
 
@@ -141,8 +151,27 @@ SoilCursor.prototype.highlightOff = function() {
     if ( ! this.isOver) {
         this.hide();
     }
-    this.material.color.copy(this.inactiveColor);
+    this.material.uniforms.t1.value = 0;
+    this.resetProgress();
     this.app.eventMediator.emit('soil-cursor.up');
+};
+
+SoilCursor.prototype.showProgress = function(progress) {
+    this.material.uniforms.t2.value = progress;
+};
+
+SoilCursor.prototype.resetProgress = function() {
+    this.material.uniforms.t2.value = 0;
+};
+
+SoilCursor.prototype.iterateFaceVertexUvs = function(geometry, callback) {
+    geometry.faces.forEach(function(face, faceIndex) {
+        [face.a, face.b, face.c].forEach(function(vertexIndex, faceVertexIndex) {
+            var vertex = geometry.vertices[vertexIndex];
+            var uv = geometry.faceVertexUvs[0][faceIndex][faceVertexIndex];
+            callback(face, vertex, uv);
+        })
+    });
 };
 
 module.exports = SoilCursor;
