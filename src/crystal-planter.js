@@ -63,7 +63,7 @@ CrystalPlanter.prototype.adjustNormals = function() {
             normal.add(idealNormal);
         }
         normal.normalize();
-        crystal.setDirection(normal);
+        crystal.setDirection(normal, true);
     });
 };
 
