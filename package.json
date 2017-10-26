@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "budo index.js --css /styles/main.css --live --force-default-index",
-    "build": "mkdir js; browserify index.js | uglifyjs > js/index.js"
+    "build": "mkdir js; browserify index.js | uglifyjs > js/index.js; node version.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +23,7 @@
     "glslify": "^6.1.0",
     "jquery": "^3.2.1",
     "mda": "^1.1.1",
+    "node-version-assets": "^1.2.0",
     "three": "^0.87.1",
     "three-orbit-controls": "^82.1.0",
     "threejs-slice-geometry": "^0.1.1",
