@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "budo index.js --css /styles/main.css --live --force-default-index",
-    "build": "mkdir js; browserify index.js | uglifyjs > js/index.js; node version.js"
+    "build": "rm -r js || true; mkdir js; browserify index.js | uglifyjs > js/index.js; node version.js"
   },
   "keywords": [],
   "author": "",
