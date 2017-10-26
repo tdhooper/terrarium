@@ -39,31 +39,35 @@ CrystalPlanter.prototype.adjustNormals = function() {
             if (crystalA.idealNormals.hasOwnProperty(crystalB.id)) {
                 return;
             }
-            var midNormal = crystalA.normal.clone().add(crystalB.normal).normalize();
-            var adjacent = crystalA.position.clone().sub(crystalB.position).normalize();
-            var tangent = midNormal.clone().cross(adjacent);
-            var idealA = midNormal.clone().applyAxisAngle(tangent, separation);
-            var idealB = midNormal.clone().applyAxisAngle(tangent, -separation);
-            var distance = crystalA.position.distanceTo(crystalB.position);
+            const midNormal = crystalA.normal.clone().add(crystalB.normal).normalize();
+            const adjacent = crystalA.position.clone().sub(crystalB.position).normalize();
+            const tangent = midNormal.clone().cross(adjacent);
+            const idealA = midNormal.clone().applyAxisAngle(tangent, separation);
+            const idealB = midNormal.clone().applyAxisAngle(tangent, -separation);
+            const distance = crystalA.position.distanceTo(crystalB.position);
             crystalA.idealNormals[crystalB.id] = [idealA, distance];
             crystalB.idealNormals[crystalA.id] = [idealB, distance];
         });
     });
 
     this.crystals.forEach((crystal) => {
-        var normal = crystal.normal.clone();
+        const normal = crystal.normal.clone();
         for (const [key, ideal] of Object.entries(crystal.idealNormals)) {
             var scale = Math.max(1 - ideal[1], 0);
             if ( ! scale) {
                 continue;
             }
             scale = Math.pow(scale, 2);
-            var idealNormal = ideal[0].clone();
+            const idealNormal = ideal[0].clone();
             idealNormal.multiplyScalar(scale);
             normal.add(idealNormal);
         }
         normal.normalize();
-        crystal.setDirection(normal, true);
+
+        const distance = crystal.position.distanceTo(this.activeCrystal.position);
+        var delay = distance * 500;
+        delay += Math.random() * 500;
+        crystal.setDirection(normal, true, delay);
     });
 };
 

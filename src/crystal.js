@@ -38,23 +38,25 @@ const Crystal = function(parent, app, position, normal) {
         .start();
 };
 
-Crystal.prototype.setDirection = function(normal, animate) {
+Crystal.prototype.setDirection = function(normal, animate, delay) {
     if (this.directionTween) {
         this.directionTween.stop();
     }
     var vector = this.position.clone().add(normal);
     if (animate) {
+        delay = delay || 0;
         var matrix = new THREE.Matrix4();
         matrix.lookAt(vector, this.mesh.position, this.mesh.up);
         const qEnd = new THREE.Quaternion().setFromRotationMatrix(matrix);
         const qStart = this.mesh.quaternion.clone();
         const time = {t: 0};
         this.directionTween = new this.app.TWEEN.Tween(time)
-            .to({t: 1}, 1000)
-            .easing(this.app.TWEEN.Easing.Quadratic.Out)
+            .to({t: 1}, 750 + delay)
+            .easing(this.app.TWEEN.Easing.Quadratic.InOut)
             .onUpdate((time) => {
                 THREE.Quaternion.slerp(qStart, qEnd, this.mesh.quaternion, time.t);
             })
+            .delay(delay)
             .start();
     } else {
         this.mesh.lookAt(vector);
