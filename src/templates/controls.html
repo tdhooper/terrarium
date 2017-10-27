@@ -1,5 +1,20 @@
 <div class="controls">
-    {{#undo}}
-        <button class="controls-undo">Undo</button>
-    {{/undo}}
+    <button
+        class="controls-undo"
+        on-click="@this.fire('undo')"
+        {{^undo}}
+            disabled
+        {{/undo}}
+    >
+        Undo
+    </button>
+    <button
+        class="controls-redo"
+        on-click="@this.fire('redo')"
+        {{^redo}}
+            disabled
+        {{/redo}}
+    >
+        Redo
+    </button>
 </div>

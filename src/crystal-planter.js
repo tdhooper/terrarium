@@ -25,6 +25,7 @@ CrystalPlanter.prototype.onMouseDown = function(intersection) {
 CrystalPlanter.prototype.onMouseUp = function() {
     if (this.activeCrystal) {
         this.activeCrystal.stopGrowth();
+        this.app.history.add(this.activeCrystal);
     }
 };
 

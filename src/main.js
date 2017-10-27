@@ -7,6 +7,7 @@ const PerspectiveCamera = require('./lib/square-perspective-camera');
 var TWEEN = require('@tweenjs/tween.js');
 
 const InteractionPublisher = require('./interaction-publisher');
+const History = require('./history');
 const Terrarium = require('./terrarium');
 const InlineLog = require('./inline-log');
 const Controls = require('./controls');
@@ -32,14 +33,16 @@ Main.prototype.initApp = function() {
         eventMediator,
         log
     );
-    const controls = new Controls(document.body, eventMediator);
+    const history = new History(eventMediator);
     this.app = {
         TWEEN: TWEEN,
         eventMediator: eventMediator,
         interactionPublisher: interactionPublisher,
         camera: this.camera,
+        history: history,
         log: log
     };
+    const controls = new Controls(document.body, this.app);
 };
 
 Main.prototype.initScene = function() {

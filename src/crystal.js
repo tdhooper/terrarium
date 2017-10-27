@@ -4,6 +4,7 @@ const crystalGen = require('crystal-gen');
 
 const Crystal = function(parent, app, position, normal) {
     this.app = app;
+    this.parent = parent;
 
     this.idealNormals = {};
     this.position = position;
@@ -78,6 +79,14 @@ Crystal.prototype.createGeometry = function() {
 
 Crystal.prototype.stopGrowth = function() {
     this.growTween.stop();
+};
+
+Crystal.prototype.destroy = function() {
+    this.parent.remove(this.mesh);
+};
+
+Crystal.prototype.restore = function() {
+    this.parent.add(this.mesh);
 };
 
 module.exports = Crystal;
