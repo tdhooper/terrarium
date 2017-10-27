@@ -17,6 +17,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "benchmark": "^2.1.4",
+    "brfs": "^1.4.3",
     "budo": "^9.4.7",
     "cga": "^1.0.8",
     "crystal-gen": "github:tdhooper/crystal-gen",
@@ -31,7 +32,8 @@
     "uglify-js": "^3.1.5"
   },
   "devDependencies": {
-    "babelify": "^7.3.0"
+    "babelify": "^7.3.0",
+    "ractive": "^0.9.7"
   },
   "browserify": {
     "transform": [
@@ -44,7 +46,8 @@
           ]
         }
       ],
-      "glslify"
+      "glslify",
+      "brfs"
     ]
   }
 }

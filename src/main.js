@@ -9,6 +9,7 @@ var TWEEN = require('@tweenjs/tween.js');
 const InteractionPublisher = require('./interaction-publisher');
 const Terrarium = require('./terrarium');
 const InlineLog = require('./inline-log');
+const Controls = require('./controls');
 
 
 const Main = function() {
@@ -31,6 +32,7 @@ Main.prototype.initApp = function() {
         eventMediator,
         log
     );
+    const controls = new Controls(document.body, eventMediator);
     this.app = {
         TWEEN: TWEEN,
         eventMediator: eventMediator,
