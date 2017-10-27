@@ -1,10 +1,10 @@
 const THREE = require('three');
-var glslify = require('glslify')
+var glslify = require('glslify');
 
 const SoilCursor = function(parent, app) {
 
-    const height = 1.;
-    const ringInner = .4;
+    const height = 1;
+    const ringInner = .35;
     const ringOuter = .5;
 
     const ring = new THREE.RingGeometry(ringInner, ringOuter, 32);
@@ -35,7 +35,8 @@ const SoilCursor = function(parent, app) {
             t2: {value: 0}
         },
         vertexShader: glslify('./shaders/cursor.vert'),
-        fragmentShader: glslify('./shaders/cursor.frag')
+        fragmentShader: glslify('./shaders/cursor.frag'),
+        side: THREE.DoubleSide
     });
 
     // material.depthTest = false;
@@ -125,7 +126,7 @@ SoilCursor.prototype.setPosition = function() {
 
     if (this.app.interactionPublisher.isTouchDevice) {
         const dist = this.app.camera.position.distanceTo(position);
-        const scale = dist * .5;
+        const scale = dist * .55;
         this.mesh.scale.set(scale, scale, scale);
     } else {
         this.mesh.scale.set(1, 1, 1);
