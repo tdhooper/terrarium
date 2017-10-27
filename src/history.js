@@ -8,6 +8,7 @@ const History = function(eventMediator) {
 
 History.prototype.add = function(entry) {
     this.undoStack.push(entry);
+    this.redoStack = [];
     this.publishUpdates();
 };
 

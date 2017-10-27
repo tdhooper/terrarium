@@ -25,8 +25,33 @@ CrystalPlanter.prototype.onMouseDown = function(intersection) {
 CrystalPlanter.prototype.onMouseUp = function() {
     if (this.activeCrystal) {
         this.activeCrystal.stopGrowth();
-        this.app.history.add(this.activeCrystal);
+        this.app.history.add({
+            destroy: this.destroy.bind(this, this.activeCrystal),
+            restore: this.restore.bind(this, this.activeCrystal)
+        });
     }
+};
+
+CrystalPlanter.prototype.destroy = function(crystal) {
+    crystal.destroy();
+    this.crystals = this.crystals.filter(c => c !== crystal);
+    this.clearIdealNormalsCache(crystal);
+    this.adjustNormals();
+};
+
+CrystalPlanter.prototype.restore = function(crystal) {
+    crystal.restore();
+    this.crystals.push(crystal);
+    this.activeCrystal = crystal;
+    this.adjustNormals();
+};
+
+CrystalPlanter.prototype.clearIdealNormalsCache = function(crystalA) {
+    this.crystals.forEach((crystalB) => {
+        if (crystalB.idealNormals.hasOwnProperty(crystalA.id)) {
+            delete crystalB.idealNormals[crystalA.id];
+        }
+    });
 };
 
 CrystalPlanter.prototype.adjustNormals = function() {
