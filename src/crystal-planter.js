@@ -1,4 +1,5 @@
 const THREE = require('three');
+var glslify = require('glslify');
 
 const Crystal = require('./crystal');
 
@@ -10,6 +11,20 @@ const CrystalPlanter = function(parent, app) {
     this.object = new THREE.Group();
     parent.add(this.object);
 
+
+    this.material = new THREE.ShaderMaterial({
+        vertexShader: glslify('./shaders/crystal.vert'),
+        fragmentShader: glslify('./shaders/crystal.frag')
+    });
+
+    // const sphereGeom = new THREE.SphereGeometry(.5);
+    // const sphere = new THREE.Mesh(sphereGeom, this.material);
+    // this.object.add(sphere);
+
+    // const boxGeom = new THREE.BoxGeometry(.1, 5, 5);
+    // const box = new THREE.Mesh(boxGeom, this.material);
+    // this.object.add(box);
+
     app.eventMediator.on('soil-cursor.down', this.onMouseDown.bind(this));
     app.eventMediator.on('soil-cursor.up', this.onMouseUp.bind(this));
 };
@@ -18,7 +33,13 @@ CrystalPlanter.prototype.onMouseDown = function(intersection) {
     const position = intersection.point.clone();
     this.object.worldToLocal(position);
     const normal = intersection.normal.clone();
-    const crystal = new Crystal(this.object, this.app, position, normal);
+    const crystal = new Crystal(
+        this.object,
+        this.app,
+        position,
+        normal,
+        this.material
+    );
     this.crystals.push(crystal);
     this.activeCrystal = crystal;
     this.adjustNormals();

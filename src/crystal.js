@@ -2,7 +2,7 @@ const THREE = require('three');
 const crystalGen = require('crystal-gen');
 
 
-const Crystal = function(parent, app, position, normal) {
+const Crystal = function(parent, app, position, normal, material) {
     this.app = app;
     this.parent = parent;
 
@@ -11,7 +11,6 @@ const Crystal = function(parent, app, position, normal) {
     this.normal = normal;
 
     const geometry = this.createGeometry();
-    const material = new THREE.MeshNormalMaterial();
     const mesh = new THREE.Mesh(geometry, material);
     parent.add(mesh);
 

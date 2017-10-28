@@ -1,9 +1,10 @@
 const THREE = require('three');
 const ThreeBSP = require('./lib/three-js-csg')(THREE);
 
+
 const Soil = function(parent, container, app) {
 
-    container.computeBoundingBox()
+    container.computeBoundingBox();
     const size = container.boundingBox.getSize();
 
     this.width = size.x;
