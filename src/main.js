@@ -46,7 +46,7 @@ Main.prototype.initApp = function() {
 };
 
 Main.prototype.initScene = function() {
-    const terrarium = new Terrarium(this.scene, this.app);
+    this.terrarium = new Terrarium(this.scene, this.app);
     this.app.eventMediator.emit('start');
 };
 
@@ -56,10 +56,14 @@ Main.prototype.initThree = function() {
 
     this.renderer = new THREE.WebGLRenderer({
         alpha: true,
-        antialias: true
+        antialias: true,
+        preserveDrawingBuffer: true
     });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(width, height);
+    this.renderer.autoClearColor = false;
+    this.renderer.autoClearDepth = false;
+    this.renderer.autoClearStencil = false;
     document.body.appendChild(this.renderer.domElement);
 
     this.camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
@@ -74,6 +78,27 @@ Main.prototype.initThree = function() {
 
 Main.prototype.render = function() {
     this.cameraControls.update();
+    this.renderer.clear(true, true, true);
+
+    // Render scene without cursor
+    this.terrarium.container.setVisible(true);
+    this.terrarium.soil.setVisible(true);
+    this.terrarium.soilCursor.setVisible(false);
+    this.terrarium.crystalPlanter.setVisible(true);
+    this.renderer.render(this.scene, this.camera);
+
+    // Render crystals and container to depth buffer only
+    this.renderer.clearDepth();
+    this.terrarium.soil.setVisible(false);
+    this.terrarium.soilCursor.setVisible(false);
+    this.renderer.context.colorMask( false, false, false, false );
+    this.renderer.render(this.scene, this.camera);
+
+    // Render cursor only
+    this.terrarium.container.setVisible(false);
+    this.terrarium.crystalPlanter.setVisible(false);
+    this.terrarium.soilCursor.setVisible(true);
+    this.renderer.context.colorMask( true, true, true, true );
     this.renderer.render(this.scene, this.camera);
 };
 

@@ -97,7 +97,21 @@ SoilCursor.prototype.resetCountdown = function() {
 
 SoilCursor.prototype.show = function() {
     this.isOver = true;
+    this.visible = true;
     this.mesh.visible = true;
+};
+
+SoilCursor.prototype.hide = function() {
+    this.isOver = false;
+    if (this.isHeld) {
+        return;
+    }
+    this.visible = false;
+    this.mesh.visible = false;
+};
+
+SoilCursor.prototype.setVisible = function(value) {
+    this.mesh.visible = this.visible && value;
 };
 
 SoilCursor.prototype.position = function(intersect) {
@@ -133,14 +147,6 @@ SoilCursor.prototype.setPosition = function() {
     }
 };
 
-SoilCursor.prototype.hide = function() {
-    this.isOver = false;
-    if (this.isHeld) {
-        return;
-    }
-    this.mesh.visible = false;
-};
-
 SoilCursor.prototype.highlightOn = function() {
     this.isHeld = true;
     this.material.uniforms.t1.value = 1;
@@ -172,7 +178,7 @@ SoilCursor.prototype.iterateFaceVertexUvs = function(geometry, callback) {
             var vertex = geometry.vertices[vertexIndex];
             var uv = geometry.faceVertexUvs[0][faceIndex][faceVertexIndex];
             callback(face, vertex, uv);
-        })
+        });
     });
 };
 

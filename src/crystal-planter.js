@@ -4,9 +4,11 @@ const Crystal = require('./crystal');
 
 
 const CrystalPlanter = function(parent, app) {
-    this.parent = parent;
     this.app = app;
     this.crystals = [];
+
+    this.object = new THREE.Group();
+    parent.add(this.object);
 
     app.eventMediator.on('soil-cursor.down', this.onMouseDown.bind(this));
     app.eventMediator.on('soil-cursor.up', this.onMouseUp.bind(this));
@@ -14,9 +16,9 @@ const CrystalPlanter = function(parent, app) {
 
 CrystalPlanter.prototype.onMouseDown = function(intersection) {
     const position = intersection.point.clone();
-    this.parent.worldToLocal(position);
+    this.object.worldToLocal(position);
     const normal = intersection.normal.clone();
-    const crystal = new Crystal(this.parent, this.app, position, normal);
+    const crystal = new Crystal(this.object, this.app, position, normal);
     this.crystals.push(crystal);
     this.activeCrystal = crystal;
     this.adjustNormals();
@@ -95,6 +97,10 @@ CrystalPlanter.prototype.adjustNormals = function() {
         delay += Math.random() * 500;
         crystal.setDirection(normal, true, delay);
     });
+};
+
+CrystalPlanter.prototype.setVisible = function(value) {
+    this.object.visible = value;
 };
 
 module.exports = CrystalPlanter;

@@ -29,6 +29,8 @@ const Soil = function(parent, container, app) {
     const mesh = new THREE.Mesh(geometry, material);
     parent.add(mesh);
 
+    this.mesh = mesh;
+
 
     // Interactive area of the soil
 
@@ -57,6 +59,10 @@ Soil.prototype.generate = function(u, v) {
     var y = Math.sin(x * 5) * Math.sin(z * 2) * .5 * this.height;
     y -= this.offset;
     return new THREE.Vector3(x, y, z);
+};
+
+Soil.prototype.setVisible = function(value) {
+    this.mesh.visible = value;
 };
 
 module.exports = Soil;

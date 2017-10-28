@@ -14,6 +14,10 @@ const Terrarium = function(parent, app) {
     const soilCursor = new SoilCursor(parent, app);
     const crystalPlanter = new CrystalPlanter(group, app);
 
+    this.container = container;
+    this.soil = soil;
+    this.soilCursor = soilCursor;
+    this.crystalPlanter = crystalPlanter;
     // Animations
 
     const TWEEN = app.TWEEN;

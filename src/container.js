@@ -14,6 +14,11 @@ const Container = function(parent, app) {
     parent.add(mesh);
 
     this.geometry = geometry;
+    this.mesh = mesh;
+};
+
+Container.prototype.setVisible = function(value) {
+    this.mesh.visible = value;
 };
 
 module.exports = Container;
