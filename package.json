@@ -26,6 +26,7 @@
     "jquery": "^3.2.1",
     "mda": "^1.1.1",
     "node-version-assets": "^1.2.0",
+    "stats.js": "^0.17.0",
     "three": "^0.87.1",
     "three-orbit-controls": "^82.1.0",
     "threejs-slice-geometry": "^0.1.1",

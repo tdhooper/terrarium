@@ -3,8 +3,8 @@ const EventEmitter = require('events');
 const THREE = require('three');
 const OrbitControls = require('three-orbit-controls')(THREE);
 const PerspectiveCamera = require('./lib/square-perspective-camera');
-
-var TWEEN = require('@tweenjs/tween.js');
+const TWEEN = require('@tweenjs/tween.js');
+const Stats = require('stats.js');
 
 const InteractionPublisher = require('./interaction-publisher');
 const History = require('./history');
@@ -43,6 +43,8 @@ Main.prototype.initApp = function() {
         log: log
     };
     const controls = new Controls(document.body, this.app);
+    this.stats = new Stats();
+    document.body.appendChild(this.stats.dom);
 };
 
 Main.prototype.initScene = function() {
@@ -128,9 +130,11 @@ Main.prototype.render = function() {
 
 Main.prototype.animate = function() {
     requestAnimationFrame(this.animate.bind(this));
+    this.stats.begin();
     this.app.eventMediator.emit('update');
     TWEEN.update();
     this.render();
+    this.stats.end();
 };
 
 Main.prototype.onResize = function() {
