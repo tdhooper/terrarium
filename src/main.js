@@ -46,6 +46,23 @@ Main.prototype.initApp = function() {
 };
 
 Main.prototype.initScene = function() {
+
+    var lights = new THREE.Group();
+
+    var sunPosition = new THREE.Vector3(-1, 2, 0);
+
+    var skyLight = new THREE.HemisphereLight(0xfafaff, 0xb0b0c0, 1);
+    skyLight.position.set(-2, 0, 0);
+    lights.add(skyLight);
+
+    var light = new THREE.PointLight(0xffffc0, .1);
+    light.position.copy(sunPosition);
+    light.castShadow = true;
+    lights.add(light);
+
+    this.lights = lights;
+
+    this.scene.add(lights);
     this.terrarium = new Terrarium(this.scene, this.app);
     this.app.eventMediator.emit('start');
 };
@@ -64,6 +81,9 @@ Main.prototype.initThree = function() {
     this.renderer.autoClearColor = false;
     this.renderer.autoClearDepth = false;
     this.renderer.autoClearStencil = false;
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
     document.body.appendChild(this.renderer.domElement);
 
     this.camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
@@ -74,10 +94,14 @@ Main.prototype.initThree = function() {
     this.cameraControls.rotateSpeed = 0.066;
 
     this.scene = new THREE.Scene();
+    this.scene.add(this.camera);
 };
 
 Main.prototype.render = function() {
     this.cameraControls.update();
+    var rotation = new THREE.Euler(0, this.cameraControls.getAzimuthalAngle(), 0);
+    this.lights.setRotationFromEuler(rotation);
+
     this.renderer.clear(true, true, true);
 
     // Render scene without cursor

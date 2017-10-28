@@ -12,7 +12,10 @@ const Soil = function(parent, container, app) {
     this.height = size.y * .1;
     this.offset = size.y * .2;
 
-    const material = new THREE.MeshNormalMaterial();
+    const material = new THREE.MeshPhongMaterial({
+        color: 0xffffff,
+        shininess: 0
+    });
 
     const surface = new THREE.ParametricGeometry(
         this.generate.bind(this),
@@ -28,6 +31,7 @@ const Soil = function(parent, container, app) {
     const geomBSP = containerBSP.intersect(surfaceBSP);
     const geometry = geomBSP.toGeometry();
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.receiveShadow = true;
     parent.add(mesh);
 
     this.mesh = mesh;

@@ -12,6 +12,7 @@ const Crystal = function(parent, app, position, normal, material) {
 
     const geometry = this.createGeometry();
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
     parent.add(mesh);
 
     const rotation = Math.random();
