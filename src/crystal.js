@@ -31,8 +31,8 @@ const Crystal = function(parent, app, position, normal) {
     var TWEEN = app.TWEEN;
     this.mesh.scale.set(.25, .25, 0);
     this.growTween = new TWEEN.Tween(this.mesh.scale)
-        .to({x: 1, y: 1, z: 1}, 1500)
-        .easing(TWEEN.Easing.Quadratic.In)
+        .to({x: 1, y: 1, z: 1}, 5000)
+        .easing(TWEEN.Easing.Sinusoidal.Out)
         .onUpdate(function(value, progress) {
             app.eventMediator.emit('crystal.growth', progress);
         })
