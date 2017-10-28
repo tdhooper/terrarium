@@ -119,12 +119,12 @@ Main.prototype.render = function() {
     this.terrarium.soilCursor.setVisible(false);
     this.renderer.context.colorMask( false, false, false, false );
     this.renderer.render(this.scene, this.camera);
+    this.renderer.context.colorMask( true, true, true, true );
 
     // Render cursor only
     this.terrarium.container.setVisible(false);
     this.terrarium.crystalPlanter.setVisible(false);
     this.terrarium.soilCursor.setVisible(true);
-    this.renderer.context.colorMask( true, true, true, true );
     this.renderer.render(this.scene, this.camera);
 };
 
