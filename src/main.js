@@ -66,8 +66,8 @@ Main.prototype.initThree = function() {
     this.camera.position.set(2.5, 1.5, 0);
     this.cameraControls = new OrbitControls(this.camera, this.renderer.domElement);
     this.cameraControls.enableDamping = true;
-    this.cameraControls.dampingFactor = 0.25;
-    this.cameraControls.rotateSpeed = 0.25;
+    this.cameraControls.dampingFactor = 0.05;
+    this.cameraControls.rotateSpeed = 0.066;
 
     this.scene = new THREE.Scene();
 };
