@@ -15,7 +15,7 @@ const Container = function(parent, app, geometry) {
     });
     material = new THREE.MeshNormalMaterial();
     // material.wireframe = true;
-    material.side = THREE.DoubleSide;
+    // material.side = THREE.DoubleSide;
     this.material = material;
     // material.wireframe = true;
 
@@ -289,10 +289,10 @@ Container.prototype.pipe = function(geometry) {
         ]);
 
         cells.push([
-            he1.vBottomIndex,
-            he3.vBottomIndex,
+            he4.vBottomIndex,
             he2.vBottomIndex,
-            he4.vBottomIndex
+            he3.vBottomIndex,
+            he1.vBottomIndex
         ]);
     });
 
@@ -304,7 +304,6 @@ Container.prototype.pipe = function(geometry) {
             return halfEdge.flipHalfEdge;
         });
 
-        // halfEdges.reverse();
 
         halfEdges.forEach((halfEdge) => {
             // addTVertexHelper(halfEdge.vTop);
@@ -313,6 +312,9 @@ Container.prototype.pipe = function(geometry) {
         });
 
         var topCell = halfEdges.map((halfEdge) => halfEdge.vTopIndex);
+
+        halfEdges.reverse();
+
         var bottomCell = halfEdges.map((halfEdge) => halfEdge.vBottomIndex);
 
         // bottomCell = [bottomCell[2], bottomCell[1], bottomCell[0]];
