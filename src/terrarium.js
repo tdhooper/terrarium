@@ -1,5 +1,6 @@
 const THREE = require('three');
 
+const ContainerGeometry = require('./container-geometry');
 const Container = require('./container');
 const Soil = require('./soil');
 const SoilCursor = require('./soil-cursor');
@@ -9,8 +10,9 @@ const Terrarium = function(parent, app) {
     const group = new THREE.Group();
     parent.add(group);
 
-    const container = new Container(group, app);
-    const soil = new Soil(group, container.geometry, app);
+    const containerGeom = new ContainerGeometry();
+    const container = new Container(group, app, containerGeom);
+    const soil = new Soil(group, containerGeom, app);
     const soilCursor = new SoilCursor(parent, app);
     const crystalPlanter = new CrystalPlanter(group, app);
 
@@ -18,6 +20,7 @@ const Terrarium = function(parent, app) {
     this.soil = soil;
     this.soilCursor = soilCursor;
     this.crystalPlanter = crystalPlanter;
+    
     // Animations
 
     const TWEEN = app.TWEEN;
