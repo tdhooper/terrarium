@@ -8,12 +8,12 @@ const Container = function(parent, app, geometry) {
 
 
     geometry = this.pipe(geometry);
-    geometry.computeFlatVertexNormals();
+    // geometry.computeFlatVertexNormals();
 
     var material = new THREE.MeshBasicMaterial({
-        color: 0x555555
+        color: 0x888888
     });
-    material = new THREE.MeshNormalMaterial();
+    // material = new THREE.MeshNormalMaterial();
     // material.wireframe = true;
     // material.side = THREE.DoubleSide;
     this.material = material;
@@ -29,7 +29,7 @@ const Container = function(parent, app, geometry) {
 };
 
 Container.prototype.pipe = function(geometry) {
-    var offset = .05;
+    var offset = .002;
 
     const mesh = new mda.Mesh();
     var vertices = geometry.vertices.map(function(vert) {
