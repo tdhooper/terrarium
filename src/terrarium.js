@@ -20,7 +20,7 @@ const Terrarium = function(parent, app) {
     this.soil = soil;
     this.soilCursor = soilCursor;
     this.crystalPlanter = crystalPlanter;
-    
+
     // Animations
 
     const TWEEN = app.TWEEN;

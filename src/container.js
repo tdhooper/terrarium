@@ -10,9 +10,11 @@ const Container = function(parent, app, geometry) {
     geometry = this.pipe(geometry);
     geometry.computeFlatVertexNormals();
 
-    const material = new THREE.MeshBasicMaterial({
+    var material = new THREE.MeshBasicMaterial({
         color: 0x555555
     });
+    material = new THREE.MeshNormalMaterial();
+    // material.wireframe = true;
     material.side = THREE.DoubleSide;
     this.material = material;
     // material.wireframe = true;
@@ -20,12 +22,14 @@ const Container = function(parent, app, geometry) {
     const mesh = new THREE.Mesh(geometry, material);
     parent.add(mesh);
 
+    // app.interactionPublisher.add(mesh, 'container', true);
+
     this.geometry = geometry;
     this.mesh = mesh;
 };
 
 Container.prototype.pipe = function(geometry) {
-    var offset = .002;
+    var offset = .05;
 
     const mesh = new mda.Mesh();
     var vertices = geometry.vertices.map(function(vert) {
@@ -53,7 +57,7 @@ Container.prototype.pipe = function(geometry) {
     mesh.setCells(cells);
     mesh.process();
 
-    // geometry = this.mdaToThree(mesh);
+    geometry = this.mdaToThree(mesh);
 
     vertices = [];
     cells = [];
@@ -69,9 +73,9 @@ Container.prototype.pipe = function(geometry) {
     for each vertex, join ends
     */
 
-var parent = this.parent;
-var material = new THREE.MeshNormalMaterial();
-        material.side = THREE.DoubleSide;
+    var parent = this.parent;
+    var material = new THREE.MeshNormalMaterial();
+    material.side = THREE.DoubleSide;
 
     
     function addEdgeNormalHelper(edge) {
@@ -83,14 +87,14 @@ var material = new THREE.MeshNormalMaterial();
     }
 
     function addTVertexHelper(v) {
-        var g = new THREE.SphereGeometry(.05);
+        var g = new THREE.SphereGeometry(.02);
         var m = new THREE.Mesh(g, material);
         m.position.copy(v);
         parent.add(m);
     }
 
     function addVertexHelper(vert) {
-        var g = new THREE.SphereGeometry(.05);
+        var g = new THREE.SphereGeometry(.02);
         var m = new THREE.Mesh(g, material);
         var v = mesh.positions[vert.index];
         m.position.fromArray(v);
@@ -102,7 +106,7 @@ var material = new THREE.MeshNormalMaterial();
         var m = new THREE.Mesh(p, material);
         m.lookAt(plane.normal);
         m.position.copy(plane.normal);
-        m.position.multiplyScalar(plane.constant);
+        m.position.multiplyScalar(plane.constant * -1);
         parent.add(m);
     }
 
@@ -139,13 +143,13 @@ var material = new THREE.MeshNormalMaterial();
         var v1 = new THREE.Vector3().fromArray(mesh.positions[edge.halfEdge.flipHalfEdge.vertex.index]);
         
         edge.topPlane = new THREE.Plane().setFromNormalAndCoplanarPoint(n1, v0);
-        edge.topPlane.constant *= -1; // THREE Gets it wrong??
+        // edge.topPlane.constant *= -1; // THREE Gets it wrong??
 
         v0.sub(v1).cross(n1).normalize();
         // parent.add(new THREE.ArrowHelper(v0, v1, 1, 0x00ff00));
 
         var p1 = new THREE.Plane().setFromNormalAndCoplanarPoint(v0, v1);
-        p1.constant *= -1; // THREE Gets it wrong??
+        // p1.constant *= -1; // THREE Gets it wrong??
 
         // addPlaneHelper(p1);
         
@@ -169,7 +173,7 @@ var material = new THREE.MeshNormalMaterial();
     // add points at intersection
 
     mesh.halfEdges.forEach((halfEdge, i) => {
-        if (i !== 2) {
+        if (i !== 4) {
             // return;
         }
 
@@ -178,24 +182,30 @@ var material = new THREE.MeshNormalMaterial();
         var p1 = halfEdge.sidePlane.clone();
         var p2 = nextHalfEdge.sidePlane.clone();
 
-        p1.constant += offset;
-        p2.constant += offset;
+
+        p1.constant -= offset;
+        p2.constant -= offset;
+
+        // addPlaneHelper(p1);
+        // addPlaneHelper(p2);
+
 
         var ray = this.intersectPlanes(p1, p2);
+
+        // this.parent.add(new THREE.ArrowHelper(ray.direction, ray.origin, 1, 0x0000ff));
 
         var topPlane = halfEdge.edge.topPlane.clone();
         var bottomPlane = halfEdge.edge.topPlane.clone();
 
-        // topPlane.constant += offset;
-        bottomPlane.constant -= offset;
+        topPlane.constant -= offset;
+        bottomPlane.constant += offset;
 
-        // if (i == 3) {
-        //     addEdgeNormalHelper(halfEdge.edge);
-        //     addPlaneHelper(topPlane);
-        // }
+        // addPlaneHelper(bottomPlane);
 
-        topPlane.constant *= -1;
-        bottomPlane.constant *= -1;
+        // addEdgeNormalHelper(halfEdge.edge);
+
+        // topPlane.constant *= -1;
+        // bottomPlane.constant *= -1;
         
         var vTop = this.intersectRayPlane(ray, topPlane);
         var vBottom = this.intersectRayPlane(ray, bottomPlane);
@@ -210,9 +220,18 @@ var material = new THREE.MeshNormalMaterial();
 
         halfEdge.vTopIndex = idx;
         halfEdge.vBottomIndex = idx + 1;
+
+        // addTVertexHelper(halfEdge.vTop);
+        // addTVertexHelper(halfEdge.vBottom);
     });
 
+    // return geometry;
+
     mesh.edges.forEach((edge, i) => {
+
+        // if (i !== 4) {
+        //     return;
+        // }
 
         var he1 = edge.halfEdge;
         var he2 = he1.flipHalfEdge;
@@ -232,6 +251,21 @@ var material = new THREE.MeshNormalMaterial();
 
         // addTVertexHelper(he4.vTop);
         // addTVertexHelper(he4.vBottom);
+
+        var su = he1;
+
+        var vert = mesh.positions[mda.HalfEdgePrev(su).vertex.index];
+
+        // if (vert[0] == 0 && vert[1] < .01 && vert[1] > -.5 && vert[2] > 0) {
+        //     console.log(i);
+        //     addTVertexHelper(new THREE.Vector3().fromArray(vert));
+        //     addEdgeNormalHelper(su.edge);
+        //     //addPlaneHelper(topPlane);
+        //     // console.log(su);
+        //     // addPlaneHelper(su.sidePlane);
+        //     addTVertexHelper(su.vTop);
+        //     addTVertexHelper(su.vBottom);
+        // }
 
         cells.push([
             he1.vTopIndex,
@@ -263,15 +297,20 @@ var material = new THREE.MeshNormalMaterial();
     });
 
     mesh.vertices.forEach((vert, i) => {
-        // if (i !== 0) {
-        //     return;
-        // }
+        if (i !== 0) {
+            // return;
+        }
         var halfEdges = mda.VertexHalfEdges(vert).map((halfEdge) => {
             return halfEdge.flipHalfEdge;
         });
 
         // halfEdges.reverse();
 
+        halfEdges.forEach((halfEdge) => {
+            // addTVertexHelper(halfEdge.vTop);
+            // addTVertexHelper(halfEdge.vBottom);
+            // addPlaneHelper(halfEdge.edge.topPlane);
+        });
 
         var topCell = halfEdges.map((halfEdge) => halfEdge.vTopIndex);
         var bottomCell = halfEdges.map((halfEdge) => halfEdge.vBottomIndex);
@@ -282,9 +321,9 @@ var material = new THREE.MeshNormalMaterial();
         cells.push(bottomCell);
 
 
-
-
     });
+
+    // return geometry;
 
     console.log(cells);
 
@@ -488,7 +527,7 @@ Container.prototype.faceNormal = function(mesh, face) {
     return plane.normal;
 };
 
-Container.prototype.intersectPlanes = function(planeA, planeB) {
+Container.prototype.intersectPlanesB = function(planeA, planeB) {
     var x1 = planeA.normal.x,
         y1 = planeA.normal.y,
         z1 = planeA.normal.z,
@@ -511,10 +550,34 @@ Container.prototype.intersectPlanes = function(planeA, planeB) {
 
     var minv = new THREE.Matrix4().getInverse( m );
 
+    console.log(minv);
+
     v.applyMatrix4( minv );
 
     var origin = new THREE.Vector3(v.x, v.y, v.z);
     var direction = planeA.normal.clone().cross(planeB.normal).normalize();
+
+    return new THREE.Ray(origin, direction);
+};
+
+
+Container.prototype.intersectPlanes = function(p1, p2) {
+    // logically the 3rd plane, but we only use the normal component.
+    var p3Normal = p1.normal.clone().cross(p2.normal);
+    var det = p3Normal.lengthSq();
+
+    // If the determinant is 0, that means parallel planes, no intersection.
+    // note: you may want to check against an epsilon value here.
+    if ( ! det) {
+        return;
+    }
+        // calculate the final (point, normal)
+
+    var a = p3Normal.clone().cross(p2.normal).multiplyScalar(p1.constant);
+    var b = p1.normal.clone().cross(p3Normal).multiplyScalar(p2.constant);
+
+    var origin = a.add(b).divideScalar(det);
+    var direction = p3Normal.normalize();
 
     return new THREE.Ray(origin, direction);
 };
