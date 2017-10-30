@@ -2,8 +2,9 @@ const THREE = require('three');
 
 
 const ContainerGeometry = function() {
-    // return new THREE.BoxGeometry(1, 1, 1);
-    return new THREE.IcosahedronGeometry(1, 1);
+    var geometry = new THREE.IcosahedronGeometry(1, 1);
+    geometry.computeFlatVertexNormals();
+    return geometry;
 };
 
 module.exports = ContainerGeometry;
