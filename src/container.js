@@ -4,7 +4,7 @@ var mda = require('mda');
 
 const Container = function(parent, app, geometry) {
 
-    geometry = this.pipe(geometry, .001);
+    geometry = this.wireframe(geometry, .001);
 
     var material = new THREE.MeshBasicMaterial({
         color: 0x888888
@@ -17,9 +17,10 @@ const Container = function(parent, app, geometry) {
     this.mesh = mesh;
 };
 
-Container.prototype.pipe = function(geometry, thickness) {
+Container.prototype.wireframe = function(geometry, thickness) {
 
-    const mesh = new mda.Mesh();
+    // Create half edge structure from geometry
+
     var vertices = geometry.vertices.map(function(vert) {
         return [vert.x, vert.y, vert.z];
     });
@@ -27,25 +28,48 @@ Container.prototype.pipe = function(geometry, thickness) {
         return [face.a, face.b, face.c];
     });
 
+    const mesh = new mda.Mesh();
     mesh.setPositions(vertices);
     mesh.setCells(cells);
     mesh.process();
 
+
+    // Reset buffers
+
     vertices = [];
     cells = [];
 
-    mesh.edges.forEach((edge, i) => {
-        var n1 = this.faceNormal(mesh, edge.halfEdge.face);
-        var n2 = this.faceNormal(mesh, edge.halfEdge.flipHalfEdge.face);
-        n1.add(n2).normalize();
-        edge.normal = n1;
 
-        var v0 = new THREE.Vector3().fromArray(mesh.positions[edge.halfEdge.vertex.index]);
-        var v1 = new THREE.Vector3().fromArray(mesh.positions[edge.halfEdge.flipHalfEdge.vertex.index]);
-        
+    // Find planes that lie along the top, and along the side of each edge
+
+    var v0 = new THREE.Vector3();
+    var v1 = new THREE.Vector3();
+
+    mesh.edges.forEach((edge) => {
+
+        var halfEdge = edge.halfEdge;
+        var flipHalfEdge = halfEdge.flipHalfEdge;
+
+        // Edge normal from adjacent faces
+
+        var n1 = this.faceNormal(mesh, halfEdge.face);
+        var n2 = this.faceNormal(mesh, flipHalfEdge.face);
+        n1.add(n2).normalize();
+
+        // Vertices at each end of the edge
+
+        v0.fromArray(mesh.positions[halfEdge.vertex.index]);
+        v1.fromArray(mesh.positions[flipHalfEdge.vertex.index]);
+
+        // Top plane for edge
+
         edge.topPlane = new THREE.Plane().setFromNormalAndCoplanarPoint(n1, v0);
 
+        // Tangent to the edge normal
+
         v0.sub(v1).cross(n1).normalize();
+
+        // Side planes for half edges
 
         var p1 = new THREE.Plane().setFromNormalAndCoplanarPoint(v0, v1);
         var p2 = p1.clone().negate();
@@ -54,17 +78,12 @@ Container.prototype.pipe = function(geometry, thickness) {
         edge.halfEdge.flipHalfEdge.sidePlane = p2;
     });
 
-    mesh.halfEdges.forEach((halfEdge, i) => {
 
-        var nextHalfEdge = halfEdge.nextHalfEdge;
+    // Find new vertices for each corner (where two edges meet)
 
-        var p1 = halfEdge.sidePlane.clone();
-        var p2 = nextHalfEdge.sidePlane.clone();
+    mesh.halfEdges.forEach((halfEdge) => {
 
-        p1.constant -= thickness;
-        p2.constant -= thickness;
-
-        var ray = this.intersectPlanes(p1, p2);
+        // Offset the top plane to mark the top and bottom of the strut
 
         var topPlane = halfEdge.edge.topPlane.clone();
         var bottomPlane = halfEdge.edge.topPlane.clone();
@@ -72,12 +91,26 @@ Container.prototype.pipe = function(geometry, thickness) {
         topPlane.constant -= thickness;
         bottomPlane.constant += thickness;
 
-        var vTop = this.intersectRayPlane(ray, topPlane);
-        var vBottom = this.intersectRayPlane(ray, bottomPlane);
+        // The halfEdge and nextHalfEdge make up a corner
 
-        halfEdge.vTop = vTop;
-        halfEdge.vBottom = vBottom;
-        
+        var nextHalfEdge = halfEdge.nextHalfEdge;
+
+        // Offset each side plane to mark the sides of the struts
+
+        var sidePlane1 = halfEdge.sidePlane.clone();
+        var sidePlane2 = nextHalfEdge.sidePlane.clone();
+
+        sidePlane1.constant -= thickness;
+        sidePlane2.constant -= thickness;
+
+        // Find the two points formed by the intersection of these planes
+
+        var ray = this.intersectPlanes(sidePlane1, sidePlane2);
+        var vTop = ray.intersectPlane(topPlane);
+        var vBottom = ray.intersectPlane(bottomPlane);
+
+        // Add to the list of vertices and store their positions
+
         var idx = vertices.length;
 
         vertices.push(vTop.toArray());
@@ -85,14 +118,22 @@ Container.prototype.pipe = function(geometry, thickness) {
 
         halfEdge.vTopIndex = idx;
         halfEdge.vBottomIndex = idx + 1;
+
+        halfEdge.vTop = vTop;
+        halfEdge.vBottom = vBottom;
     });
 
-    mesh.edges.forEach((edge, i) => {
+
+    // Connect the each edge's 8 corner vertices into a box 
+
+    mesh.edges.forEach((edge) => {
 
         var he1 = edge.halfEdge;
         var he2 = he1.flipHalfEdge;
         var he3 = mda.HalfEdgePrev(he1);
         var he4 = mda.HalfEdgePrev(he2);
+
+        // Side face 1
 
         cells.push([
             he1.vTopIndex,
@@ -101,6 +142,8 @@ Container.prototype.pipe = function(geometry, thickness) {
             he3.vTopIndex
         ]);
 
+        // Side face 2
+
         cells.push([
             he2.vTopIndex,
             he2.vBottomIndex,
@@ -108,12 +151,16 @@ Container.prototype.pipe = function(geometry, thickness) {
             he4.vTopIndex
         ]);
 
+        // Top face
+
         cells.push([
             he1.vTopIndex,
             he3.vTopIndex,
             he2.vTopIndex,
             he4.vTopIndex
         ]);
+
+        // Bottom face
 
         cells.push([
             he4.vBottomIndex,
@@ -123,20 +170,27 @@ Container.prototype.pipe = function(geometry, thickness) {
         ]);
     });
 
-    mesh.vertices.forEach((vert, i) => {
+
+    // Connect the corner vertices surrounding each vertex into top and bottom panels
+
+    mesh.vertices.forEach((vert) => {
+
         var halfEdges = mda.VertexHalfEdges(vert).map((halfEdge) => {
             return halfEdge.flipHalfEdge;
         });
 
         var topCell = halfEdges.map((halfEdge) => halfEdge.vTopIndex);
 
-        halfEdges.reverse();
+        halfEdges.reverse(); // So the normal faces out
 
         var bottomCell = halfEdges.map((halfEdge) => halfEdge.vBottomIndex);
 
         cells.push(topCell);
         cells.push(bottomCell);
     });
+
+
+    // Convert n-sided faces into triangles
 
     const mesh2 = new mda.Mesh();
     mesh2.setPositions(vertices);
@@ -157,6 +211,9 @@ Container.prototype.faceNormal = function(mesh, face) {
 };
 
 Container.prototype.intersectPlanes = function(p1, p2) {
+
+    // https://stackoverflow.com/questions/6408670/line-of-intersection-between-two-planes
+
     var p3Normal = p1.normal.clone().cross(p2.normal);
     var det = p3Normal.lengthSq();
 
@@ -171,16 +228,6 @@ Container.prototype.intersectPlanes = function(p1, p2) {
     var direction = p3Normal.normalize();
 
     return new THREE.Ray(origin, direction);
-};
-
-Container.prototype.intersectRayPlane = function(ray, plane) {
-    var v = ray.intersectPlane(plane);
-    if (v) {
-        return v;
-    }
-    ray = ray.clone();
-    ray.direction.negate();
-    return ray.intersectPlane(plane);
 };
 
 Container.prototype.mdaToThree = function(mesh) {
