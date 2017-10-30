@@ -4,7 +4,7 @@ var mda = require('mda');
 
 const Container = function(parent, app, geometry) {
 
-    geometry = this.pipe(geometry, .002);
+    geometry = this.pipe(geometry, .001);
 
     var material = new THREE.MeshBasicMaterial({
         color: 0x888888
