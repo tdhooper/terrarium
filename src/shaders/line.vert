@@ -3,10 +3,12 @@ attribute float direction;
 attribute vec3 next;
 attribute vec3 previous;
 
+varying float edge;
+
 void main() {
-    float thickness = .3;
+    float thickness = .02;
     float aspect = 1.;
-    int miter = 0;
+    int miter = 1;
 
      // gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1);
      // return;
@@ -52,6 +54,8 @@ void main() {
   vec2 normal = vec2(-dir.y, dir.x);
   normal *= len/2.0;
   normal.x /= aspect;
+
+  edge = orientation;
 
   vec4 offset = vec4(normal * orientation, 0.0, 1.0);
   gl_Position = currentProjected + offset;

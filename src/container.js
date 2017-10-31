@@ -17,7 +17,9 @@ const Container = function(parent, app, geometry) {
     var points = [
         [0, 0, 0],
         [.8, 0, 0],
-        [1, 1, 0]
+        [1.8, 1, 0],
+        [1.8, 1.5, 0],
+        [1, 2, 0]
     ];
 
     var positions = points.reduce((acc, point) => {
