@@ -21,7 +21,7 @@ const CrystalPlanter = function(parent, app) {
     // const sphere = new THREE.Mesh(sphereGeom, this.material);
     // this.object.add(sphere);
 
-    // const boxGeom = new THREE.BoxGeometry(.1, 5, 5);
+    // const boxGeom = new THREE.BoxGeometry(.2, 1, .2);
     // const box = new THREE.Mesh(boxGeom, this.material);
     // this.object.add(box);
 
