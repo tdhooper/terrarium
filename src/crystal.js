@@ -65,6 +65,7 @@ Crystal.prototype.setDirection = function(normal, animate, delay) {
 };
 
 Crystal.prototype.createGeometry = function() {
+    const seed = Math.random();
     const geometry = crystalGen.create({
         sides: 5,
         diameter: .125,
@@ -72,9 +73,14 @@ Crystal.prototype.createGeometry = function() {
         topSlope: .7,
         topFacets: 3,
         topScale: 1.5,
-        seed: Math.random()
+        seed: seed
     });
-    return geometry;
+    var bufferGeometry = new THREE.BufferGeometry().fromGeometry( geometry );
+    console.log(bufferGeometry);
+    var seeds = new Float32Array(bufferGeometry.attributes.position.length);
+    seeds.fill(seed);
+    bufferGeometry.addAttribute('seed', new THREE.BufferAttribute(seeds, 3));
+    return bufferGeometry;
 };
 
 Crystal.prototype.stopGrowth = function() {
