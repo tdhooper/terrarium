@@ -152,6 +152,14 @@ float pattern( vec3 st ) {
 
     f = pow(c.x*2., 2.);
 
+    float j = floor(f * 2.) / 2.;
+
+    j = hash(j);
+
+    f = j * f;
+
+    f = pow(f,3.);
+
     return clamp(f, 0., 1.);
 }
 
@@ -164,7 +172,7 @@ float pattern( vec3 st ) {
 
 void main() {
     float d = dot(vec3(0,0,1), normalize(vNormal));
-    float e = pattern(vPosition) * .5;
+    float e = pattern(vPosition) * .2;
     // e = step(e, .5);
     // e = e * 2. - 1.;
     // e = 0.;
