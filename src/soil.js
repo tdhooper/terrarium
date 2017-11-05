@@ -37,6 +37,8 @@ const Soil = function(parent, container, app) {
     var res = sections + 1;
     var bottom = -1;
 
+    this.res = res;
+
     surface.vertices.push(new THREE.Vector3(this.width * .5, bottom, this.depth * .5));
     surface.vertices.push(new THREE.Vector3(this.width * -.5, bottom, this.depth * .5));
     surface.vertices.push(new THREE.Vector3(this.width * .5, bottom, this.depth * -.5));
@@ -56,29 +58,61 @@ const Soil = function(parent, container, app) {
     // triangulate
     // for each triangle, add face using map
 
+    var sideIndices, bottomIndices;
+
     // -x face
-    // var sideIndices = [...Array(sections + 1)].map(function(v, i) {
-    //     return i;
-    // });
-    // sideIndices.push(surface.vertices.length - 3);
-    // sideIndices.push(surface.vertices.length - 1);
-    // this.addSideFaces(surface, sideIndices);
+    sideIndices = [...Array(sections + 1)].map(function(v, i) {
+        return i;
+    });
+    bottomIndices = [
+        surface.vertices.length - 3,
+        surface.vertices.length - 1,
+    ];
+    this.addSideFaces(surface, sideIndices, bottomIndices);
 
     // +x face
-    var sideIndices = [...Array(sections + 1)].map(function(v, i) {
+    sideIndices = [...Array(sections + 1)].map(function(v, i) {
         return (sections + 1) * sections + i;
     });
-    sideIndices.push(surface.vertices.length - 4);
-    sideIndices.push(surface.vertices.length - 2);
-    // sideIndices.reverse();
-    sideIndices.push(sideIndices.pop());
-    this.addSideFaces(surface, sideIndices);
+    sideIndices.reverse();
+    bottomIndices = [
+        surface.vertices.length - 2,
+        surface.vertices.length - 4
+    ];
+    this.addSideFaces(surface, sideIndices, bottomIndices);
 
-
-    sideIndices.forEach(i => {
-        var vertex = surface.vertices[i];
-        addHelper(vertex);
+    // -z face
+    sideIndices = [...Array(sections + 1)].map(function(v, i) {
+        return (sections + 1) * i;
     });
+    sideIndices.reverse();
+    bottomIndices = [
+        surface.vertices.length - 1,
+        surface.vertices.length - 2,
+    ];
+    this.addSideFaces(surface, sideIndices, bottomIndices);
+
+    // +z face
+    sideIndices = [...Array(sections + 1)].map(function(v, i) {
+        return (sections + 1) * i + sections;
+    });
+    bottomIndices = [
+        surface.vertices.length - 4,
+        surface.vertices.length - 3,
+    ];
+    this.addSideFaces(surface, sideIndices, bottomIndices);
+
+
+
+
+    // bottomIndices.forEach(i => {
+    //     var vertex = surface.vertices[i];
+    //     addHelper(vertex);
+    // });
+
+    // sideIndices.push(sideIndices.pop());
+    // this.addSideFaces(surface, sideIndices);
+
 
 
 
@@ -144,31 +178,21 @@ const Soil = function(parent, container, app) {
     // app.interactionPublisher.add(normalMesh, 'soil-normals', true);
 };
 
-Soil.prototype.addSideFaces = function(geometry, indices) {
-    var vertices2d = [];
-    var vertexMap = [];
-
-    indices.forEach(i => {
-        var vertex = geometry.vertices[i];
-        vertices2d.push([
-            vertex.z,
-            vertex.y,
-        ]);
-        vertexMap.push(i);
+Soil.prototype.addSideFaces = function(geometry, sideIndices, bottomIndices) {
+    sideIndices.forEach((index, i) => {
+        if (i >= sideIndices.length - 1) {
+            return;
+        } 
+        var a = i >= this.res / 2 ? bottomIndices[0] : bottomIndices[1];
+        var b = sideIndices[i + 1];
+        var c = sideIndices[i];
+        geometry.faces.push(new THREE.Face3(a, b, c));
     });
-
-    vertices2d.reverse();
-
-    var faces = cga.triangulatePolygon2(vertices2d)
-        .map(face => {
-            return new THREE.Face3(
-                vertexMap[face[2]],
-                vertexMap[face[1]],
-                vertexMap[face[0]]
-            );
-        });
-
-    geometry.faces = geometry.faces.concat(faces);
+    geometry.faces.push(new THREE.Face3(
+        bottomIndices[1],
+        bottomIndices[0],
+        sideIndices[Math.round(sideIndices.length / 2)]
+    ));
 };
 
 Soil.prototype.generate = function(u, v) {
