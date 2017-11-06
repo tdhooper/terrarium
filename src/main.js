@@ -42,7 +42,7 @@ Main.prototype.initApp = function() {
         camera: this.camera,
         history: history,
         log: log,
-        renderer: this.renderer
+        main: this,
     };
     const controls = new Controls(document.body, this.app);
 
@@ -50,8 +50,6 @@ Main.prototype.initApp = function() {
     document.body.appendChild(this.stats.dom);
     this.stats.dom.style.left = 'auto';
     this.stats.dom.style.right = 0;
-
-    this.adjust = new QualityAdjust(this.app);
 };
 
 Main.prototype.initScene = function() {
@@ -67,13 +65,23 @@ Main.prototype.initScene = function() {
     var light = new THREE.PointLight(0xffffc0, .1);
     light.position.copy(sunPosition);
     light.castShadow = true;
+    light.shadow.mapSize.width = 1024;
+    light.shadow.mapSize.height = 1024;
     lights.add(light);
+    this.shadowLightHigh = light;
+
+    var lightLow = new THREE.PointLight(0xffffc0, .1);
+    lightLow.position.copy(sunPosition);
+    lightLow.castShadow = false;
+    lights.add(lightLow);
+    this.shadowLightLow = lightLow;
 
     this.lights = lights;
 
     this.scene.add(lights);
     this.terrarium = new Terrarium(this.scene, this.app);
     this.app.eventMediator.emit('start');
+    this.adjust = new QualityAdjust(this.app);
 };
 
 Main.prototype.initThree = function() {

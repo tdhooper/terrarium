@@ -30,10 +30,12 @@ QualityAdjust.prototype.adjust = function(quality) {
     this.app.log.log('Switching quality to ' + quality);
     switch (quality) {
         case QUALITY.HIGH:
-            this.app.renderer.shadowMap.enabled = true;
+            this.app.main.shadowLightHigh.visible = true;
+            this.app.main.shadowLightLow.visible = false;
             break;
         case QUALITY.LOW:
-            this.app.renderer.shadowMap.enabled = false;
+            this.app.main.shadowLightHigh.visible = false;
+            this.app.main.shadowLightLow.visible = true;
             break;
     }
 };
