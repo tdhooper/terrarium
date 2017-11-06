@@ -14,10 +14,11 @@ const Soil = function(parent, container, app) {
     this.height = size.y * .1;
     this.offset = size.y * .2;
 
-    const material = new THREE.MeshPhongMaterial({
-        color: 0x000000,
-        shininess: 0,
-        wireframe: true
+    const material = new THREE.MeshNormalMaterial({
+        // color: 0x000000,
+        // shininess: 0,
+        wireframe: true,
+        // side: THREE.DoubleSide
     });
 
     var sections = 5;
@@ -35,7 +36,7 @@ const Soil = function(parent, container, app) {
     };
 
     var res = sections + 1;
-    var bottom = -1;
+    var bottom = -5;
 
     this.res = res;
 
@@ -44,19 +45,12 @@ const Soil = function(parent, container, app) {
     surface.vertices.push(new THREE.Vector3(this.width * .5, bottom, this.depth * -.5));
     surface.vertices.push(new THREE.Vector3(this.width * -.5, bottom, this.depth * -.5));
 
-    // addHelper(surface.vertices[surface.vertices.length - 1]);
-    // addHelper(surface.vertices[surface.vertices.length - 2]);
-    // addHelper(surface.vertices[surface.vertices.length - 3]);
-    // addHelper(surface.vertices[surface.vertices.length - 4]);
-
-    // create corner vertices
-
-    // get top vertices for edge
-    // get bottom vertices
-    // create a new list of 2d vertices
-    // create a map from the 2d index to the geom vertex index
-    // triangulate
-    // for each triangle, add face using map
+    var baseIndicies = [
+        surface.vertices.length - 1,
+        surface.vertices.length - 2,
+        surface.vertices.length - 3,
+        surface.vertices.length - 4
+    ];
 
     var sideIndices, bottomIndices;
 
@@ -65,8 +59,8 @@ const Soil = function(parent, container, app) {
         return i;
     });
     bottomIndices = [
-        surface.vertices.length - 3,
-        surface.vertices.length - 1,
+        baseIndicies[2],
+        baseIndicies[0]
     ];
     this.addSideFaces(surface, sideIndices, bottomIndices);
 
@@ -76,8 +70,8 @@ const Soil = function(parent, container, app) {
     });
     sideIndices.reverse();
     bottomIndices = [
-        surface.vertices.length - 2,
-        surface.vertices.length - 4
+        baseIndicies[1],
+        baseIndicies[3]
     ];
     this.addSideFaces(surface, sideIndices, bottomIndices);
 
@@ -87,8 +81,8 @@ const Soil = function(parent, container, app) {
     });
     sideIndices.reverse();
     bottomIndices = [
-        surface.vertices.length - 1,
-        surface.vertices.length - 2,
+        baseIndicies[0],
+        baseIndicies[1]
     ];
     this.addSideFaces(surface, sideIndices, bottomIndices);
 
@@ -97,48 +91,43 @@ const Soil = function(parent, container, app) {
         return (sections + 1) * i + sections;
     });
     bottomIndices = [
-        surface.vertices.length - 4,
-        surface.vertices.length - 3,
+        baseIndicies[3],
+        baseIndicies[2]
     ];
     this.addSideFaces(surface, sideIndices, bottomIndices);
 
+    // base
+    surface.faces.push(new THREE.Face3(
+        baseIndicies[0],
+        baseIndicies[1],
+        baseIndicies[2]
+    ));
+    surface.faces.push(new THREE.Face3(
+        baseIndicies[3],
+        baseIndicies[2],
+        baseIndicies[1]
+    ));
 
 
+    container.faces.forEach((face, i) => {
+        if (i < 42 || i > 43) {
+            return;
+        }
+        // if (i !== 43) {
+        //     return;
+        // }
+        // if (i > 0) {
+        //     return;
+        // }
+        var plane = new THREE.Plane().setFromCoplanarPoints(
+            container.vertices[face.b],
+            container.vertices[face.a],
+            container.vertices[face.c]
+        );
+        surface = sliceGeometry(surface, plane, true);
+    });
 
-    // bottomIndices.forEach(i => {
-    //     var vertex = surface.vertices[i];
-    //     addHelper(vertex);
-    // });
-
-    // sideIndices.push(sideIndices.pop());
-    // this.addSideFaces(surface, sideIndices);
-
-
-
-
-    parent.add(new THREE.AxisHelper(1));
-
-
-    // for (var u = 0; u <= res * 2; u++) {
-    //     // for (var v = 0; v < res * 2; v++) {
-    //         var x = (((u % res) / (res - 1)) - .5) * this.width;
-    //         var z = u > res ? this.depth * .5 : this.depth * -.5;
-    //         var vertex = new THREE.Vector3(
-    //             x,-this.offset,z
-    //         );
-    //         addHelper(vertex);
-    //     // }
-    // }
-
-
-    // container.faces.forEach(face => {
-    //     var plane = new THREE.Plane().setFromCoplanarPoints(
-    //         container.vertices[face.b],
-    //         container.vertices[face.a],
-    //         container.vertices[face.c]
-    //     );
-    //     surface = sliceGeometry(surface, plane);
-    // });
+    surface.computeFaceNormals();
 
     // const containerBSP = new ThreeBSP(container);
     // const surfaceBSP = new ThreeBSP(surface);
