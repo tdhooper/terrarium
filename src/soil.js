@@ -1,5 +1,6 @@
 const THREE = require('three');
 const ThreeBSP = require('./lib/three-js-csg')(THREE);
+const sliceGeometry = require('threejs-slice-geometry')(THREE);
 
 
 const Soil = function(parent, container, app) {
@@ -25,37 +26,31 @@ const Soil = function(parent, container, app) {
     const containerBSP = new ThreeBSP(container);
     const surfaceBSP = new ThreeBSP(surface);
 
+    // Top
+    var topGeom = surface.clone();
+    container.faces.forEach((face, i) => {
+        var plane = new THREE.Plane().setFromCoplanarPoints(
+            container.vertices[face.b],
+            container.vertices[face.a],
+            container.vertices[face.c]
+        );
+        topGeom = sliceGeometry(topGeom, plane);
+    });
+    const top = new THREE.Mesh(topGeom, material);
+    top.receiveShadow = true;
+    parent.add(top);
 
-    // Visible soil
+    // Bottom
+    var bottomBSP = containerBSP.cut(surfaceBSP);
+    var bottomGeom = bottomBSP.toGeometry();
+    const bottom = new THREE.Mesh(bottomGeom, material);
+    bottom.receiveShadow = true;
+    parent.add(bottom);
 
-    const geomBSP = containerBSP.intersect(surfaceBSP);
-    const geometry = geomBSP.toGeometry();
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.receiveShadow = true;
-    parent.add(mesh);
+    this.top = top;
+    this.bottom = bottom;
 
-    this.mesh = mesh;
-
-
-    // Interactive area of the soil
-
-    var interactiveBSP = surfaceBSP.cut(containerBSP);
-    var interactiveGeom = interactiveBSP.toGeometry();
-    var interactiveMesh = new THREE.Mesh(interactiveGeom, material);
-    interactiveMesh.visible = false;
-    parent.add(interactiveMesh);
-
-    app.interactionPublisher.add(interactiveMesh, 'soil-area', true);
-
-
-    // Clean normals for the soil
-
-    surface.computeFaceNormals();
-    var normalMesh = new THREE.Mesh(surface, material);
-    normalMesh.visible = false;
-    parent.add(normalMesh);
-
-    app.interactionPublisher.add(normalMesh, 'soil-normals', true);
+    app.interactionPublisher.add(top, 'soil', true);
 };
 
 Soil.prototype.generate = function(u, v) {
@@ -67,7 +62,8 @@ Soil.prototype.generate = function(u, v) {
 };
 
 Soil.prototype.setVisible = function(value) {
-    this.mesh.visible = value;
+    this.top.visible = value;
+    this.bottom.visible = value;
 };
 
 module.exports = Soil;

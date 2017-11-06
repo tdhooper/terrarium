@@ -52,23 +52,23 @@ const SoilCursor = function(parent, app) {
     this.mesh = mesh;
     this.material = material;
 
-    app.eventMediator.on('soil-area.mouseover', this.show.bind(this));
-    app.eventMediator.on('soil-area.touchstart', this.show.bind(this));
+    app.eventMediator.on('soil.mouseover', this.show.bind(this));
+    app.eventMediator.on('soil.touchstart', this.show.bind(this));
 
-    app.eventMediator.on('soil-normals.mousemove', this.position.bind(this));
-    app.eventMediator.on('soil-normals.touchstart', this.position.bind(this)); // TODO make touch/mouse over/move behave the same
+    app.eventMediator.on('soil.mousemove', this.position.bind(this));
+    app.eventMediator.on('soil.touchstart', this.position.bind(this)); // TODO make touch/mouse over/move behave the same
 
-    app.eventMediator.on('soil-area.touchholdstart', this.startCountdown.bind(this));
-    app.eventMediator.on('soil-area.touchholdend', this.resetCountdown.bind(this));
+    app.eventMediator.on('soil.touchholdstart', this.startCountdown.bind(this));
+    app.eventMediator.on('soil.touchholdend', this.resetCountdown.bind(this));
 
-    app.eventMediator.on('soil-area.mouseout', this.hide.bind(this));
-    app.eventMediator.on('soil-area.touchend', this.hide.bind(this));
+    app.eventMediator.on('soil.mouseout', this.hide.bind(this));
+    app.eventMediator.on('soil.touchend', this.hide.bind(this));
 
-    app.eventMediator.on('soil-area.mousedown', this.highlightOn.bind(this));
-    app.eventMediator.on('soil-area.touchholddown', this.highlightOn.bind(this));
+    app.eventMediator.on('soil.mousedown', this.highlightOn.bind(this));
+    app.eventMediator.on('soil.touchholddown', this.highlightOn.bind(this));
 
-    app.eventMediator.on('soil-area.mouseup', this.highlightOff.bind(this));
-    app.eventMediator.on('soil-area.touchend', this.highlightOff.bind(this));
+    app.eventMediator.on('soil.mouseup', this.highlightOff.bind(this));
+    app.eventMediator.on('soil.touchend', this.highlightOff.bind(this));
 
     app.eventMediator.on('crystal.growth', this.showProgress.bind(this));
 
