@@ -20,7 +20,7 @@ const Soil = function(parent, container, app) {
 
     const surface = new THREE.ParametricGeometry(
         this.generate.bind(this),
-        25, 25
+        15, 15
     );
 
     const containerBSP = new ThreeBSP(container);
