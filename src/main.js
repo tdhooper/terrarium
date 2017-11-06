@@ -11,6 +11,7 @@ const History = require('./history');
 const Terrarium = require('./terrarium');
 const InlineLog = require('./inline-log');
 const Controls = require('./controls');
+const QualityAdjust = require('./quality-adjust');
 
 
 const Main = function() {
@@ -40,11 +41,17 @@ Main.prototype.initApp = function() {
         interactionPublisher: interactionPublisher,
         camera: this.camera,
         history: history,
-        log: log
+        log: log,
+        renderer: this.renderer
     };
     const controls = new Controls(document.body, this.app);
+
     this.stats = new Stats();
     document.body.appendChild(this.stats.dom);
+    this.stats.dom.style.left = 'auto';
+    this.stats.dom.style.right = 0;
+
+    this.adjust = new QualityAdjust(this.app);
 };
 
 Main.prototype.initScene = function() {
@@ -129,12 +136,14 @@ Main.prototype.render = function() {
 };
 
 Main.prototype.animate = function() {
+    // setTimeout(this.animate.bind(this), Math.random() * 100);
     requestAnimationFrame(this.animate.bind(this));
     this.stats.begin();
     this.app.eventMediator.emit('update');
     TWEEN.update();
     this.render();
     this.stats.end();
+    this.adjust.update();
 };
 
 Main.prototype.onResize = function() {
