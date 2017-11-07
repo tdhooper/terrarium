@@ -178,8 +178,11 @@ void main() {
     // e = 0.;
     float angle = vAngleOfIncidence + e;
     vec3 color = spectrum(angle * 1.);
+    float falloff = clamp(0., 1., 1. - pow(vAngleOfIncidence * .75, 5.));
+    // falloff = pow(falloff, 1./5.);
     color = linearToScreen(color);
-    // color = vec3(e);
+    color *= mix(.8, 1., falloff);
+    // color = vec3(falloff);
     // color = mod(vPosition * 10., 1.);
     gl_FragColor = vec4(color, 1);
 }
