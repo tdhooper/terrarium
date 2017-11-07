@@ -26,8 +26,8 @@ const Main = function() {
 Main.prototype.initApp = function() {
     class Emitter extends EventEmitter {}
     const eventMediator = new Emitter();
-    const log = new InlineLog();
-    // const log = console;
+    // const log = new InlineLog();
+    const log = console;
     const interactionPublisher = new InteractionPublisher(
         this.renderer.domElement,
         this.camera,

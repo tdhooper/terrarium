@@ -9,8 +9,7 @@ const QualityAdjust = function(app) {
     this.throttle = new QualityThrottle(
         qualityRange,
         initialQuality,
-        this.adjust.bind(this),
-        app.log
+        this.adjust.bind(this)
     );
 };
 
