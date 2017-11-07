@@ -1,24 +1,16 @@
 var QualityThrottle = require('./quality-throttle');
 
 
-const QUALITY = {
-    HIGH: 'high',
-    LOW: 'low'
-};
-
-const FPS_QUALITY = {
-    0: QUALITY.LOW,
-    40: QUALITY.HIGH
-};
-
 const QualityAdjust = function(app) {
     this.app = app;
-    const initial = QUALITY.HIGH;
-    this.adjust(initial);
+    const qualityRange = 2;
+    const initialQuality = 1;
+    this.adjust(initialQuality);
     this.throttle = new QualityThrottle(
-        FPS_QUALITY,
-        initial,
-        this.adjust.bind(this)
+        qualityRange,
+        initialQuality,
+        this.adjust.bind(this),
+        app.log
     );
 };
 
@@ -29,13 +21,13 @@ QualityAdjust.prototype.update = function() {
 QualityAdjust.prototype.adjust = function(quality) {
     this.app.log.log('Switching quality to ' + quality);
     switch (quality) {
-        case QUALITY.HIGH:
-            this.app.main.shadowLightHigh.visible = true;
-            this.app.main.shadowLightLow.visible = false;
-            break;
-        case QUALITY.LOW:
+        case 0:
             this.app.main.shadowLightHigh.visible = false;
             this.app.main.shadowLightLow.visible = true;
+            break;
+        case 1:
+            this.app.main.shadowLightHigh.visible = true;
+            this.app.main.shadowLightLow.visible = false;
             break;
     }
 };

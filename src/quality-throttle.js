@@ -7,26 +7,28 @@ const LAG_RESOLUTION = 10;
 
 const ALLOW_SWITCHES = 4;
 
+const RAISE_DELAY = 2000;
 
-var QualityThrottle = function(FPS_QUALITY, initial, callback) {
+// Drop the quality for anything below
+// Increase the quality for anything above
+const TARGET_FPS_RANGE = [30, 50];
+
+
+var QualityThrottle = function(qualityRange, initialQuality, callback, log) {
     this.callback = callback;
 
     this.lastUpdate = Date.now();
     this.samples = [];
     this.lagWindow = [];
-    this.switchHistory = [];
-    this.stopSwitching = false;
+    this.lastLower = 0;
 
-    this.quality = initial;
-
-    this.fpsQualityMap = Object.entries(FPS_QUALITY).reverse();
-    this.qualityFpsMap = this.fpsQualityMap.reduce((obj, entry) => {
-        obj[entry[1]]= entry[0];
-        return obj;
-    }, {});
+    this.qualityRange = qualityRange;
+    this.quality = initialQuality;
 
     const delay = ACCEPTABLE_LAG / LAG_RESOLUTION;
     this.measure(delay);
+
+    this.log = log;
 };
 
 QualityThrottle.prototype.update = function() {
@@ -52,29 +54,33 @@ QualityThrottle.prototype.measure = function(delay) {
 };
 
 QualityThrottle.prototype.throttle = function(fps) {
-    var quality = this.qualityForFps(fps);
-    if (quality !== this.quality) {
-        this.publishSwitch(quality);
+    this.log.clear();
+    this.log.log(fps);
+    if (fps < TARGET_FPS_RANGE[0]) {
+        this.lowerQuality();
+    } else if (fps > TARGET_FPS_RANGE[1]) {
+        this.raiseQuality();
     }
 };
 
-QualityThrottle.prototype.publishSwitch = function(quality) {
-    if (this.stopSwitching) {
+QualityThrottle.prototype.lowerQuality = function() {
+    this.lastLower = Date.now();
+    const quality = Math.max(this.quality - 1, 0);
+    if (quality !== this.quality) {
+        this.quality = quality;
+        this.callback(quality);
+    }
+};
+
+QualityThrottle.prototype.raiseQuality = function() {
+    if (Date.now() < this.lastLower + RAISE_DELAY) {
         return;
     }
-    this.switchHistory.push(quality);
-    if (this.switchHistory.length >= ALLOW_SWITCHES) {
-        this.stopSwitching = true;
-        var sorted = this.switchHistory.slice(-2).sort((a, b) => {
-            return this.qualityFpsMap[a] - this.qualityFpsMap[b];
-        });
-        quality = sorted[0];
-        if (quality == this.quality) {
-            return;
-        }
+    const quality = Math.min(this.quality + 1, this.qualityRange - 1);
+    if (quality !== this.quality) {
+        this.quality = quality;
+        this.callback(quality);
     }
-    this.quality = quality;
-    this.callback(this.quality);
 };
 
 QualityThrottle.prototype.average = function(values) {
@@ -85,13 +91,6 @@ QualityThrottle.prototype.average = function(values) {
         return total + value;
     }, 0);
     return total / values.length;
-};
-
-QualityThrottle.prototype.qualityForFps = function(fps) {
-    var result = this.fpsQualityMap.find(entry => {
-        return fps >= entry[0];
-    });
-    return result[1];
 };
 
 module.exports = QualityThrottle;

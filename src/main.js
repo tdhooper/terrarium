@@ -26,8 +26,8 @@ const Main = function() {
 Main.prototype.initApp = function() {
     class Emitter extends EventEmitter {}
     const eventMediator = new Emitter();
-    // const log = new InlineLog();
-    const log = console;
+    const log = new InlineLog();
+    // const log = console;
     const interactionPublisher = new InteractionPublisher(
         this.renderer.domElement,
         this.camera,
@@ -144,7 +144,7 @@ Main.prototype.render = function() {
 };
 
 Main.prototype.animate = function() {
-    // setTimeout(this.animate.bind(this), Math.random() * 100);
+    // setTimeout(this.animate.bind(this), Math.random() * 70);
     requestAnimationFrame(this.animate.bind(this));
     this.stats.begin();
     this.app.eventMediator.emit('update');
