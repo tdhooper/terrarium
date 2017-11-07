@@ -9,12 +9,16 @@ const Stats = require('stats.js');
 const InteractionPublisher = require('./interaction-publisher');
 const History = require('./history');
 const Terrarium = require('./terrarium');
+const Lights = require('./lights');
 const InlineLog = require('./inline-log');
 const Controls = require('./controls');
 const QualityAdjust = require('./quality-adjust');
 
 
 const Main = function() {
+    // this.log = new InlineLog();
+    this.log = console;
+
     this.initThree();
     this.initApp();
     this.initScene();
@@ -26,13 +30,11 @@ const Main = function() {
 Main.prototype.initApp = function() {
     class Emitter extends EventEmitter {}
     const eventMediator = new Emitter();
-    // const log = new InlineLog();
-    const log = console;
     const interactionPublisher = new InteractionPublisher(
         this.renderer.domElement,
         this.camera,
         eventMediator,
-        log
+        this.log
     );
     const history = new History(eventMediator);
     this.app = {
@@ -41,7 +43,7 @@ Main.prototype.initApp = function() {
         interactionPublisher: interactionPublisher,
         camera: this.camera,
         history: history,
-        log: log,
+        log: this.log,
         main: this,
     };
     const controls = new Controls(document.body, this.app);
@@ -53,35 +55,10 @@ Main.prototype.initApp = function() {
 };
 
 Main.prototype.initScene = function() {
-
-    var lights = new THREE.Group();
-
-    var sunPosition = new THREE.Vector3(-1, 2, 0);
-
-    var skyLight = new THREE.HemisphereLight(0xfafaff, 0xb0b0c0, 1);
-    skyLight.position.set(-2, 0, 0);
-    lights.add(skyLight);
-
-    var light = new THREE.PointLight(0xffffc0, .1);
-    light.position.copy(sunPosition);
-    light.castShadow = true;
-    light.shadow.mapSize.width = 1024;
-    light.shadow.mapSize.height = 1024;
-    lights.add(light);
-    this.shadowLightHigh = light;
-
-    var lightLow = new THREE.PointLight(0xffffc0, .1);
-    lightLow.position.copy(sunPosition);
-    lightLow.castShadow = false;
-    lights.add(lightLow);
-    this.shadowLightLow = lightLow;
-
-    this.lights = lights;
-
-    this.scene.add(lights);
+    this.lights = new Lights(this.scene);
     this.terrarium = new Terrarium(this.scene, this.app);
+    this.adjust = new QualityAdjust(this);
     this.app.eventMediator.emit('start');
-    this.adjust = new QualityAdjust(this.app);
 };
 
 Main.prototype.initThree = function() {
@@ -99,7 +76,7 @@ Main.prototype.initThree = function() {
     this.renderer.autoClearDepth = false;
     this.renderer.autoClearStencil = false;
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     document.body.appendChild(this.renderer.domElement);
 
@@ -117,7 +94,7 @@ Main.prototype.initThree = function() {
 Main.prototype.render = function() {
     this.cameraControls.update();
     var rotation = new THREE.Euler(0, this.cameraControls.getAzimuthalAngle(), 0);
-    this.lights.setRotationFromEuler(rotation);
+    this.lights.setRotation(rotation);
 
     this.renderer.clear(true, true, true);
 

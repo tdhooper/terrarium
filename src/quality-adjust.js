@@ -1,9 +1,9 @@
 var QualityThrottle = require('./quality-throttle');
 
 
-const QualityAdjust = function(app) {
-    this.app = app;
-    const qualityRange = 2;
+const QualityAdjust = function(main) {
+    this.main = main;
+    const qualityRange = 3;
     const initialQuality = 1;
     this.adjust(initialQuality);
     this.throttle = new QualityThrottle(
@@ -18,15 +18,17 @@ QualityAdjust.prototype.update = function() {
 };
 
 QualityAdjust.prototype.adjust = function(quality) {
-    this.app.log.log('Switching quality to ' + quality);
+    this.main.log.log('Switching quality to ' + quality);
+    const lights = this.main.lights;
     switch (quality) {
         case 0:
-            this.app.main.shadowLightHigh.visible = false;
-            this.app.main.shadowLightLow.visible = true;
+            lights.setShadows(lights.SHADOW_OPTIONS.OFF);
             break;
         case 1:
-            this.app.main.shadowLightHigh.visible = true;
-            this.app.main.shadowLightLow.visible = false;
+            lights.setShadows(lights.SHADOW_OPTIONS.LOW);
+            break;
+        case 2:
+            lights.setShadows(lights.SHADOW_OPTIONS.HIGH);
             break;
     }
 };
