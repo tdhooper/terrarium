@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "budo index.js --css /styles/main.css --live --force-default-index",
-    "build": "rm -r js || true; mkdir js; browserify index.js | uglifyjs > js/index.js; node version.js"
+    "start": "node budo.js",
+    "build": "rm -r js || true; mkdir js; browserify index.js | uglifyjs > js/index.js; cp -f index.template index.html; node version.js"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +21,7 @@
     "budo": "^9.4.7",
     "cga": "^1.0.8",
     "crystal-gen": "github:tdhooper/crystal-gen",
+    "from2-string": "^1.1.0",
     "gl-matrix": "^2.4.0",
     "glslify": "^6.1.0",
     "jquery": "^3.2.1",

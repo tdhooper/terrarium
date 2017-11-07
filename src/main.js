@@ -76,7 +76,10 @@ Main.prototype.initThree = function() {
     this.renderer.shadowMap.enabled = true;
     // this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    document.body.appendChild(this.renderer.domElement);
+    this.container = document.createElement('div');
+    this.container.classList.add('container');
+    document.body.appendChild(this.container);
+    this.container.appendChild(this.renderer.domElement);
 
     this.camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
     this.camera.position.set(2.5, 1.5, 0);
@@ -141,6 +144,23 @@ Main.prototype.onResize = function() {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+
+    // Fixes https://github.com/mrdoob/three.js/issues/9500
+    // From https://bugs.webkit.org/show_bug.cgi?id=152556#c2
+    this.container.style.height = (height + 1) + 'px';
+    requestAnimationFrame(() => {
+        this.container.style.width = width + 'px';
+        this.container.style.height = height + 'px';
+    });
+};
+
+Main.prototype.setPixelRatio = function(value) {
+    if (this.renderer.getPixelRatio() === value) {
+        return;
+    }
+    this.renderer.setPixelRatio(value);
+    this.onResize();
+    this.render();
 };
 
 module.exports = Main;

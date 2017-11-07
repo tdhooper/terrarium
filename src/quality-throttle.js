@@ -2,11 +2,11 @@
 // How long to put up with sub-optimal performance
 const ACCEPTABLE_LAG = 500;
 
-const RAISE_DELAY = 2000;
+const RAISE_DELAY = 3000;
 
 // Drop the quality for anything below
 // Increase the quality for anything above
-const TARGET_FPS_RANGE = [30, 40];
+const TARGET_FPS_RANGE = [30, 50];
 
 
 var QualityThrottle = function(qualityRange, initialQuality, callback) {
