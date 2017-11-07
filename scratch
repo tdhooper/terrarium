@@ -1,0 +1,27 @@
+TODO
+
+* Stop uneven scaling of crystals, clip from bottom and move
+* Stop single click placing crystal with 0 height
+
+* Fix crystal bufferattribute length warning
+* Make cursor taller than largest crystal
+** Maybe animate in/out?
+* Style undo/redo
+* Style background and container (see glass?)
+* Auto rotate
+
+
+perf tweaks
+
+* Simplify crystal texture
+* Drop resolution
+
+
+glass?
+
+* increase opacity with angle
+* high opacity specular highlights
+* use an env map for nice highlight shapes
+* silver frame
+* iridescence?
+* gradient for lines?
