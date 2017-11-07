@@ -43,8 +43,7 @@ Main.prototype.initApp = function() {
         interactionPublisher: interactionPublisher,
         camera: this.camera,
         history: history,
-        log: this.log,
-        main: this,
+        log: this.log
     };
     const controls = new Controls(document.body, this.app);
 
@@ -98,11 +97,13 @@ Main.prototype.render = function() {
 
     this.renderer.clear(true, true, true);
 
+    if (this.terrarium.soilCursor.renderOnTop) {
+        this.renderer.render(this.scene, this.camera);
+        return;
+    }
+
     // Render scene without cursor
-    this.terrarium.container.setVisible(true);
-    this.terrarium.soil.setVisible(true);
     this.terrarium.soilCursor.setVisible(false);
-    this.terrarium.crystalPlanter.setVisible(true);
     this.renderer.render(this.scene, this.camera);
 
     // Render crystals and container to depth buffer only
@@ -118,6 +119,10 @@ Main.prototype.render = function() {
     this.terrarium.crystalPlanter.setVisible(false);
     this.terrarium.soilCursor.setVisible(true);
     this.renderer.render(this.scene, this.camera);
+
+    this.terrarium.container.setVisible(true);
+    this.terrarium.soil.setVisible(true);
+    this.terrarium.crystalPlanter.setVisible(true);
 };
 
 Main.prototype.animate = function() {

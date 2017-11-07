@@ -40,9 +40,7 @@ const SoilCursor = function(parent, app) {
         side: THREE.DoubleSide
     });
 
-    // material.depthTest = false;
     const mesh = new THREE.Mesh(geometry, material);
-    // mesh.renderOrder = 1;
     mesh.visible = false;
 
     parent.add(mesh);
@@ -78,6 +76,17 @@ const SoilCursor = function(parent, app) {
             app.interactionPublisher.TOUCH_HOLD_DELAY
         )
         .easing(app.TWEEN.Easing.Quadratic.In);
+};
+
+SoilCursor.prototype.setRenderOnTop = function(value) {
+    if (value) {
+        this.material.depthTest = false;
+        this.mesh.renderOrder = 1;
+    } else {
+        this.material.depthTest = true;
+        this.mesh.renderOrder = 0;
+    }
+    this.renderOnTop = value;
 };
 
 SoilCursor.prototype.startCountdown = function() {
