@@ -1,6 +1,6 @@
 
 // How long to put up with sub-optimal performance
-const ACCEPTABLE_LAG = 1000;
+const ACCEPTABLE_LAG = 500;
 
 const RAISE_DELAY = 2000;
 

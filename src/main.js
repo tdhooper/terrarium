@@ -69,7 +69,6 @@ Main.prototype.initThree = function() {
         antialias: true,
         preserveDrawingBuffer: true
     });
-    this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(width, height);
     this.renderer.autoClearColor = false;
     this.renderer.autoClearDepth = false;
