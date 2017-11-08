@@ -2,13 +2,11 @@ TODO
 
 * Stop uneven scaling of crystals, clip from bottom and move
 * Stop single click placing crystal with 0 height
-
+** Maybe animate in/out?
 * Fix crystal bufferattribute length warning
 * Make cursor taller than largest crystal
-** Maybe animate in/out?
 * Style undo/redo
 * Style background and container (see glass?)
-* Auto rotate
 * On mobile, pause before starting cursor timer
 
 
@@ -16,6 +14,7 @@ perf tweaks
 
 * Simplify crystal texture
 * Drop resolution
+* Use top-down shadows, and drop update rate
 
 
 glass?
@@ -26,3 +25,18 @@ glass?
 * silver frame
 * iridescence?
 * gradient for lines?
+
+
+Appearance
+
+* Make crystals iridescent on bottom, refractive on top
+* Add specular reflections
+* Ambient dust/snow billboards
+* Gradient or env map background
+
+
+Features
+
+* Switch container
+* Auto rotate
+* Flash ground after inactivity
