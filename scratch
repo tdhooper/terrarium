@@ -9,6 +9,7 @@ TODO
 * Style undo/redo
 * Style background and container (see glass?)
 * Auto rotate
+* On mobile, pause before starting cursor timer
 
 
 perf tweaks
