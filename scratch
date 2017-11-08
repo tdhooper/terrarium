@@ -1,10 +1,7 @@
 TODO
 
-* Stop uneven scaling of crystals, clip from bottom and move
 * Stop single click placing crystal with 0 height
 ** Maybe animate in/out?
-* Fix crystal bufferattribute length warning
-* Make cursor taller than largest crystal
 * Style undo/redo
 * Style background and container (see glass?)
 * On mobile, pause before starting cursor timer
@@ -13,7 +10,6 @@ TODO
 perf tweaks
 
 * Simplify crystal texture
-* Drop resolution
 * Use top-down shadows, and drop update rate
 
 
