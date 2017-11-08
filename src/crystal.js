@@ -47,8 +47,9 @@ const Crystal = function(parent, app, position, normal, material) {
 
     this.growTween = new TWEEN.Tween(size)
         .to({t: 1}, 5000)
+        .easing(TWEEN.Easing.Sinusoidal.Out)
         .onUpdate((object, progress) => {
-            var scale = THREE.Math.lerp(.1, 1, object.t);
+            var scale = THREE.Math.lerp(.2, 1, TWEEN.Easing.Sinusoidal.In(object.t));
 
             var bottomT = 1 - TWEEN.Easing.Sinusoidal.Out(object.t);
             var actualHeight = height * scale;
@@ -58,6 +59,8 @@ const Crystal = function(parent, app, position, normal, material) {
             this.mesh.position.set(0, 0, bottomScale);
 
             this.material.uniforms.bottomClip.value = (height - (sink / scale)) * bottomT;
+            this.material.uniforms.height.value = actualHeight;
+            this.material.uniforms.scale.value = scale;
 
             app.eventMediator.emit('crystal.growth', progress);
         })

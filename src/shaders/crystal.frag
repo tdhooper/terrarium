@@ -11,6 +11,8 @@
 
 uniform float seed;
 uniform float bottomClip;
+uniform float height;
+uniform float scale;
 
 varying vec3 vPosition;
 varying vec3 vNormal;
@@ -188,7 +190,10 @@ float pattern( vec3 st ) {
 
 void main() {
     float d = dot(vec3(0,0,1), normalize(vNormal));
-    float e = pattern(vPosition) * .2;
+    vec3 positon = vPosition;
+    positon *= scale;
+    positon.z += height * .5;
+    float e = pattern(positon) * .2;
     // e = step(e, .5);
     // e = e * 2. - 1.;
     // e = 0.;

@@ -19,7 +19,9 @@ const CrystalPlanter = function(parent, app) {
             fogColor: {type: 'c'},
             fogDensity: {type: 'f'},
             seed: {type: 'f'},
-            bottomClip: {type: 'f'}
+            bottomClip: {type: 'f'},
+            height: {type: 'f'},
+            scale: {type: 'f'}
         }
     });
 
