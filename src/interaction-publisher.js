@@ -48,6 +48,7 @@ InteractionPublisher.prototype.show = function(object) {
 };
 
 InteractionPublisher.prototype.mouseMove = function(event) {
+    event.preventDefault();
     if (this.isTouchDevice) {
         return;
     }
@@ -76,6 +77,7 @@ InteractionPublisher.prototype.mouseMove = function(event) {
 };
 
 InteractionPublisher.prototype.mouseDown = function(event) {
+    event.preventDefault();
     if (this.isTouchDevice) {
         return;
     }
@@ -91,6 +93,7 @@ InteractionPublisher.prototype.mouseDown = function(event) {
 };
 
 InteractionPublisher.prototype.mouseUp = function(event) {
+    event.preventDefault();
     if (this.isTouchDevice) {
         return;
     }
@@ -111,12 +114,13 @@ InteractionPublisher.prototype.touchHoldDown = function(state) {
 };
 
 InteractionPublisher.prototype.touchStart = function(event) {
+    event.preventDefault();
     this.isTouchDevice = true;
 
     if (event.touches.length > 1) {
         return;
     }
-    var event = event.touches[0];
+    event = event.touches[0];
 
     var intersections = this.findIntersections(event);
     intersections.forEach(function(state) {
@@ -133,10 +137,11 @@ InteractionPublisher.prototype.initTouchHold = function(event, state) {
     var touchHoldDown = this.touchHoldDown.bind(this, state);
     state.touchHoldTimeout = setTimeout(touchHoldDown, this.TOUCH_HOLD_DELAY);
     this.eventMediator.emit(state.namespace + '.touchholdstart', state.intersect);
-}
+};
 
 InteractionPublisher.prototype.touchMove = function(event) {
-    var event = event.touches[0];
+    event.preventDefault();
+    event = event.touches[0];
 
     var intersections = this.findIntersections(event);
     intersections.forEach(function(state) {
@@ -162,7 +167,8 @@ InteractionPublisher.prototype.touchMove = function(event) {
 };
 
 InteractionPublisher.prototype.touchEnd = function(event) {
-    var event = event.touches[0];
+    event.preventDefault();
+    event = event.touches[0];
 
     this.objectStates.forEach(function(state) {
         if (state.isTouchDown) {
@@ -206,12 +212,6 @@ InteractionPublisher.prototype.findIntersections = function(event) {
     }.bind(this));
 
     return intersectedStates;
-};
-
-InteractionPublisher.prototype.touchHandler = function(handler) {
-    return function(event) {
-        handler(event.touches[0]);
-    };
 };
 
 InteractionPublisher.prototype.eventPosition = function(event) {
