@@ -13,19 +13,23 @@ const Crystal = function(parent, app, position, normal, material) {
     const geometry = this.createGeometry();
     const mesh = new THREE.Mesh(geometry, material);
     mesh.castShadow = true;
-    parent.add(mesh);
+
+    const group = new THREE.Group();
+    group.add(mesh);
+    parent.add(group);
 
     const rotation = Math.random();
-    mesh.up = new THREE.Vector3(
+    group.up = new THREE.Vector3(
         Math.sin(rotation),
         0,
         Math.cos(rotation)
     );
 
     this.mesh = mesh;
+    this.group = group;
     this.id = mesh.id;
 
-    mesh.position.copy(position);
+    group.position.copy(position);
     this.setDirection(normal);
 
     geometry.computeBoundingSphere();
@@ -33,20 +37,15 @@ const Crystal = function(parent, app, position, normal, material) {
 
     var TWEEN = app.TWEEN;
     var size = {t: 0};
-    
 
     this.growTween = new TWEEN.Tween(size)
         .to({t: 1}, 5000)
         .onUpdate((object, progress) => {
             var scale = THREE.Math.lerp(0, 1, object.t);
-
             var bottomScale = bounding.radius * 2 * scale * (1 - TWEEN.Easing.Sinusoidal.Out(object.t));
-            var bottomOffset = new THREE.Vector3(0, 0, -1)
-                .multiplyScalar(bottomScale)
-                .applyQuaternion(this.mesh.quaternion);
 
             this.mesh.scale.set(scale, scale, scale);
-            this.mesh.position.copy(this.position).add(bottomOffset);
+            this.mesh.position.set(0, 0, bottomScale * -1);
 
             app.eventMediator.emit('crystal.growth', progress);
         })
@@ -61,20 +60,20 @@ Crystal.prototype.setDirection = function(normal, animate, delay) {
     if (animate) {
         delay = delay || 0;
         var matrix = new THREE.Matrix4();
-        matrix.lookAt(vector, this.mesh.position, this.mesh.up);
+        matrix.lookAt(vector, this.group.position, this.group.up);
         const qEnd = new THREE.Quaternion().setFromRotationMatrix(matrix);
-        const qStart = this.mesh.quaternion.clone();
+        const qStart = this.group.quaternion.clone();
         const time = {t: 0};
         this.directionTween = new this.app.TWEEN.Tween(time)
             .to({t: 1}, 750 + delay)
             .easing(this.app.TWEEN.Easing.Quadratic.InOut)
             .onUpdate((time) => {
-                THREE.Quaternion.slerp(qStart, qEnd, this.mesh.quaternion, time.t);
+                THREE.Quaternion.slerp(qStart, qEnd, this.group.quaternion, time.t);
             })
             .delay(delay)
             .start();
     } else {
-        this.mesh.lookAt(vector);
+        this.group.lookAt(vector);
     }
 };
 
@@ -102,11 +101,11 @@ Crystal.prototype.stopGrowth = function() {
 };
 
 Crystal.prototype.destroy = function() {
-    this.parent.remove(this.mesh);
+    this.parent.remove(this.group);
 };
 
 Crystal.prototype.restore = function() {
-    this.parent.add(this.mesh);
+    this.parent.add(this.group);
 };
 
 module.exports = Crystal;
