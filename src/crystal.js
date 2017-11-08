@@ -28,12 +28,26 @@ const Crystal = function(parent, app, position, normal, material) {
     mesh.position.copy(position);
     this.setDirection(normal);
 
+    geometry.computeBoundingSphere();
+    var bounding = geometry.boundingSphere;
+
     var TWEEN = app.TWEEN;
-    this.mesh.scale.set(.25, .25, 0);
-    this.growTween = new TWEEN.Tween(this.mesh.scale)
-        .to({x: 1, y: 1, z: 1}, 5000)
-        .easing(TWEEN.Easing.Sinusoidal.Out)
-        .onUpdate(function(value, progress) {
+    var size = {t: 0};
+    
+
+    this.growTween = new TWEEN.Tween(size)
+        .to({t: 1}, 5000)
+        .onUpdate((object, progress) => {
+            var scale = THREE.Math.lerp(0, 1, object.t);
+
+            var bottomScale = bounding.radius * 2 * scale * (1 - TWEEN.Easing.Sinusoidal.Out(object.t));
+            var bottomOffset = new THREE.Vector3(0, 0, -1)
+                .multiplyScalar(bottomScale)
+                .applyQuaternion(this.mesh.quaternion);
+
+            this.mesh.scale.set(scale, scale, scale);
+            this.mesh.position.copy(this.position).add(bottomOffset);
+
             app.eventMediator.emit('crystal.growth', progress);
         })
         .start();
