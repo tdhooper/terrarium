@@ -16,8 +16,10 @@ const CrystalPlanter = function(parent, app) {
         fragmentShader: glslify('./shaders/crystal.frag'),
         fog: true,
         uniforms: {
-            fogColor: {type: "c"},
-            fogDensity: {type: "f"}
+            fogColor: {type: 'c'},
+            fogDensity: {type: 'f'},
+            seed: {type: 'f'},
+            bottomClip: {type: 'f'}
         }
     });
 

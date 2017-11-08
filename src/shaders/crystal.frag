@@ -9,10 +9,12 @@
     #endif
 #endif
 
+uniform float seed;
+uniform float bottomClip;
+
 varying vec3 vPosition;
 varying vec3 vNormal;
 varying float vAngleOfIncidence;
-varying float vSeed;
 
 const float LOG2 = 1.442695;
 
@@ -131,7 +133,7 @@ float fbm ( in vec3 _st) {
 float pattern( vec3 st ) {
     // st *= 3.5;
 
-    st.x += vSeed * 100.;
+    st.x += seed * 100.;
     
     vec3 color = vec3(0.);
     vec3 a, b, c;
@@ -193,6 +195,11 @@ void main() {
     float angle = vAngleOfIncidence + e;
     vec3 color = spectrum(angle * 1.);
     color = linearToScreen(color);
+
+    if (vPosition.z < bottomClip) {
+        discard;
+    }
+
     // color = vec3(e);
     // color = mod(vPosition * 10., 1.);
 

@@ -10,8 +10,13 @@ const Crystal = function(parent, app, position, normal, material) {
     this.position = position;
     this.normal = normal;
 
-    const geometry = this.createGeometry();
-    const mesh = new THREE.Mesh(geometry, material);
+    const seed = Math.random();
+
+    this.material = material.clone();
+    this.material.uniforms.seed.value = seed;
+
+    const geometry = this.createGeometry(seed);
+    const mesh = new THREE.Mesh(geometry, this.material);
     mesh.castShadow = true;
 
     const group = new THREE.Group();
@@ -33,7 +38,9 @@ const Crystal = function(parent, app, position, normal, material) {
     this.setDirection(normal);
 
     geometry.computeBoundingSphere();
-    var bounding = geometry.boundingSphere;
+    const bounding = geometry.boundingSphere;
+    const height = bounding.radius * 2;
+    const sink = .01;
 
     var TWEEN = app.TWEEN;
     var size = {t: 0};
@@ -41,11 +48,16 @@ const Crystal = function(parent, app, position, normal, material) {
     this.growTween = new TWEEN.Tween(size)
         .to({t: 1}, 5000)
         .onUpdate((object, progress) => {
-            var scale = THREE.Math.lerp(0, 1, object.t);
-            var bottomScale = bounding.radius * 2 * scale * (1 - TWEEN.Easing.Sinusoidal.Out(object.t));
+            var scale = THREE.Math.lerp(.1, 1, object.t);
+
+            var bottomT = 1 - TWEEN.Easing.Sinusoidal.Out(object.t);
+            var actualHeight = height * scale;
+            var bottomScale = (actualHeight - sink) * -1 * bottomT - sink;
 
             this.mesh.scale.set(scale, scale, scale);
-            this.mesh.position.set(0, 0, bottomScale * -1);
+            this.mesh.position.set(0, 0, bottomScale);
+
+            this.material.uniforms.bottomClip.value = (height - (sink / scale)) * bottomT;
 
             app.eventMediator.emit('crystal.growth', progress);
         })
@@ -77,8 +89,7 @@ Crystal.prototype.setDirection = function(normal, animate, delay) {
     }
 };
 
-Crystal.prototype.createGeometry = function() {
-    const seed = Math.random();
+Crystal.prototype.createGeometry = function(seed) {
     const geometry = crystalGen.create({
         sides: 5,
         diameter: .125,
@@ -88,12 +99,7 @@ Crystal.prototype.createGeometry = function() {
         topScale: 1.5,
         seed: seed
     });
-    var bufferGeometry = new THREE.BufferGeometry().fromGeometry( geometry );
-    console.log(bufferGeometry);
-    var seeds = new Float32Array(bufferGeometry.attributes.position.length);
-    seeds.fill(seed);
-    bufferGeometry.addAttribute('seed', new THREE.BufferAttribute(seeds, 3));
-    return bufferGeometry;
+    return geometry;
 };
 
 Crystal.prototype.stopGrowth = function() {
