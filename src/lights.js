@@ -8,7 +8,11 @@ const Lights = function(parent) {
 
     const sunPosition = new THREE.Vector3(-1, 2, 0);
 
-    const skyLight = new THREE.HemisphereLight(0xfafaff, 0xb0b0c0, 1);
+    const skyLight = new THREE.HemisphereLight(
+        0xfafaff,
+        0xc0cfee,
+        1
+    );
     skyLight.position.set(-2, 0, 0);
     lights.add(skyLight);
 

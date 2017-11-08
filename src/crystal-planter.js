@@ -11,10 +11,14 @@ const CrystalPlanter = function(parent, app) {
     this.object = new THREE.Group();
     parent.add(this.object);
 
-
     this.material = new THREE.ShaderMaterial({
         vertexShader: glslify('./shaders/crystal.vert'),
-        fragmentShader: glslify('./shaders/crystal.frag')
+        fragmentShader: glslify('./shaders/crystal.frag'),
+        fog: true,
+        uniforms: {
+            fogColor: {type: "c"},
+            fogDensity: {type: "f"}
+        }
     });
 
     // const sphereGeom = new THREE.SphereGeometry(.5);

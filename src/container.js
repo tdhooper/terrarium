@@ -6,7 +6,7 @@ var geometryTools = require('./geometry-tools');
 const Container = function(parent, app, geometry) {
     geometry = geometryTools.wireframeMesh(geometry, .0025);
     var material = new THREE.MeshBasicMaterial({
-        color: 0x888888
+        color: 0xb4c0d3
     });
     const mesh = new THREE.Mesh(geometry, material);
     parent.add(mesh);

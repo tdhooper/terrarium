@@ -43,7 +43,8 @@ Main.prototype.initApp = function() {
         interactionPublisher: interactionPublisher,
         camera: this.camera,
         history: history,
-        log: this.log
+        log: this.log,
+        scene: this.scene
     };
     const controls = new Controls(document.body, this.app);
 
@@ -56,6 +57,7 @@ Main.prototype.initApp = function() {
 Main.prototype.initScene = function() {
     this.lights = new Lights(this.scene);
     this.terrarium = new Terrarium(this.scene, this.app);
+    this.scene.fog = new THREE.FogExp2(0xe0ecff, .2);
     this.adjust = new QualityAdjust(this);
     this.app.eventMediator.emit('start');
 };

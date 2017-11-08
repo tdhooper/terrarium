@@ -1,3 +1,7 @@
+#ifdef USE_FOG
+    varying float fogDepth;
+#endif
+
 attribute float seed;
 
 varying vec3 vPosition;
@@ -17,6 +21,11 @@ void main() {
     vAngleOfIncidence = acos(dot(cameraRay, modelNormal));
 
     vPosition = position;
+
+    #ifdef USE_FOG
+        vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+        fogDepth = -mvPosition.z;
+    #endif
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1);
 }

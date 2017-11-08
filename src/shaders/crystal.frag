@@ -1,7 +1,23 @@
+#ifdef USE_FOG
+    uniform vec3 fogColor;
+    varying float fogDepth;
+    #ifdef FOG_EXP2
+        uniform float fogDensity;
+    #else
+        uniform float fogNear;
+        uniform float fogFar;
+    #endif
+#endif
+
 varying vec3 vPosition;
 varying vec3 vNormal;
 varying float vAngleOfIncidence;
 varying float vSeed;
+
+const float LOG2 = 1.442695;
+
+#define saturate(a) clamp( a, 0.0, 1.0 )
+#define whiteCompliment(a) ( 1.0 - saturate( a ) )
 
 
 // --------------------------------------------------------
@@ -164,8 +180,6 @@ float pattern( vec3 st ) {
 }
 
 
-
-
 // --------------------------------------------------------
 // Main
 // --------------------------------------------------------
@@ -181,5 +195,16 @@ void main() {
     color = linearToScreen(color);
     // color = vec3(e);
     // color = mod(vPosition * 10., 1.);
+
     gl_FragColor = vec4(color, 1);
+
+    #ifdef USE_FOG
+        #ifdef FOG_EXP2
+            float fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 ) );
+        #else
+            float fogFactor = smoothstep( fogNear, fogFar, fogDepth );
+        #endif
+        gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+    #endif
+
 }
