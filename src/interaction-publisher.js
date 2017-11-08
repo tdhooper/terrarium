@@ -159,6 +159,7 @@ InteractionPublisher.prototype.touchMove = function(event) {
             }
 
             clearTimeout(state.touchHoldTimeout);
+            delete state.touchHoldTimeout;
 
             this.eventMediator.emit(state.namespace + '.touchholdend');
             this.initTouchHold(event, state);
@@ -183,6 +184,7 @@ InteractionPublisher.prototype.touchEnd = function(event) {
         }
         if (state.touchHoldTimeout) {
             clearTimeout(state.touchHoldTimeout);
+            delete state.touchHoldTimeout;
         }
     }.bind(this));
 };
