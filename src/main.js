@@ -1,6 +1,6 @@
 const EventEmitter = require('events');
 
-const THREE = require('three');
+const THREE = require('./lib/three');
 const OrbitControls = require('three-orbit-controls')(THREE);
 const PerspectiveCamera = require('./lib/square-perspective-camera');
 const TWEEN = require('@tweenjs/tween.js');
@@ -13,7 +13,45 @@ const Lights = require('./lights');
 const InlineLog = require('./inline-log');
 const Controls = require('./controls');
 const QualityAdjust = require('./quality-adjust');
+const RenderPass = require('./render-pass');
 
+
+THREE.DotScreenShader = {
+  uniforms: {
+    "tDiffuse": { type: "t", value: null },
+    "tSize":    { type: "v2", value: new THREE.Vector2( 256, 256 ) },
+    "center":   { type: "v2", value: new THREE.Vector2( 0.5, 0.5 ) },
+    "angle":    { type: "f", value: 1.57 },
+    "scale":    { type: "f", value: 1.0 }
+  },
+  vertexShader: [
+    "varying vec2 vUv;",
+    "void main() {",
+      "vUv = uv;",
+      "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+    "}"
+  ].join("\n"),
+  fragmentShader: [
+    "uniform vec2 center;",
+    "uniform float angle;",
+    "uniform float scale;",
+    "uniform vec2 tSize;",
+    "uniform sampler2D tDiffuse;",
+    "varying vec2 vUv;",
+    "float pattern() {",
+      "float s = sin( angle ), c = cos( angle );",
+      "vec2 tex = vUv * tSize - center;",
+      "vec2 point = vec2( c * tex.x - s * tex.y, s * tex.x + c * tex.y ) * scale;",
+      "return ( sin( point.x ) * sin( point.y ) ) * 4.0;",
+    "}",
+    "void main() {",
+      "vec4 color = texture2D( tDiffuse, vUv );",
+      "float average = ( color.r + color.g + color.b ) / 3.0;",
+      "gl_FragColor = color;",
+      // "gl_FragColor = vec4( vec3( average * 10.0 - 5.0 + pattern() ), color.a );",
+    "}"
+  ].join("\n")
+};
 
 const Main = function() {
     // this.log = new InlineLog();
@@ -67,15 +105,12 @@ Main.prototype.initThree = function() {
     var height = document.body.clientHeight;
 
     this.renderer = new THREE.WebGLRenderer({
-        alpha: true,
         antialias: true,
         preserveDrawingBuffer: true
     });
     this.renderer.setSize(width, height);
-    this.renderer.autoClearColor = false;
-    this.renderer.autoClearDepth = false;
-    this.renderer.autoClearStencil = false;
     this.renderer.shadowMap.enabled = true;
+    this.renderer.setClearColor(0xe0ecff, 1);
     // this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.container = document.createElement('div');
@@ -92,41 +127,59 @@ Main.prototype.initThree = function() {
 
     this.scene = new THREE.Scene();
     this.scene.add(this.camera);
+
+    // postprocessing
+    this.composer = new THREE.EffectComposer(this.renderer);
+
+    var pass = new RenderPass(this.scene, this.camera, this.renderFunc.bind(this));
+    this.composer.addPass(pass);
+
+    var rgbEffect = new THREE.ShaderPass(THREE.CopyShader);
+    rgbEffect.clear = true;
+    rgbEffect.renderToScreen = true;
+    this.composer.addPass(rgbEffect);
 };
 
 Main.prototype.render = function() {
     this.cameraControls.update();
     var rotation = new THREE.Euler(0, this.cameraControls.getAzimuthalAngle(), 0);
     this.lights.setRotation(rotation);
+    this.composer.render(.1);
+};
 
-    this.renderer.clear(true, true, true);
+Main.prototype.renderFunc = function(renderer, render) {
+
+    renderer.autoClear = true;
 
     if (this.terrarium.soilCursor.renderOnTop) {
-        this.renderer.render(this.scene, this.camera);
+        render();
         return;
     }
 
     // Render scene without cursor
     this.terrarium.soilCursor.setVisible(false);
-    this.renderer.render(this.scene, this.camera);
+    render();
+
+    renderer.autoClear = false;
 
     // Render crystals and container to depth buffer only
     this.renderer.clearDepth();
     this.terrarium.soil.setVisible(false);
     this.terrarium.soilCursor.setVisible(false);
     this.renderer.context.colorMask( false, false, false, false );
-    this.renderer.render(this.scene, this.camera);
+    render();
     this.renderer.context.colorMask( true, true, true, true );
 
     // Render cursor only
     this.terrarium.container.setVisible(false);
     this.terrarium.crystalPlanter.setVisible(false);
     this.terrarium.soilCursor.setVisible(true);
-    this.renderer.render(this.scene, this.camera);
+    render();
 
     this.terrarium.container.setVisible(true);
     this.terrarium.soil.setVisible(true);
     this.terrarium.crystalPlanter.setVisible(true);
+
 };
 
 Main.prototype.animate = function() {
@@ -146,6 +199,8 @@ Main.prototype.onResize = function() {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+    this.composer.renderTarget1.setSize(width * this.renderer.getPixelRatio(), height * this.renderer.getPixelRatio());
+    this.composer.renderTarget2.setSize(width * this.renderer.getPixelRatio(), height * this.renderer.getPixelRatio());
 
     // Fixes https://github.com/mrdoob/three.js/issues/9500
     // From https://bugs.webkit.org/show_bug.cgi?id=152556#c2

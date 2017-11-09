@@ -1,4 +1,4 @@
-const THREE = require('three');
+const THREE = require('./lib/three');
 
 const ContainerGeometry = require('./container-geometry');
 const Container = require('./container');

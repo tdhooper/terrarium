@@ -1,4 +1,4 @@
-const THREE = require('three');
+const THREE = require('./lib/three');
 var glslify = require('glslify');
 
 const Crystal = require('./crystal');
