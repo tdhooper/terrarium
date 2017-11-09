@@ -4,16 +4,53 @@ var mda = require('mda');
 
 var wireframeMesh = function(geometry, thickness) {
 
+    // vertex normals weighted by triangle areas
+    // http://www.iquilezles.org/www/articles/normals/normals.htm
+
+    var v, vl, f, fl, face;
+
+    const vertexNormals = new Array( geometry.vertices.length );
+
+    for ( v = 0, vl = geometry.vertices.length; v < vl; v ++ ) {
+        vertexNormals[ v ] = new THREE.Vector3();
+    }
+
+    var vA, vB, vC;
+    var cb = new THREE.Vector3(), ab = new THREE.Vector3();
+
+    for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
+
+        face = geometry.faces[ f ];
+
+        vA = geometry.vertices[ face.a ];
+        vB = geometry.vertices[ face.b ];
+        vC = geometry.vertices[ face.c ];
+
+        cb.subVectors( vC, vB );
+        ab.subVectors( vA, vB );
+        cb.cross( ab );
+
+        vertexNormals[ face.a ].add( cb );
+        vertexNormals[ face.b ].add( cb );
+        vertexNormals[ face.c ].add( cb );
+
+    }
+
+    for ( v = 0, vl = vertexNormals.length; v < vl; v ++ ) {
+        vertexNormals[ v ].normalize();
+    }
+
+
+
     // Create half edge structure from geometry
 
-    const mesh = threeToMda(geometry);
-
+    const mesh = threeToMda(geometry);    
 
     // Buffers
 
     var vertices = [];
     var cells = [];
-
+    var vertexColors = [];
 
     // Find planes that lie along the top, and along the side of each edge
 
@@ -90,6 +127,12 @@ var wireframeMesh = function(geometry, thickness) {
 
         vertices.push(vTop.toArray());
         vertices.push(vBottom.toArray());
+
+        var normal = vertexNormals[nextHalfEdge.vertex.index];
+        var color = new THREE.Color().fromArray(normal.toArray());
+
+        vertexColors.push(color);
+        vertexColors.push(color);
 
         halfEdge.vTopIndex = idx;
         halfEdge.vBottomIndex = idx + 1;
@@ -174,6 +217,12 @@ var wireframeMesh = function(geometry, thickness) {
 
     geometry = mdaToThree(mesh2);
 
+    geometry.faces.forEach(face => {
+        face.vertexColors = ['a', 'b', 'c'].map(v => {
+            return vertexColors[face[v]];
+        });
+    });
+
     return geometry;
 };
 
@@ -221,7 +270,6 @@ var threeToMda = function(geometry) {
     mesh.process();
     return mesh;
 };
-
 
 var mdaToThree = function(mesh) {
     mda.TriangulateOperator(mesh);
