@@ -7,8 +7,8 @@ var geometryTools = require('./geometry-tools');
 const Container = function(parent, app, geometry) {
     geometry = geometryTools.wireframeMesh(geometry, .0025);
 
-    const front = new THREE.Color(0x8e9baf);
-    const back = new THREE.Color(0xe0ecff);
+    const front = new THREE.Color(0x70a8f3);
+    const back = new THREE.Color(0x322f57);
 
     back.lerp(front, .25);
 

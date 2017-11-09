@@ -112,6 +112,7 @@ Main.prototype.render = function() {
 
     // Render crystals and container to depth buffer only
     this.renderer.clearDepth();
+    this.terrarium.background.setVisible(false);
     this.terrarium.soil.setVisible(false);
     this.terrarium.soilCursor.setVisible(false);
     this.renderer.context.colorMask( false, false, false, false );
@@ -125,6 +126,7 @@ Main.prototype.render = function() {
     this.renderer.render(this.scene, this.camera);
 
     this.terrarium.container.setVisible(true);
+    this.terrarium.background.setVisible(true);
     this.terrarium.soil.setVisible(true);
     this.terrarium.crystalPlanter.setVisible(true);
 };

@@ -7,7 +7,7 @@ body {
     margin: 0;
     position: relative;
     overflow: hidden;
-    background: #e0ecff;
+    background: linear-gradient(0deg, #503f83, #4e5fa1);
 }
 
 .container {

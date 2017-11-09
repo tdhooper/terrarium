@@ -5,6 +5,7 @@ uniform vec3 backColor;
 
 
 void main() {
-    vec3 color = mix(frontColor, backColor, smoothstep(1., -1., vAngleOfIncidence));
+
+    vec3 color = mix(frontColor, backColor, smoothstep(.0, -.5, vAngleOfIncidence));
     gl_FragColor = vec4(color, 1);
 }
