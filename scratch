@@ -1,7 +1,6 @@
 TODO
 
 * Style undo/redo
-* Style background and container (see glass?)
 * On mobile, pause before starting cursor timer
 
 
@@ -11,23 +10,13 @@ perf tweaks
 * Use top-down shadows, and drop update rate
 
 
-glass?
-
-* increase opacity with angle
-* high opacity specular highlights
-* use an env map for nice highlight shapes
-* silver frame
-* iridescence?
-* gradient for lines?
-
-
 Appearance
 
 * Make crystals iridescent on bottom, refractive on top
 * Add specular reflections
 * Ambient dust/snow billboards
-* Gradient or env map background
-
+* Stars
+* Orbiting planet shapes
 
 Features
 
