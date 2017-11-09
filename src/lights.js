@@ -30,6 +30,13 @@ const Lights = function(parent) {
     lights.add(lightLow);
     this.shadowLights[this.SHADOW_OPTIONS.LOW] = lightLow;
 
+    const lightMed = light.clone();
+    lightMed.castShadow = true;
+    lightMed.shadow.mapSize.width = 512;
+    lightMed.shadow.mapSize.height = 512;
+    lights.add(lightMed);
+    this.shadowLights[this.SHADOW_OPTIONS.MEDIUM] = lightMed;
+
     const lightHigh = light.clone();
     lightHigh.castShadow = true;
     lightHigh.shadow.mapSize.width = 1024;
@@ -43,6 +50,7 @@ const Lights = function(parent) {
 Lights.prototype.SHADOW_OPTIONS = {
     OFF: 'off',
     LOW: 'low',
+    MEDIUM: 'medium',
     HIGH: 'high'
 };
 

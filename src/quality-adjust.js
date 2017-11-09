@@ -46,6 +46,11 @@ QualityAdjust.prototype.adjust = function(quality) {
         case 4:
             this.main.setPixelRatio(window.devicePixelRatio);
             soilCursor.setRenderOnTop(false);
+            lights.setShadows(lights.SHADOW_OPTIONS.MEDIUM);
+            break;
+        case 5:
+            this.main.setPixelRatio(window.devicePixelRatio);
+            soilCursor.setRenderOnTop(false);
             lights.setShadows(lights.SHADOW_OPTIONS.HIGH);
             break;
     }
