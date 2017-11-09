@@ -1,6 +1,7 @@
 const THREE = require('three');
 const ThreeBSP = require('./lib/three-js-csg')(THREE);
 const sliceGeometry = require('threejs-slice-geometry')(THREE);
+var glslify = require('glslify');
 
 
 const Soil = function(parent, container, app) {
@@ -13,14 +14,45 @@ const Soil = function(parent, container, app) {
     this.height = size.y * .1;
     this.offset = size.y * .2;
 
-    const material = new THREE.MeshPhongMaterial({
+    var bottomMaterial = new THREE.MeshPhongMaterial({
         color: 0xffffff,
         shininess: 0
     });
 
+    var material = new THREE.MeshPhongMaterial({
+        flatShading: true
+    });
+    material.type = 'ShaderMaterial';
+    material.vertexShader = THREE.ShaderLib.phong.vertexShader;
+    material.fragmentShader = THREE.ShaderLib.phong.fragmentShader;
+
+    var insertPlace, insert;
+
+    insertPlace = '#include <displacementmap_pars_vertex>';
+    insert = 'uniform float time;';
+    material.vertexShader = material.vertexShader.replace(insertPlace, insertPlace + '\n' + insert);
+
+    insertPlace = '#include <displacementmap_vertex>';
+    insert = [
+        'float magnitude = max(.8 - length(position.xz), 0.);',
+        'transformed += normalize( objectNormal ) * sin(sin(magnitude) * 40. + time * 5.) * magnitude * .1;'
+    ].join('\n');
+    material.vertexShader = material.vertexShader.replace(insertPlace, insertPlace + '\n' + insert);
+
+    console.log(material.vertexShader);
+
+    var shader = THREE.ShaderLib.phong;
+    material.uniforms = THREE.UniformsUtils.clone(shader.uniforms);
+    material.uniforms.time = {type: 'f', value: 0};
+
+    new app.TWEEN.Tween(material.uniforms.time)
+        .to({value: '+1'})
+        .repeat(Infinity)
+        .start();
+
     const surface = new THREE.ParametricGeometry(
         this.generate.bind(this),
-        15, 15
+        55, 55
     );
 
     const containerBSP = new ThreeBSP(container);
@@ -43,7 +75,7 @@ const Soil = function(parent, container, app) {
     // Bottom
     var bottomBSP = containerBSP.cut(surfaceBSP);
     var bottomGeom = bottomBSP.toGeometry();
-    const bottom = new THREE.Mesh(bottomGeom, material);
+    const bottom = new THREE.Mesh(bottomGeom, bottomMaterial);
     bottom.receiveShadow = true;
     parent.add(bottom);
 
