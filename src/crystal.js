@@ -39,32 +39,63 @@ const Crystal = function(parent, app, position, normal, material) {
 
     geometry.computeBoundingSphere();
     const bounding = geometry.boundingSphere;
-    const height = bounding.radius * 2;
-    const sink = .01;
+    this.height = bounding.radius * 2;
 
-    var TWEEN = app.TWEEN;
-    var size = {t: 0};
+    const TWEEN = app.TWEEN;
+
+    var stop = 0;
+    const initial = {t: 0};
+    const size = {t: 0};
+    const minSize = .2;
+
+    const initialTween = new TWEEN.Tween(initial)
+        .to({t: minSize}, 500)
+        .easing(TWEEN.Easing.Sinusoidal.Out)
+        .onComplete(() => {
+            stop += 1;
+        });
 
     this.growTween = new TWEEN.Tween(size)
         .to({t: 1}, 5000)
         .easing(TWEEN.Easing.Sinusoidal.Out)
         .onUpdate((object, progress) => {
-            var scale = THREE.Math.lerp(.2, 1, TWEEN.Easing.Sinusoidal.In(object.t));
-
-            var bottomT = 1 - TWEEN.Easing.Sinusoidal.Out(object.t);
-            var actualHeight = height * scale;
-            var bottomScale = (actualHeight - sink) * -1 * bottomT - sink;
-
-            this.mesh.scale.set(scale, scale, scale);
-            this.mesh.position.set(0, 0, bottomScale);
-
-            this.material.uniforms.bottomClip.value = (height - (sink / scale)) * bottomT;
-            this.material.uniforms.height.value = actualHeight;
-            this.material.uniforms.scale.value = scale;
-
             app.eventMediator.emit('crystal.growth', progress);
-        })
-        .start();
+        }).onComplete(() => {
+            stop += 1;
+        }).onStop(() => {
+            stop += 1;
+        });
+
+    const combinedTween = new TWEEN.Tween({t: 0})
+        .to({t: 1}, 1)
+        .repeat(Infinity)
+        .onUpdate(() => {
+            if (stop >= 2) {
+                combinedTween.stop();
+                return;
+            }
+            this.setSize(initial.t + size.t * (1 - minSize));
+        });
+
+    initialTween.start();
+    this.growTween.start();
+    combinedTween.start();
+};
+
+Crystal.prototype.setSize = function(size) {
+    const sink = .01;
+    var scale = THREE.Math.lerp(.2, 1, this.app.TWEEN.Easing.Sinusoidal.In(size));
+
+    var bottomT = THREE.Math.lerp(1, 0, this.app.TWEEN.Easing.Sinusoidal.Out(size));
+    var actualHeight = this.height * scale;
+    var bottomScale = (actualHeight - sink) * -1 * bottomT - sink;
+
+    this.mesh.scale.set(scale, scale, scale);
+    this.mesh.position.set(0, 0, bottomScale);
+
+    this.material.uniforms.bottomClip.value = (this.height - (sink / scale)) * bottomT;
+    this.material.uniforms.height.value = actualHeight;
+    this.material.uniforms.scale.value = scale;
 };
 
 Crystal.prototype.setDirection = function(normal, animate, delay) {

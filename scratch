@@ -1,7 +1,5 @@
 TODO
 
-* Stop single click placing crystal with 0 height
-** Maybe animate in/out?
 * Style undo/redo
 * Style background and container (see glass?)
 * On mobile, pause before starting cursor timer
