@@ -50,23 +50,16 @@ const SoilCursor = function(parent, app) {
     this.mesh = mesh;
     this.material = material;
 
+    app.eventMediator.on('ready', this.enable.bind(this));
+
     app.eventMediator.on('soil.mouseover', this.show.bind(this));
     app.eventMediator.on('soil.touchstart', this.show.bind(this));
 
     app.eventMediator.on('soil.mousemove', this.position.bind(this));
     app.eventMediator.on('soil.touchstart', this.position.bind(this)); // TODO make touch/mouse over/move behave the same
 
-    app.eventMediator.on('soil.touchholdstart', this.startCountdown.bind(this));
-    app.eventMediator.on('soil.touchholdend', this.resetCountdown.bind(this));
-
     app.eventMediator.on('soil.mouseout', this.hide.bind(this));
     app.eventMediator.on('soil.touchend', this.hide.bind(this));
-
-    app.eventMediator.on('soil.mousedown', this.highlightOn.bind(this));
-    app.eventMediator.on('soil.touchholddown', this.highlightOn.bind(this));
-
-    app.eventMediator.on('soil.mouseup', this.highlightOff.bind(this));
-    app.eventMediator.on('soil.touchend', this.highlightOff.bind(this));
 
     app.eventMediator.on('crystal.growth', this.showProgress.bind(this));
 
@@ -76,6 +69,26 @@ const SoilCursor = function(parent, app) {
             app.interactionPublisher.TOUCH_HOLD_DELAY
         )
         .easing(app.TWEEN.Easing.Quadratic.In);
+};
+
+SoilCursor.prototype.enable = function() {
+    if (this.enabled) {
+        return;
+    }
+
+    this.enabled = true;
+
+    const app = this.app;
+
+    app.eventMediator.on('soil.touchholdstart', this.startCountdown.bind(this));
+    app.eventMediator.on('soil.touchholdend', this.resetCountdown.bind(this));
+
+    app.eventMediator.on('soil.mousedown', this.highlightOn.bind(this));
+    app.eventMediator.on('soil.touchholddown', this.highlightOn.bind(this));
+
+    app.eventMediator.on('soil.mouseup', this.highlightOff.bind(this));
+    app.eventMediator.on('soil.touchend', this.highlightOff.bind(this));
+
 };
 
 SoilCursor.prototype.setRenderOnTop = function(value) {
@@ -106,12 +119,23 @@ SoilCursor.prototype.resetCountdown = function() {
 };
 
 SoilCursor.prototype.show = function() {
+    if ( ! this.enabled) {
+        if ( ! this.readyShowHandler) {
+            this.readyShowHandler = this.show.bind(this);
+            this.app.eventMediator.on('ready', this.readyShowHandler);
+        }
+        return;
+    }
     this.isOver = true;
     this.visible = true;
     this.mesh.visible = true;
 };
 
 SoilCursor.prototype.hide = function() {
+    if ( ! this.enabled) {
+        this.readyShowHandler && this.app.eventMediator.removeListener('ready', this.readyShowHandler);
+        return;
+    }
     this.isOver = false;
     if (this.isHeld) {
         return;

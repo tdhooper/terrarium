@@ -13,6 +13,7 @@ const Lights = require('./lights');
 const InlineLog = require('./inline-log');
 const Controls = require('./controls');
 const QualityAdjust = require('./quality-adjust');
+const Controller = require('./controller');
 
 
 const Main = function() {
@@ -59,6 +60,8 @@ Main.prototype.initScene = function() {
     this.terrarium = new Terrarium(this.scene, this.app);
     // this.scene.fog = new THREE.FogExp2(0xe0ecff, .2);
     this.adjust = new QualityAdjust(this);
+    this.app.terrarium = this.terrarium;
+    const controller = new Controller(this.app);
     this.app.eventMediator.emit('start');
 };
 
