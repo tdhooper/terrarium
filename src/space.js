@@ -12,18 +12,38 @@ const Space = function(parent, app) {
     this.app = app;
 
     this.addPlanets();
+    this.addStars();
 };
 
 Space.prototype.setVisible = function(value) {
     this.group.visible = value;
 };
 
+Space.prototype.addStars = function() {
+    var geometry = new THREE.Geometry();
+
+    for ( i = 0; i < 500; i ++ ) {
+        var vertex = this.randomPointOnSphere(
+            random.floatBetween(30, 40),
+            random.random
+        );
+        geometry.vertices.push( vertex );
+    }
+
+    var material = new THREE.PointsMaterial({
+        size: .15,
+    });
+    
+    var particles = new THREE.Points( geometry, material );
+    this.group.add(particles);
+};
+
 Space.prototype.addPlanets = function() {
-    const solidMaterial = materials.crystal.clone();
-    solidMaterial.uniforms.seed.value = 3;
-    solidMaterial.uniforms.scale.value = .2;
-    solidMaterial.uniforms.height.value = 1;
-    solidMaterial.uniforms.flash.value = 3;
+    const solidMaterial = materials.soilBottom;
+    // solidMaterial.uniforms.seed.value = 3;
+    // solidMaterial.uniforms.scale.value = .2;
+    // solidMaterial.uniforms.height.value = 1;
+    // solidMaterial.uniforms.flash.value = 3;
 
     const lineMaterial = materials.planetWireframe;
 
