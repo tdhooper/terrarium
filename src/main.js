@@ -1,7 +1,8 @@
+global.THREE = require('three');
+require('three/examples/js/controls/OrbitControls');
+
 const EventEmitter = require('events');
 
-const THREE = require('three');
-const OrbitControls = require('three-orbit-controls')(THREE);
 const PerspectiveCamera = require('./lib/square-perspective-camera');
 const TWEEN = require('@tweenjs/tween.js');
 const Stats = require('stats.js');
@@ -89,7 +90,7 @@ Main.prototype.initThree = function() {
 
     this.camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
     this.camera.position.set(3, .5, 0);
-    this.cameraControls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.cameraControls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     this.cameraControls.enableDamping = true;
     this.cameraControls.dampingFactor = 0.05;
     this.cameraControls.rotateSpeed = 0.066;

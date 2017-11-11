@@ -1,4 +1,3 @@
-const THREE = require('three');
 const random = require('random-seed').create(2);
 
 

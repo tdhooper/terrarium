@@ -1,5 +1,3 @@
-const THREE = require('three');
-
 const ContainerGeometry = require('./container-geometry');
 const Container = require('./container');
 const ContainerBackground = require('./container-background');

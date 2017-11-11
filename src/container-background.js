@@ -1,5 +1,3 @@
-const THREE = require('three');
-
 
 const ContainerBackground = function(parent, app, geometry) {
 

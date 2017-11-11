@@ -1,4 +1,3 @@
-const THREE = require('three');
 var glslify = require('glslify');
 
 var geometryTools = require('./geometry-tools');

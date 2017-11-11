@@ -1,5 +1,3 @@
-const THREE = require('three');
-
 
 const InteractionPublisher = function(
     element,

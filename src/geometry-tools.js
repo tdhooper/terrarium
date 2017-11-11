@@ -1,4 +1,3 @@
-const THREE = require('three');
 var mda = require('mda');
 
 

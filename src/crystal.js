@@ -1,4 +1,3 @@
-const THREE = require('three');
 const crystalGen = require('crystal-gen');
 
 

@@ -1,4 +1,3 @@
-const THREE = require('three');
 const ThreeBSP = require('./lib/three-js-csg')(THREE);
 const sliceGeometry = require('threejs-slice-geometry')(THREE);
 var glslify = require('glslify');
