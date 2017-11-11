@@ -3,7 +3,7 @@ const random = require('random-seed').create('daadrD22sadassk');
 var materials = require('./materials');
 
 
-const Space = function(parent) {
+const Space = function(parent, app) {
 
     const group = new THREE.Group();
     parent.add(group);
@@ -36,6 +36,8 @@ const Space = function(parent) {
     var verts = distributionA.vertices.concat(distributionB.vertices);
     // var verts = distributionB.vertices;
 
+    const TWEEN = app.TWEEN;
+
     verts.forEach((vert, i) => {
         var direction, position, size;
 
@@ -50,6 +52,7 @@ const Space = function(parent) {
 
         const geom = Math.round(size * 2);
         const geometry = geometries[geom];
+        const rotate = THREE.Math.lerp(15000, 300000, size);
 
         var mesh;
 
@@ -66,6 +69,12 @@ const Space = function(parent) {
         mesh.rotateX(random.random() * Math.PI);
         mesh.rotateY(random.random() * Math.PI);
         group.add(mesh);
+
+        mesh.rotation.z = 0;
+        new TWEEN.Tween(mesh.rotation)
+            .to({z: Math.PI * 2}, rotate)
+            .repeat(Infinity)
+            .start();
     });
 
     this.group = group;
