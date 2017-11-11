@@ -1,4 +1,4 @@
-const random = require('random-seed').create('escher-fuller-moebius');
+const random = require('random-seed').create('escher/fuller/moebius');
 
 var materials = require('./materials');
 
@@ -71,8 +71,8 @@ Space.prototype.addPlanets = function() {
 
     distributionA.rotateX(1.1);
     distributionB.rotateX(1.1);
-    distributionA.rotateY(4.8);
-    distributionB.rotateY(4.8);
+    // distributionA.rotateY(4.8);
+    // distributionB.rotateY(4.8);
 
     var verts = distributionA.vertices.concat(distributionB.vertices);
     // var verts = distributionB.vertices;
@@ -80,18 +80,24 @@ Space.prototype.addPlanets = function() {
     const TWEEN = this.app.TWEEN;
 
     verts.forEach((vert, i) => {
-        var direction, position, size;
-
-        var dist = random.floatBetween(.8, 1.3);
-        direction = new THREE.Vector3().fromArray(this.randomPointOnSphere(3, random.random));
-        position = vert.clone().multiplyScalar(dist).add(direction);
-        size = random.random();
+        var direction, position, size, dist, geom;
 
         if (i < distributionA.vertices.length) {
-            size = Math.pow(size, 6);
+            geom = 0;
+            size = random.floatBetween(0, 1/3);
+        } else if (i % 2 === 0){
+            geom = 1;
+            size = random.floatBetween(1/3, 2/3);
+        } else {
+            geom = 2;
+            size = random.floatBetween(2/3, 1);
         }
 
-        const geom = Math.round(size * 2);
+        // size = random.random();
+        dist = random.floatBetween(1, 1.3);
+        direction = new THREE.Vector3().fromArray(this.randomPointOnSphere(3, random.random));
+        position = vert.clone().multiplyScalar(dist).add(direction);
+        
         const geometry = geometries[geom];
         const rotate = THREE.Math.lerp(15000, 300000, size);
 
