@@ -133,7 +133,6 @@ const stars = new THREE.PointsMaterial({
 makeShadable(stars);
 
 stars.extensions = {derivatives: true};
-stars.transparent = true;
 stars.sizeAttenuation = false;
 
 stars.vertexShader = insertGlsl(

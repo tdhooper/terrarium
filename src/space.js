@@ -50,6 +50,9 @@ Space.prototype.addStars = function() {
         .start();
     
     const particles = new THREE.Points(geometry, material);
+
+    particles.renderOrder = -1;
+
     this.group.add(particles);
 };
 
