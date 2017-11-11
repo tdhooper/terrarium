@@ -1,7 +1,7 @@
 const THREE = require('three');
 
 
-const Background = function(parent, app, geometry) {
+const ContainerBackground = function(parent, app, geometry) {
 
     const material = new THREE.MeshBasicMaterial({
         color: 0x322f57,
@@ -15,8 +15,8 @@ const Background = function(parent, app, geometry) {
     this.mesh = mesh;
 };
 
-Background.prototype.setVisible = function(value) {
+ContainerBackground.prototype.setVisible = function(value) {
     this.mesh.visible = value;
 };
 
-module.exports = Background;
+module.exports = ContainerBackground;

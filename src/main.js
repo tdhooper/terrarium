@@ -9,6 +9,7 @@ const Stats = require('stats.js');
 const InteractionPublisher = require('./interaction-publisher');
 const History = require('./history');
 const Terrarium = require('./terrarium');
+const Space = require('./space');
 const Lights = require('./lights');
 const InlineLog = require('./inline-log');
 const Controls = require('./controls');
@@ -58,7 +59,7 @@ Main.prototype.initApp = function() {
 Main.prototype.initScene = function() {
     this.lights = new Lights(this.scene);
     this.terrarium = new Terrarium(this.scene, this.app);
-    // this.scene.fog = new THREE.FogExp2(0xe0ecff, .2);
+    this.space = new Space(this.scene);
     this.adjust = new QualityAdjust(this);
     this.app.terrarium = this.terrarium;
     const controller = new Controller(this.app);
@@ -115,7 +116,8 @@ Main.prototype.render = function() {
 
     // Render crystals and container to depth buffer only
     this.renderer.clearDepth();
-    this.terrarium.background.setVisible(false);
+    this.space.setVisible(false);
+    this.terrarium.containerBackground.setVisible(false);
     this.terrarium.soil.setVisible(false);
     this.terrarium.soilCursor.setVisible(false);
     this.renderer.context.colorMask( false, false, false, false );
@@ -128,8 +130,9 @@ Main.prototype.render = function() {
     this.terrarium.soilCursor.setVisible(true);
     this.renderer.render(this.scene, this.camera);
 
+    this.space.setVisible(true);
     this.terrarium.container.setVisible(true);
-    this.terrarium.background.setVisible(true);
+    this.terrarium.containerBackground.setVisible(true);
     this.terrarium.soil.setVisible(true);
     this.terrarium.crystalPlanter.setVisible(true);
 };
