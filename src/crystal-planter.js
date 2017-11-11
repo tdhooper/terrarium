@@ -1,5 +1,4 @@
-var glslify = require('glslify');
-
+var materials = require('./materials');
 const Crystal = require('./crystal');
 
 
@@ -10,19 +9,7 @@ const CrystalPlanter = function(parent, app) {
     this.object = new THREE.Group();
     parent.add(this.object);
 
-    this.material = new THREE.ShaderMaterial({
-        vertexShader: glslify('./shaders/crystal.vert'),
-        fragmentShader: glslify('./shaders/crystal.frag'),
-        fog: true,
-        uniforms: {
-            fogColor: {type: 'c'},
-            fogDensity: {type: 'f'},
-            seed: {type: 'f'},
-            bottomClip: {type: 'f'},
-            height: {type: 'f'},
-            scale: {type: 'f'}
-        }
-    });
+    this.material = materials.crystal;
 
     // const sphereGeom = new THREE.SphereGeometry(.5);
     // const sphere = new THREE.Mesh(sphereGeom, this.material);

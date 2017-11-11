@@ -1,5 +1,7 @@
 const random = require('random-seed').create('darD22saASdak');
 
+var materials = require('./materials');
+
 
 const Space = function(parent) {
 
@@ -11,15 +13,9 @@ const Space = function(parent) {
     const back = new THREE.Color(0x322f57);
     back.lerp(front, .25);
 
-    const solidMaterial = new THREE.MeshPhongMaterial({
-        color: front,
-        transparent: true,
-        opacity: .5
-    });
+    const solidMaterial = materials.planetSolid;
 
-    const lineMaterial = new THREE.LineBasicMaterial({
-        color: front
-    });
+    const lineMaterial = materials.planetWireframe;
 
     const radius = 20;
     const geometries = this.geometries();

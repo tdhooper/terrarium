@@ -1,4 +1,4 @@
-var glslify = require('glslify');
+var materials = require('./materials');
 
 
 const SoilCursor = function(parent, app) {
@@ -29,15 +29,7 @@ const SoilCursor = function(parent, app) {
     ring.merge(spike);
     const geometry = ring;
 
-    const material = new THREE.ShaderMaterial({
-        uniforms: {
-            t1: {value: 0},
-            t2: {value: 0}
-        },
-        vertexShader: glslify('./shaders/cursor.vert'),
-        fragmentShader: glslify('./shaders/cursor.frag'),
-        side: THREE.DoubleSide
-    });
+    const material = materials.soilCursor;
 
     const mesh = new THREE.Mesh(geometry, material);
     mesh.visible = false;
