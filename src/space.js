@@ -22,7 +22,7 @@ Space.prototype.setVisible = function(value) {
 Space.prototype.addStars = function() {
     var geometry = new THREE.Geometry();
 
-    for ( i = 0; i < 500; i ++ ) {
+    for (var i = 0; i < 500; i ++ ) {
         var vertex = this.randomPointOnSphere(
             random.floatBetween(30, 40),
             random.random
