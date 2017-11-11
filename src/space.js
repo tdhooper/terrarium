@@ -20,21 +20,36 @@ Space.prototype.setVisible = function(value) {
 };
 
 Space.prototype.addStars = function() {
-    var geometry = new THREE.Geometry();
+    const geometry = new THREE.BufferGeometry();
+    const count = 500;
+    const vertices = new Float32Array(count * 3);
+    const size = new Float32Array(count);
+    const seed = new Float32Array(count);
 
-    for (var i = 0; i < 500; i ++ ) {
+    for (var i = 0; i < count; i++) {
         var vertex = this.randomPointOnSphere(
             random.floatBetween(30, 40),
             random.random
         );
-        geometry.vertices.push( vertex );
+        vertices[i * 3 + 0] = vertex[0];
+        vertices[i * 3 + 1] = vertex[1];
+        vertices[i * 3 + 2] = vertex[2];
+        size[i] = random.floatBetween(.2, 2);
+        seed[i] = random.random();
     }
 
-    var material = new THREE.PointsMaterial({
-        size: .15,
-    });
+    geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    geometry.addAttribute('aSize', new THREE.BufferAttribute(size, 1));
+    geometry.addAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
+
+    const material = materials.stars;
+
+    new this.app.TWEEN.Tween(material.uniforms.time)
+        .to({value: 1}, 6000)
+        .repeat(Infinity)
+        .start();
     
-    var particles = new THREE.Points( geometry, material );
+    const particles = new THREE.Points(geometry, material);
     this.group.add(particles);
 };
 
@@ -68,7 +83,7 @@ Space.prototype.addPlanets = function() {
         var direction, position, size;
 
         var dist = random.floatBetween(.8, 1.3);
-        direction = this.randomPointOnSphere(3, random.random);
+        direction = new THREE.Vector3().fromArray(this.randomPointOnSphere(3, random.random));
         position = vert.clone().multiplyScalar(dist).add(direction);
         size = random.random();
 
@@ -125,7 +140,7 @@ Space.prototype.randomPointOnSphere = function(radius, rand) {
     var x = radius * Math.sin(theta) * Math.cos(phi);
     var y = radius * Math.sin(theta) * Math.sin(phi);
     var z = radius * Math.cos(theta);
-    return new THREE.Vector3(x, y, z);
+    return [x, y, z];
 };
 
 module.exports = Space;

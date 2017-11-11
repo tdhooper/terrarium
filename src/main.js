@@ -7,6 +7,7 @@ const PerspectiveCamera = require('./lib/square-perspective-camera');
 const TWEEN = require('@tweenjs/tween.js');
 const Stats = require('stats.js');
 
+const materials = require('./materials');
 const InteractionPublisher = require('./interaction-publisher');
 const History = require('./history');
 const Terrarium = require('./terrarium');
@@ -173,6 +174,12 @@ Main.prototype.onResize = function() {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+
+    var size = this.renderer.getDrawingBufferSize();
+    materials.stars.uniforms.uResolution.value = [
+        size.width,
+        size.height
+    ];
 
     // Fixes https://github.com/mrdoob/three.js/issues/9500
     // From https://bugs.webkit.org/show_bug.cgi?id=152556#c2
