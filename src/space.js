@@ -1,4 +1,4 @@
-const random = require('random-seed').create('daadrD22sadassk');
+const random = require('random-seed').create('escher-fuller-moebius');
 
 var materials = require('./materials');
 
@@ -107,7 +107,7 @@ Space.prototype.addPlanets = function() {
         
         mesh.position.copy(position);
         mesh.scale.set(size, size, size);
-        mesh.rotateX(random.random() * Math.PI);
+        mesh.rotateX(random.random() * Math.PI * 2);
         mesh.rotateY(random.random() * Math.PI);
         this.group.add(mesh);
 

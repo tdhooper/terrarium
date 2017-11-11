@@ -91,6 +91,7 @@ Main.prototype.initThree = function() {
 
     this.camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
     this.camera.position.set(3 * 1.2, .5 * 1.2, 0);
+    this.camera.position.applyAxisAngle(new THREE.Vector3(0,1,0), Math.PI * .12);
     this.cameraControls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     this.cameraControls.enableDamping = true;
     this.cameraControls.dampingFactor = 0.05;
