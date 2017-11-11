@@ -13,6 +13,7 @@ uniform float seed;
 uniform float bottomClip;
 uniform float height;
 uniform float scale;
+uniform float flash;
 
 varying vec3 vPosition;
 varying vec3 vNormal;
@@ -197,7 +198,7 @@ void main() {
     // e = step(e, .5);
     // e = e * 2. - 1.;
     // e = 0.;
-    float angle = vAngleOfIncidence + e;
+    float angle = vAngleOfIncidence * flash + e;
     vec3 color = spectrum(angle * 1.);
     color = linearToScreen(color);
 
@@ -209,6 +210,8 @@ void main() {
     // color = mod(vPosition * 10., 1.);
 
     gl_FragColor = vec4(color, 1);
+
+    // gl_FragColor = vec4(vNormal *.5 + .5, 1);
 
     #ifdef USE_FOG
         #ifdef FOG_EXP2

@@ -132,6 +132,7 @@ Crystal.prototype.createGeometry = function(seed) {
         topScale: 1.5,
         seed: seed
     });
+    geometry.computeFlatVertexNormals();
     return geometry;
 };
 

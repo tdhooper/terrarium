@@ -35,7 +35,8 @@ module.exports.crystal = new THREE.ShaderMaterial({
         seed: {type: 'f'},
         bottomClip: {type: 'f'},
         height: {type: 'f'},
-        scale: {type: 'f'}
+        scale: {type: 'f'},
+        flash: {type: 'f', value: 1}
     }
 });
 

@@ -1,4 +1,4 @@
-const random = require('random-seed').create('darD22saASdak');
+const random = require('random-seed').create('daadrD22sadassk');
 
 var materials = require('./materials');
 
@@ -13,7 +13,11 @@ const Space = function(parent) {
     const back = new THREE.Color(0x322f57);
     back.lerp(front, .25);
 
-    const solidMaterial = materials.planetSolid;
+    const solidMaterial = materials.crystal.clone();
+    solidMaterial.uniforms.seed.value = 3;
+    solidMaterial.uniforms.scale.value = .2;
+    solidMaterial.uniforms.height.value = 1;
+    solidMaterial.uniforms.flash.value = 3;
 
     const lineMaterial = materials.planetWireframe;
 

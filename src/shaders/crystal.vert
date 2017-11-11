@@ -16,6 +16,7 @@ void main() {
     vAngleOfIncidence = acos(dot(cameraRay, modelNormal));
 
     vPosition = position;
+    vNormal = normal;
 
     #ifdef USE_FOG
         vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
