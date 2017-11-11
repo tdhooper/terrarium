@@ -8,11 +8,17 @@ const Space = function(parent, app) {
     const group = new THREE.Group();
     parent.add(group);
 
-    const color = new THREE.Color(0x423a6f);
-    const front = new THREE.Color(0x5cbcff);
-    const back = new THREE.Color(0x322f57);
-    back.lerp(front, .25);
+    this.group = group;
+    this.app = app;
 
+    this.addPlanets();
+};
+
+Space.prototype.setVisible = function(value) {
+    this.group.visible = value;
+};
+
+Space.prototype.addPlanets = function() {
     const solidMaterial = materials.crystal.clone();
     solidMaterial.uniforms.seed.value = 3;
     solidMaterial.uniforms.scale.value = .2;
@@ -36,7 +42,7 @@ const Space = function(parent, app) {
     var verts = distributionA.vertices.concat(distributionB.vertices);
     // var verts = distributionB.vertices;
 
-    const TWEEN = app.TWEEN;
+    const TWEEN = this.app.TWEEN;
 
     verts.forEach((vert, i) => {
         var direction, position, size;
@@ -68,7 +74,7 @@ const Space = function(parent, app) {
         mesh.scale.set(size, size, size);
         mesh.rotateX(random.random() * Math.PI);
         mesh.rotateY(random.random() * Math.PI);
-        group.add(mesh);
+        this.group.add(mesh);
 
         mesh.rotation.z = 0;
         new TWEEN.Tween(mesh.rotation)
@@ -76,12 +82,6 @@ const Space = function(parent, app) {
             .repeat(Infinity)
             .start();
     });
-
-    this.group = group;
-};
-
-Space.prototype.setVisible = function(value) {
-    this.group.visible = value;
 };
 
 Space.prototype.geometries = function() {
