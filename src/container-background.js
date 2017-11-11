@@ -2,9 +2,10 @@
 const ContainerBackground = function(parent, app, geometry) {
 
     const material = new THREE.MeshBasicMaterial({
-        color: 0x322f57,
+        color: 0x1c1833,
         side: THREE.BackSide,
-        depthTest: false
+        transparent: true,
+        opacity: .75
     });
 
     const mesh = new THREE.Mesh(geometry, material);

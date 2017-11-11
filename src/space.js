@@ -1,4 +1,4 @@
-const random = require('random-seed').create(2);
+const random = require('random-seed').create('darD22saASdak');
 
 
 const Space = function(parent) {
@@ -6,25 +6,65 @@ const Space = function(parent) {
     const group = new THREE.Group();
     parent.add(group);
 
-    const material = new THREE.MeshBasicMaterial({
-        color: 0x322f57
+    const color = new THREE.Color(0x423a6f);
+    const front = new THREE.Color(0x5cbcff);
+    const back = new THREE.Color(0x322f57);
+    back.lerp(front, .25);
+
+    const solidMaterial = new THREE.MeshPhongMaterial({
+        color: front,
+        transparent: true,
+        opacity: .5
     });
 
-    const radius = 15;
-    const geometries = this.geometries();
-    const distribution = new THREE.DodecahedronGeometry(radius);
+    const lineMaterial = new THREE.LineBasicMaterial({
+        color: front
+    });
 
-    distribution.vertices.forEach(vert => {
+    const radius = 20;
+    const geometries = this.geometries();
+    const distributionA = new THREE.IcosahedronGeometry(radius);
+    const distributionB = new THREE.DodecahedronGeometry(radius);
+
+    distributionB.rotateX(Math.PI * .5);
+
+    distributionA.rotateX(1.1);
+    distributionB.rotateX(1.1);
+    distributionA.rotateY(4.8);
+    distributionB.rotateY(4.8);
+
+    var verts = distributionA.vertices.concat(distributionB.vertices);
+    // var verts = distributionB.vertices;
+
+    verts.forEach((vert, i) => {
         var direction, position, size;
 
-        direction = this.randomPointOnSphere(6, random.random);
-        position = vert.clone().add(direction);
-        size = random.floatBetween(1, 2);
+        var dist = random.floatBetween(.8, 1.3);
+        direction = this.randomPointOnSphere(3, random.random);
+        position = vert.clone().multiplyScalar(dist).add(direction);
+        size = random.random();
 
-        const geometry = geometries[i % geometries.length];
-        const mesh = new THREE.Mesh(geometry, material);
+        if (i < distributionA.vertices.length) {
+            size = Math.pow(size, 6);
+        }
+
+        const geom = Math.round(size * 2);
+        const geometry = geometries[geom];
+
+        var mesh;
+
+        if (geom === 0) {
+            mesh = new THREE.Mesh(geometry.solid, solidMaterial);
+        } else {
+            mesh = new THREE.LineSegments(geometry.wireframe, lineMaterial);
+        }
+
+        size = size * 5 + 1;
+        
         mesh.position.copy(position);
         mesh.scale.set(size, size, size);
+        mesh.rotateX(random.random() * Math.PI);
+        mesh.rotateY(random.random() * Math.PI);
         group.add(mesh);
     });
 
@@ -37,10 +77,15 @@ Space.prototype.setVisible = function(value) {
 
 Space.prototype.geometries = function() {
     return [
-        new THREE.DodecahedronGeometry(1),
-        new THREE.IcosahedronGeometry(1),
-        new THREE.OctahedronGeometry(1)
-    ];
+        new THREE.OctahedronBufferGeometry(1),
+        new THREE.DodecahedronBufferGeometry(1),
+        new THREE.IcosahedronBufferGeometry(1)
+    ].map(geometry => {
+        return {
+            solid: geometry,
+            wireframe: new THREE.EdgesGeometry(geometry)
+        };
+    });
 };
 
 Space.prototype.randomPointOnSphere = function(radius, rand) {

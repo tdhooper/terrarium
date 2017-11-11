@@ -89,7 +89,7 @@ Main.prototype.initThree = function() {
     this.container.appendChild(this.renderer.domElement);
 
     this.camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
-    this.camera.position.set(3, .5, 0);
+    this.camera.position.set(3 * 1.2, .5 * 1.2, 0);
     this.cameraControls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     this.cameraControls.enableDamping = true;
     this.cameraControls.dampingFactor = 0.05;
@@ -107,7 +107,25 @@ Main.prototype.render = function() {
     this.renderer.clear(true, true, true);
 
     if (this.terrarium.soilCursor.renderOnTop) {
+
+        // Render background and space only
+        this.terrarium.soilCursor.setVisible(false);
+        this.terrarium.container.setVisible(false);
+        this.terrarium.soil.setVisible(false);
+        this.terrarium.soilCursor.setVisible(false);
         this.renderer.render(this.scene, this.camera);
+
+        // render everything else
+        this.space.setVisible(false);
+        this.terrarium.containerBackground.setVisible(false);
+        this.terrarium.soilCursor.setVisible(true);
+        this.terrarium.container.setVisible(true);
+        this.terrarium.soil.setVisible(true);
+        this.terrarium.soilCursor.setVisible(true);
+        this.renderer.render(this.scene, this.camera);
+
+        this.space.setVisible(true);
+        this.terrarium.containerBackground.setVisible(true);
         return;
     }
 
