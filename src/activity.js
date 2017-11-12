@@ -2,7 +2,7 @@
 const INACTIVE_DELAY = 2500;
 
 function ActivityMonitor() {
-    this.isActive = true;
+    this.active();
     document.addEventListener('mousemove', this.active.bind(this));
     document.addEventListener('mousedown', this.active.bind(this));
     document.addEventListener('mouseup', this.active.bind(this));
