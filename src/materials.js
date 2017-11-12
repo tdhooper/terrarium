@@ -177,7 +177,7 @@ stars.fragmentShader = insertGlsl(
         'float r = dot(cxy, cxy);',
         'float delta = fwidth(r);',
         'diffuseColor.a = 1.0 - smoothstep(1.0 - delta, 1.0 + delta, r);',
-        'diffuseColor.xyz = spectrum(vSeed + time * ceil(vSeed * 6.));',
+        'diffuseColor.xyz = spectrum(vSeed * 6. + time * ceil(vSeed * 6.));',
         'diffuseColor.xyz = mix(diffuseColor.xyz, vec3(1), hash11(vSeed));'
     ].join('\n')
 );
