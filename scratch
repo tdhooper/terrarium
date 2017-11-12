@@ -8,17 +8,16 @@ perf tweaks
 
 * Simplify crystal texture
 * Use top-down shadows, and drop update rate
+* Delay between setting up scene and animating in
 
 
 Appearance
 
 * Make crystals iridescent on bottom, refractive on top
+** Or allow choosing between two materials
 * Add specular reflections
 * Ambient dust/snow billboards
-* Stars
-* Orbiting planet shapes
 
 Features
 
 * Switch container
-* Auto rotate

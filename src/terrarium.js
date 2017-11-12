@@ -8,6 +8,7 @@ const CrystalPlanter = require('./crystal-planter');
 const Terrarium = function(parent, app) {
     const group = new THREE.Group();
     parent.add(group);
+    this.group = group;
 
     const containerGeom = new ContainerGeometry();
     const containerBackground = new ContainerBackground(group, app, containerGeom);
@@ -44,6 +45,15 @@ const Terrarium = function(parent, app) {
         inTween.start();
         spinTween.start();
     });
+
+    app.eventMediator.on('start', function() {
+        inTween.start();
+        spinTween.start();
+    });
+};
+
+Terrarium.prototype.setRotation = function(rotation) {
+    this.group.rotation.y = rotation % (Math.PI * 2);
 };
 
 module.exports = Terrarium;

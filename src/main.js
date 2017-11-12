@@ -17,6 +17,7 @@ const InlineLog = require('./inline-log');
 const Controls = require('./controls');
 const QualityAdjust = require('./quality-adjust');
 const Controller = require('./controller');
+const Autorotate = require('./autorotate');
 
 
 const Main = function() {
@@ -28,7 +29,7 @@ const Main = function() {
     this.initScene();
     window.addEventListener('resize', this.onResize.bind(this), false);
     this.onResize();
-    this.animate();
+    this.animate(0);
 };
 
 Main.prototype.initApp = function() {
@@ -65,6 +66,7 @@ Main.prototype.initScene = function() {
     this.adjust = new QualityAdjust(this);
     this.app.terrarium = this.terrarium;
     const controller = new Controller(this.app);
+    this.autorotate = new Autorotate(this.app, this.terrarium);
     this.app.eventMediator.emit('start');
 };
 
@@ -158,12 +160,13 @@ Main.prototype.render = function() {
     this.terrarium.crystalPlanter.setVisible(true);
 };
 
-Main.prototype.animate = function() {
+Main.prototype.animate = function(elapsed) {
     // setTimeout(this.animate.bind(this), Math.random() * 70);
     requestAnimationFrame(this.animate.bind(this));
     this.stats.begin();
     this.app.eventMediator.emit('update');
     TWEEN.update();
+    this.autorotate.update(elapsed);
     this.render();
     this.stats.end();
     this.adjust.update();
