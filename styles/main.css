@@ -39,6 +39,15 @@ body {
     position: fixed;
     bottom: 30px;
     left: 30px;
+    transition-property: transform;
+    transition-duration: .25s;
+    transition-timing-function: ease-out;
+}
+
+.activity-monitor-inactive .controls {
+    transform: translate(-70px);
+    transition-duration: .5s;
+    transition-timing-function: ease-in;
 }
 
 .controls-undo {

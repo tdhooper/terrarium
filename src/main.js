@@ -7,6 +7,7 @@ const PerspectiveCamera = require('./lib/square-perspective-camera');
 const TWEEN = require('@tweenjs/tween.js');
 const Stats = require('stats.js');
 
+const ActivityMonitor = require('./activity');
 const materials = require('./materials');
 const InteractionPublisher = require('./interaction-publisher');
 const History = require('./history');
@@ -23,6 +24,8 @@ const Autorotate = require('./autorotate');
 const Main = function() {
     // this.log = new InlineLog();
     this.log = console;
+
+    new ActivityMonitor();
 
     class Emitter extends EventEmitter {}
     this.eventMediator = new Emitter();
