@@ -13,6 +13,16 @@ const Space = function(parent, app) {
 
     this.addPlanets();
     this.addStars();
+
+    const t = {t: 0};
+    const axis = new THREE.Vector3(1,1,0).normalize();
+    new app.TWEEN.Tween(t)
+        .to({t: 1}, 1000000)
+        .onUpdate(object => {
+            group.quaternion.setFromAxisAngle(axis, object.t * Math.PI * 2);
+        })
+        .repeat(Infinity)
+        .start();
 };
 
 Space.prototype.setVisible = function(value) {
