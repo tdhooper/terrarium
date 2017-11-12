@@ -1,14 +1,12 @@
 TODO
 
-* Style undo/redo
 * On mobile, pause before starting cursor timer
-
 
 perf tweaks
 
 * Simplify crystal texture
 * Use top-down shadows, and drop update rate
-* Delay between setting up scene and animating in
+* Only import necessary js
 
 
 Appearance

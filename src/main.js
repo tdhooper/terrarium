@@ -36,6 +36,9 @@ const Main = function() {
     window.addEventListener('resize', this.onResize.bind(this), false);
     this.onResize();
     this.animate(0);
+    setTimeout(() => {
+        this.eventMediator.emit('start');
+    }, 100);
 };
 
 Main.prototype.initApp = function() {
@@ -71,7 +74,6 @@ Main.prototype.initScene = function() {
     this.app.terrarium = this.terrarium;
     const controller = new Controller(this.app);
     this.autorotate = new Autorotate(this.app, this.terrarium);
-    this.eventMediator.emit('start');
 };
 
 Main.prototype.initThree = function() {
