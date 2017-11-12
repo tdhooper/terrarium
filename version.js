@@ -2,8 +2,11 @@ const Version = require("node-version-assets");
 
 
 const version = new Version({
-    assets: ['js/index.js'],
-    grepFiles: ['index.html']
+    assets: [
+        'build/index.js',
+        'build/main.css'
+    ],
+    grepFiles: ['build/index.html']
 });
 
 version.run();

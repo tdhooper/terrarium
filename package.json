@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node budo.js",
-    "build": "rm -r js || true; mkdir js; browserify index.js | uglifyjs > js/index.js; cp -f index.template index.html; node version.js"
+    "start": "budo index.js --css /styles/main.css --live --force-default-index",
+    "build": "./build.sh"
   },
   "keywords": [],
   "author": "",
