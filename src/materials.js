@@ -133,7 +133,7 @@ const stars = new THREE.PointsMaterial({
 makeShadable(stars);
 
 stars.extensions = {derivatives: true};
-stars.sizeAttenuation = false;
+// stars.sizeAttenuation = false;
 
 stars.vertexShader = insertGlsl(
     stars.vertexShader,
@@ -150,12 +150,16 @@ stars.vertexShader = insertGlsl(
     stars.vertexShader,
     '#include <color_vertex>',
     [
-        'float sizeRez = min(uResolution.x, uResolution.y) * .005;',
+        'float sizeRez = min(uResolution.x, uResolution.y);',
         'vSeed = aSeed;'
     ].join('\n')
 );
 
 stars.vertexShader = stars.vertexShader.replace(/gl_PointSize = size/g, 'gl_PointSize = (aSize * sizeRez)');
+
+stars.vertexShader = stars.vertexShader.replace('* ( scale / - mvPosition.z )', '/ length(cameraPosition - mvPosition.xyz)');
+
+
 
 stars.fragmentShader = insertGlsl(
     stars.fragmentShader,
