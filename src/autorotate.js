@@ -75,7 +75,7 @@ Autorotate.prototype.start = function(delay) {
         this.rotating = true;
         this.rotateOn();
     }
-    if ( ! self.delay) {
+    if (delay && ! self.delay) {
         this.delay = setTimeout(() => {
             delete this.delay;
             this.start();
