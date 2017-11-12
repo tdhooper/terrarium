@@ -34,7 +34,7 @@ Space.prototype.addStars = function() {
         vertices[i * 3 + 0] = vertex[0];
         vertices[i * 3 + 1] = vertex[1];
         vertices[i * 3 + 2] = vertex[2];
-        size[i] = random.floatBetween(.02, .2);
+        size[i] = random.floatBetween(.02, .25);
         seed[i] = random.random();
     }
 
