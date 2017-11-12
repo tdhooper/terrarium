@@ -31,7 +31,8 @@
     "stats.js": "^0.17.0",
     "three": "^0.87.1",
     "threejs-slice-geometry": "^0.1.1",
-    "uglify-js": "^3.1.5"
+    "uglify-js": "^3.1.5",
+    "what-input": "^5.0.3"
   },
   "devDependencies": {
     "babelify": "^7.3.0",
