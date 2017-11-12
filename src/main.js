@@ -24,6 +24,9 @@ const Main = function() {
     // this.log = new InlineLog();
     this.log = console;
 
+    class Emitter extends EventEmitter {}
+    this.eventMediator = new Emitter();
+
     this.initThree();
     this.initApp();
     this.initScene();
@@ -33,18 +36,16 @@ const Main = function() {
 };
 
 Main.prototype.initApp = function() {
-    class Emitter extends EventEmitter {}
-    const eventMediator = new Emitter();
     const interactionPublisher = new InteractionPublisher(
         this.renderer.domElement,
         this.camera,
-        eventMediator,
+        this.eventMediator,
         this.log
     );
-    const history = new History(eventMediator);
+    const history = new History(this.eventMediator);
     this.app = {
         TWEEN: TWEEN,
-        eventMediator: eventMediator,
+        eventMediator: this.eventMediator,
         interactionPublisher: interactionPublisher,
         camera: this.camera,
         history: history,
@@ -67,7 +68,7 @@ Main.prototype.initScene = function() {
     this.app.terrarium = this.terrarium;
     const controller = new Controller(this.app);
     this.autorotate = new Autorotate(this.app, this.terrarium);
-    this.app.eventMediator.emit('start');
+    this.eventMediator.emit('start');
 };
 
 Main.prototype.initThree = function() {
@@ -93,11 +94,20 @@ Main.prototype.initThree = function() {
 
     this.camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
     this.camera.position.set(3 * 1.2, .5 * 1.2, 0);
-    // this.camera.position.applyAxisAngle(new THREE.Vector3(0,1,0), Math.PI * .12);
+
     this.cameraControls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     this.cameraControls.enableDamping = true;
     this.cameraControls.dampingFactor = 0.05;
     this.cameraControls.rotateSpeed = 0.066;
+
+    var azimuth = 0;
+    this.cameraControls.addEventListener('change', () => {
+        var newAzimuth = this.cameraControls.getAzimuthalAngle();
+        if (newAzimuth !== azimuth) {
+            this.eventMediator.emit('camera.rotate.azimuth', newAzimuth);
+        }
+        azimuth = newAzimuth;
+    });
 
     this.scene = new THREE.Scene();
     this.scene.add(this.camera);
@@ -164,7 +174,7 @@ Main.prototype.animate = function(elapsed) {
     // setTimeout(this.animate.bind(this), Math.random() * 70);
     requestAnimationFrame(this.animate.bind(this));
     this.stats.begin();
-    this.app.eventMediator.emit('update');
+    this.eventMediator.emit('update');
     TWEEN.update();
     this.autorotate.update(elapsed);
     this.render();
