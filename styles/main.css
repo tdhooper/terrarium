@@ -83,7 +83,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNzguMjU0IiBoZWlnaHQ9IjE3OC4yNTciIHZpZXdCb3g9IjAgMCAxNzguMjU0IDE3OC4yNTciPjxwYXRoIGQ9Ik00NC44NzQgNDYuMjM3TDI5LjcyOSAzMS41NTggMTMuNzk0IDk0Ljk3MyA3Ni42OCA3Ny4wNjRsLTE1LjE0Ni0xNC42OGMxNC43Ny0xNS4yMzkgMzkuMDk4LTE1LjYxOCA1NC4zMzYtLjg0OCAxNS4yMzkgMTQuNzcgMTUuNjE5IDM5LjA5OC44NSA1NC4zMzYtMTQuNzcxIDE1LjIzOS0zOS4wOTggMTUuNjE5LTU0LjMzNi44NDlsLTE2LjE0NyAxNi42NmMyNC40NCAyMy42ODggNjMuNDU2IDIzLjA4IDg3LjE0NS0xLjM2MSAyMy42ODgtMjQuNDQgMjMuMDc5LTYzLjQ1Ny0xLjM2MS04Ny4xNDUtMjQuNDQzLTIzLjY4Ny02My40NTgtMjMuMDgtODcuMTQ3IDEuMzYyeiIvPjwvc3ZnPg==);
+    background-image: url(../images/undo.svg);
     background-repeat: no-repeat;
     background-size: 80%;
     background-position: 50%;
