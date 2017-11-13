@@ -94,7 +94,7 @@ Main.prototype.initThree = function() {
 
     this.container = document.createElement('div');
     this.container.classList.add('container');
-    document.body.appendChild(this.container);
+    document.body.insertBefore(this.container, document.body.firstChild);
     this.container.appendChild(this.renderer.domElement);
 
     this.camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
