@@ -1,6 +1,7 @@
 rm -r build || true
 mkdir build
-browserify index.js | uglifyjs -cm > build/index.js
+browserify index.js > build/index.js
+uglifyjs build/index.js -m -c unused=false -o build/index.js
 cp -f index.html build/index.html
 cp -rf styles build/
 cp -rf images build/
