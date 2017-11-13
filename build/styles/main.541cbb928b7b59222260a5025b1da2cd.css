@@ -7,7 +7,7 @@ body {
     margin: 0;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(0deg, #503f83, #4e5fa1);
+    background: linear-gradient(0deg, #5d3277, #4e5fa1);
 }
 
 [data-whatintent="mouse"] *:focus {
@@ -37,8 +37,8 @@ body {
 
 .controls {
     position: fixed;
-    bottom: 30px;
-    left: 30px;
+    bottom: 20px;
+    left: 20px;
     transition-property: transform;
     transition-duration: .25s;
     transition-timing-function: ease-out;
