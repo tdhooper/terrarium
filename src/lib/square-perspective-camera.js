@@ -1,5 +1,3 @@
-const THREE = require('three');
-
 const _Math = THREE.Math;
 
 

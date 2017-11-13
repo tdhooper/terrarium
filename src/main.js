@@ -1,4 +1,5 @@
-global.THREE = require('three');
+global.THREE = require('three/build/three.min');
+
 require('three/examples/js/controls/OrbitControls');
 
 const EventEmitter = require('events');
