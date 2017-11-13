@@ -20,7 +20,6 @@
     "brfs": "^1.4.3",
     "budo": "^9.4.7",
     "cga": "^1.0.8",
-    "crystal-gen": "github:tdhooper/crystal-gen",
     "from2-string": "^1.1.0",
     "gl-matrix": "^2.4.0",
     "glslify": "^6.1.0",

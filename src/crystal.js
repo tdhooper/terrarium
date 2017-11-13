@@ -1,4 +1,4 @@
-const crystalGen = require('crystal-gen');
+const crystalGen = require('./crystal-gen');
 
 
 const Crystal = function(parent, app, position, normal, material) {
@@ -123,7 +123,7 @@ Crystal.prototype.setDirection = function(normal, animate, delay) {
 };
 
 Crystal.prototype.createGeometry = function(seed) {
-    const geometry = crystalGen.create({
+    const geometry = crystalGen({
         sides: 5,
         diameter: .125,
         height: 1.25,
