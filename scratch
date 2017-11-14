@@ -1,6 +1,9 @@
 TODO
 
 * On mobile, pause before starting cursor timer
+* fix 180 on start
+* limit zoom
+* fix highlight artifacts
 
 perf tweaks
 

@@ -57,7 +57,8 @@ Main.prototype.initApp = function() {
         camera: this.camera,
         history: history,
         log: this.log,
-        scene: this.scene
+        scene: this.scene,
+        elapsed: 0
     };
     const controls = new Controls(document.body, this.app);
 
@@ -177,6 +178,7 @@ Main.prototype.render = function() {
 };
 
 Main.prototype.animate = function(elapsed) {
+    this.app.elapsed = elapsed;
     // setTimeout(this.animate.bind(this), Math.random() * 70);
     requestAnimationFrame(this.animate.bind(this));
     this.stats.begin();

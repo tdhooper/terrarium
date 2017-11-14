@@ -18,6 +18,8 @@ const Crystal = function(parent, app, position, normal, material) {
     const mesh = new THREE.Mesh(geometry, this.material);
     mesh.castShadow = true;
 
+    mesh.onBeforeRender = this.updateTime.bind(this);
+
     const group = new THREE.Group();
     group.add(mesh);
     parent.add(group);
@@ -79,6 +81,10 @@ const Crystal = function(parent, app, position, normal, material) {
     initialTween.start();
     this.growTween.start();
     combinedTween.start();
+};
+
+Crystal.prototype.updateTime = function() {
+    this.material.uniforms.time.value = this.app.elapsed / 500;
 };
 
 Crystal.prototype.setSize = function(size) {

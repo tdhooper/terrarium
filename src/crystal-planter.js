@@ -10,6 +10,9 @@ const CrystalPlanter = function(parent, app) {
     parent.add(this.object);
 
     this.material = materials.crystal;
+    this.material.uniforms.seed.value = Math.random();
+    this.material.uniforms.height.value = 1;
+    this.material.uniforms.scale.value = 1;
 
     // const sphereGeom = new THREE.SphereGeometry(.5);
     // const sphere = new THREE.Mesh(sphereGeom, this.material);
@@ -18,6 +21,10 @@ const CrystalPlanter = function(parent, app) {
     // const boxGeom = new THREE.BoxGeometry(.2, 1, .2);
     // const box = new THREE.Mesh(boxGeom, this.material);
     // this.object.add(box);
+
+    // box.onBeforeRender = function() {
+    //     this.material.uniforms.time.value = this.app.elapsed / 500;
+    // }.bind(this);
 
     app.eventMediator.on('soil-cursor.down', this.onMouseDown.bind(this));
     app.eventMediator.on('soil-cursor.up', this.onMouseUp.bind(this));

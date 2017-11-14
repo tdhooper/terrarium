@@ -33,6 +33,7 @@ module.exports.crystal = new THREE.ShaderMaterial({
         fogColor: {type: 'c'},
         fogDensity: {type: 'f'},
         seed: {type: 'f'},
+        time: {type: 'f', value: 0},
         bottomClip: {type: 'f'},
         height: {type: 'f'},
         scale: {type: 'f'},

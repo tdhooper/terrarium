@@ -1,23 +1,13 @@
-#ifdef USE_FOG
-    uniform vec3 fogColor;
-    varying float fogDepth;
-    #ifdef FOG_EXP2
-        uniform float fogDensity;
-    #else
-        uniform float fogNear;
-        uniform float fogFar;
-    #endif
-#endif
-
 uniform float seed;
+uniform float time;
 uniform float bottomClip;
 uniform float height;
 uniform float scale;
-uniform float flash;
 
 varying vec3 vPosition;
+varying vec3 vViewPosition;
 varying vec3 vNormal;
-varying float vAngleOfIncidence;
+
 
 const float LOG2 = 1.442695;
 
@@ -76,7 +66,7 @@ float noise(vec3 x) {
                    mix( hash(n + dot(step, vec3(0, 1, 1))), hash(n + dot(step, vec3(1, 1, 1))), u.x), u.y), u.z);
 }
 
-#define NUM_OCTAVES 5
+#define NUM_OCTAVES 2
 
 float fbm ( in vec3 _st) {
     float v = 0.0;
@@ -95,10 +85,27 @@ float fbm ( in vec3 _st) {
     return v;
 }
 
+#define NUM_OCTAVES2 5
+
+float fbm2 ( in vec3 _st) {
+    float v = 0.0;
+    float a = 0.5;
+    vec3 shift = vec3(20.0);
+    // Rotate to reduce axial bias
+    mat3 rot = mat3(cos(0.5), sin(0.5), 0,
+                    -sin(0.5), cos(0.50), 0,
+                    0, 0, 1
+                );
+    for (int i = 0; i < NUM_OCTAVES2; ++i) {
+        v += a * noise(_st);
+        _st = rot * _st * 2.2 + shift;
+        a *= 0.5;
+    }
+    return v;
+}
 
 
-float pattern( vec3 st ) {
-    // st *= 3.5;
+vec4 map( vec3 st ) {
 
     st.x += seed * 100.;
     
@@ -108,44 +115,12 @@ float pattern( vec3 st ) {
     a.x = fbm( st);
     a.y = fbm( st + vec3(1.0));
     a.z = fbm( st + vec3(2.0));
-    
-    b.x = fbm( st + 4.*a);
-    b.y = fbm( st);
-    b.z = fbm( st + 10. * a);
 
-    c.x = fbm( st + 7.0*b + vec3(10.7,.2,0)+ 0.215 );
-    c.y = fbm( st + 3.944*b + vec3(.3,12.8,0)+ 0.16);
-    c.z = fbm( st + 1.8*b + vec3(8.3,1.8,0)+ 0.16);
+    b.x = fbm( st + 4. * a + time * .05);
+    b.y = fbm( st + time * .2);
+    b.z = fbm( st + 10. * a + time * .1);
 
-    float f = fbm(st+b+c);
-
-    // f -= c.x;
-    // f += c.y;
-
-    f -= (c.x / b.y) * .25;
-    f += (c.y / b.x) * .25;
-
-    // f /= a.y * 1.55;
-
-    float o = .2;
-    float s = .3;
-    float g = f;
-
-    float gg = smoothstep(o, o + s, g) - smoothstep(o + s, o + s * 2., g);
-
-    f = mix(f, c.x, gg);
-
-    f = pow(c.x*2., 2.);
-
-    float j = floor(f * 2.) / 2.;
-
-    j = hash(j);
-
-    f = j * f;
-
-    f = pow(f,3.);
-
-    return clamp(f, 0., 1.);
+    return vec4(normalize(b * 2. - 1.), fbm2(b) * 2. - 1.);
 }
 
 
@@ -154,36 +129,28 @@ float pattern( vec3 st ) {
 // --------------------------------------------------------
 
 void main() {
-    float d = dot(vec3(0,0,1), normalize(vNormal));
+
     vec3 positon = vPosition;
     positon *= scale;
     positon.z += height * .5;
-    float e = pattern(positon) * .2;
-    // e = step(e, .5);
-    // e = e * 2. - 1.;
-    // e = 0.;
-    float angle = vAngleOfIncidence * flash + e;
-    vec3 color = spectrum(angle * 1.);
+
+    vec4 m = map(positon);
+    float e = m.w;
+
+    vec3 normal = vNormal;
+    float angleOfIncidence = acos(dot(normalize(normal + m.xyz * .25), normalize(vViewPosition)));
+
+    angleOfIncidence = 1.75 - angleOfIncidence * .5;
+
+    angleOfIncidence += e * 1.5;
+
+    vec3 color = spectrum(angleOfIncidence);
+
     color = linearToScreen(color);
 
     if (vPosition.z < bottomClip) {
         discard;
     }
 
-    // color = vec3(e);
-    // color = mod(vPosition * 10., 1.);
-
     gl_FragColor = vec4(color, 1);
-
-    // gl_FragColor = vec4(vNormal *.5 + .5, 1);
-
-    #ifdef USE_FOG
-        #ifdef FOG_EXP2
-            float fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 ) );
-        #else
-            float fogFactor = smoothstep( fogNear, fogFar, fogDepth );
-        #endif
-        gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
-    #endif
-
 }
