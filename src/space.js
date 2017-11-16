@@ -1,4 +1,5 @@
 const random = require('random-seed').create('escher/fuller/moebius');
+const crystalGen = require('./crystal-gen');
 
 var materials = require('./materials');
 
@@ -139,10 +140,40 @@ Space.prototype.addPlanets = function() {
 };
 
 Space.prototype.geometries = function() {
+
+    var geometry = new THREE.Geometry();
+
+    var shard = new THREE.OctahedronGeometry();
+    shard.scale(.2,.2,.5);
+
+    var distribution = new THREE.IcosahedronGeometry(1);
+    distribution.vertices.forEach(vertex => {
+        // var crystal = crystalGen(
+        //     {
+        //         sides: 5,
+        //         diameter: .25,
+        //         height: 1.2,
+        //         topSlope: .7,
+        //         topFacets: 3,
+        //         topScale: .5,
+        //         doubleSide: true
+        //     },
+        //     function() {
+        //         return 0;
+        //     }
+        // );
+        var crystal = shard.clone();
+        crystal.translate(0,0,1);
+        crystal.lookAt(vertex);
+
+        geometry.merge(crystal);
+    });
+
+
     return [
-        new THREE.OctahedronBufferGeometry(1),
-        new THREE.DodecahedronBufferGeometry(1),
-        new THREE.IcosahedronBufferGeometry(1)
+        geometry,
+        geometry,
+        geometry
     ].map(geometry => {
         return {
             solid: geometry,

@@ -1,4 +1,5 @@
 const crystalGen = require('./crystal-gen');
+const genRandom = require('random-seed');
 
 
 const Crystal = function(parent, app, position, normal, material) {
@@ -129,15 +130,16 @@ Crystal.prototype.setDirection = function(normal, animate, delay) {
 };
 
 Crystal.prototype.createGeometry = function(seed) {
-    const geometry = crystalGen({
+    var spec = {
         sides: 5,
         diameter: .125,
         height: 1.25,
         topSlope: .7,
         topFacets: 3,
-        topScale: 1.5,
-        seed: seed
-    });
+        topScale: 1.5
+    };
+    var rand = genRandom(seed).random;
+    const geometry = crystalGen(spec, rand);
     geometry.computeFlatVertexNormals();
     return geometry;
 };

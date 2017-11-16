@@ -1,8 +1,7 @@
 const ThreeBSP = require('ThreeCSG')(THREE);
-const genRandom = require('random-seed');
 
 
-function topPlane(slope, angle, point) {
+function topPlane(slope, angle, point, invert) {
     var normal = new THREE.Vector3(
         0,
         Math.cos( (slope * .5 - .5) * Math.PI),
@@ -12,6 +11,9 @@ function topPlane(slope, angle, point) {
         new THREE.Vector3(0, 0, 1),
         angle * Math.PI * 2
     );
+    if (invert) {
+        normal = normal.negate();
+    }
     var plane = new THREE.Plane().setFromNormalAndCoplanarPoint(normal, point);
     var basicPlane = [
         plane.normal.toArray(),
@@ -20,10 +22,10 @@ function topPlane(slope, angle, point) {
     return basicPlane;
 }
 
-function create(spec) {
+function create(spec, rand) {
     var engine = threeEngine;
     var shape = polygon(spec.sides, spec.diameter);
-    var rand = genRandom(spec.seed).random;
+    var doubleSide = spec.doubleSide || false;
 
     shape.forEach(function(point) {        
         point[0] += (rand() * 2 - 1) * .2 * spec.diameter;
@@ -36,11 +38,13 @@ function create(spec) {
 
     var rot = (Math.PI * 2) / (spec.topFacets * 2);
 
-    for (var i = 0; i < spec.topFacets; i++) {
-        var offset = (rand() * 2 - 1) * .05;
-        var slopeOffset = (rand() * 2 - 1) * .1;
-        var angle = i / spec.topFacets + rot + offset;
-        var plane = topPlane(
+    var i, offset, slopeOffset, angle, plane;
+
+    for (i = 0; i < spec.topFacets; i++) {
+        offset = (rand() * 2 - 1) * .05;
+        slopeOffset = (rand() * 2 - 1) * .1;
+        angle = i / spec.topFacets + rot + offset;
+        plane = topPlane(
             spec.topSlope + slopeOffset,
             angle,
             point
@@ -48,11 +52,27 @@ function create(spec) {
         geometry = engine.slice(geometry, plane);
     }
 
-    var plane = topPlane(
-        spec.topSlope * .5,
-        0,
-        point.clone().multiplyScalar(.9)
-    );
+    if (doubleSide) {
+        point = new THREE.Vector3(0, 0, 0);
+        for (i = 0; i < spec.topFacets; i++) {
+            offset = (rand() * 2 - 1) * .05;
+            slopeOffset = (rand() * 2 - 1) * .1;
+            angle = i / spec.topFacets + rot + offset;
+            plane = topPlane(
+                spec.topSlope + slopeOffset,
+                angle,
+                point,
+                true
+            );
+            geometry = engine.slice(geometry, plane);
+        }
+    }
+
+    // var plane = topPlane(
+    //     spec.topSlope * .5,
+    //     0,
+    //     point.clone().multiplyScalar(.9)
+    // );
     // geometry = engine.slice(geometry, plane);
 
     return engine.asThreeGeometry(geometry);
