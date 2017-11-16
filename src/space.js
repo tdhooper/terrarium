@@ -102,6 +102,7 @@ Space.prototype.addPlanets = function() {
         instancedGeometryA.updateRotation(this.app.elapsed * .00005);
     }.bind(this);
     this.group.add(instancedMeshA);
+    instancedMeshA.renderOrder = -1;
 
     var instancedGeometryB = this.createInstancedGeometry(
         bufferGeometry,
