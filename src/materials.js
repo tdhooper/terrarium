@@ -1,6 +1,13 @@
 var glslify = require('glslify');
 
 
+const ShadablePointsMaterial = ShadableMixin(THREE.PointsMaterial);
+const ShadablePhongMaterial = ShadableMixin(THREE.MeshPhongMaterial);
+
+
+/* Container
+   ========================================================================== */
+
 const front = new THREE.Color(0x70a8f3);
 const back = new THREE.Color(0x322f57);
 
@@ -16,7 +23,6 @@ module.exports.containerWireframe = new THREE.ShaderMaterial({
     }
 });
 
-
 module.exports.containerBack = new THREE.MeshBasicMaterial({
     color: 0x1c1833,
     side: THREE.BackSide,
@@ -25,21 +31,25 @@ module.exports.containerBack = new THREE.MeshBasicMaterial({
 });
 
 
+/* Crystals
+   ========================================================================== */
+
 module.exports.crystal = new THREE.ShaderMaterial({
     vertexShader: glslify('./shaders/crystal.vert'),
     fragmentShader: glslify('./shaders/crystal.frag'),
     fog: true,
     uniforms: {
-        fogColor: {type: 'c'},
-        fogDensity: {type: 'f'},
         seed: {type: 'f'},
         time: {type: 'f', value: 0},
         bottomClip: {type: 'f'},
         height: {type: 'f'},
         scale: {type: 'f'},
-        flash: {type: 'f', value: 1}
     }
 });
+
+
+/* Soil Cursor
+   ========================================================================== */
 
 module.exports.soilCursor = new THREE.ShaderMaterial({
     uniforms: {
@@ -52,30 +62,31 @@ module.exports.soilCursor = new THREE.ShaderMaterial({
 });
 
 
+/* Soil Bottom
+   ========================================================================== */
+
 module.exports.soilBottom = new THREE.MeshPhongMaterial({
     color: 0xffffff,
     shininess: 0
 });
 
-const soilTop = new THREE.MeshPhongMaterial();
-makeShadable(soilTop);
 
-var insertPlace, insert;
+/* Soil top
+   ========================================================================== */
 
-soilTop.vertexShader = insertGlsl(
-    soilTop.vertexShader,
+const soilTop = new ShadablePhongMaterial();
+
+soilTop.updateVertexShader(
     '#include <common>',
     'varying vec3 vPosition;'
 );
 
-soilTop.vertexShader = insertGlsl(
-    soilTop.vertexShader,
+soilTop.updateVertexShader(
     '#include <uv_vertex>',
     'vPosition = position;'
 );
 
-soilTop.fragmentShader = insertGlsl(
-    soilTop.fragmentShader,
+soilTop.updateFragmentShader(
     '#include <common>',
     [
         'varying vec3 vPosition;',
@@ -84,8 +95,7 @@ soilTop.fragmentShader = insertGlsl(
     ].join('\n')
 );
 
-soilTop.fragmentShader = insertGlsl(
-    soilTop.fragmentShader,
+soilTop.updateFragmentShader(
     '#include <color_fragment>',
     [
         'float magnitude = length(vPosition.xz);',
@@ -115,6 +125,9 @@ soilTop.uniforms.highlightColor3 = {type: 'v3', value: highlightColor.toArray()}
 module.exports.soilTop = soilTop;
 
 
+/* Planets
+   ========================================================================== */
+
 const planetColor = new THREE.Color(0x5cbcff);
 
 module.exports.planetSolid = new THREE.MeshPhongMaterial({
@@ -128,16 +141,16 @@ module.exports.planetWireframe = new THREE.LineBasicMaterial({
 });
 
 
-const stars = new THREE.PointsMaterial({
+/* Stars
+   ========================================================================== */
+
+const stars = new ShadablePointsMaterial({
     transparent: true
 });
-makeShadable(stars);
 
 stars.extensions = {derivatives: true};
-// stars.sizeAttenuation = false;
 
-stars.vertexShader = insertGlsl(
-    stars.vertexShader,
+stars.updateVertexShader(
     '#include <common>',
     [
         'attribute float aSize;',
@@ -147,8 +160,7 @@ stars.vertexShader = insertGlsl(
     ].join('\n')
 );
 
-stars.vertexShader = insertGlsl(
-    stars.vertexShader,
+stars.updateVertexShader(
     '#include <color_vertex>',
     [
         'float sizeRez = min(uResolution.x, uResolution.y);',
@@ -160,10 +172,7 @@ stars.vertexShader = stars.vertexShader.replace(/gl_PointSize = size/g, 'gl_Poin
 
 stars.vertexShader = stars.vertexShader.replace('* ( scale / - mvPosition.z )', '/ length(cameraPosition - mvPosition.xyz)');
 
-
-
-stars.fragmentShader = insertGlsl(
-    stars.fragmentShader,
+stars.updateFragmentShader(
     '#include <common>',
     [
         glslify('./shaders/lib/spectrum.glsl'),
@@ -174,8 +183,7 @@ stars.fragmentShader = insertGlsl(
     ].join('\n')
 );
 
-stars.fragmentShader = insertGlsl(
-    stars.fragmentShader,
+stars.updateFragmentShader(
     '#include <color_fragment>',
     [
         'vec2 cxy = 2.0 * gl_PointCoord - 1.0;',
@@ -193,7 +201,12 @@ stars.uniforms.time = {type: 'float', value: 0};
 module.exports.stars = stars;
 
 
-function makeShadable(material) {
+/* ShadableMixin
+   ========================================================================== */
+
+
+function ShadableMixin(SourceMaterial) {
+
     const shaderIDs = {
         MeshDepthMaterial: 'depth',
         MeshDistanceMaterial: 'distanceRGBA',
@@ -209,18 +222,38 @@ function makeShadable(material) {
         PointsMaterial: 'points',
         ShadowMaterial: 'shadow'
     };
-    const shaderId = shaderIDs[material.type];
-    const shader = THREE.ShaderLib[shaderId];
-    material.type = 'ShaderMaterial';
-    material.vertexShader = shader.vertexShader;
-    material.fragmentShader = shader.fragmentShader;
-    material.uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-}
 
-function insertGlsl(glsl, place, insert, before) {
-    if (before) {
-        return glsl.replace(place, insert + '\n' + place);
-    }
-    var a = glsl.replace(place, place + '\n' + insert);
-    return a;
+    var NewMaterial = function(parameters) {
+        SourceMaterial.call(this, parameters);
+
+        const sourceType = this.type;
+        this.type = 'ShaderMaterial';
+
+        const shaderId = shaderIDs[sourceType];
+        const shader = THREE.ShaderLib[shaderId];
+        this.vertexShader = shader.vertexShader;
+        this.fragmentShader = shader.fragmentShader;
+        this.uniforms = THREE.UniformsUtils.clone(shader.uniforms);
+    };
+
+    NewMaterial.prototype = Object.create(SourceMaterial.prototype);
+    NewMaterial.prototype.constructor = NewMaterial;
+
+    NewMaterial.prototype.updateVertexShader = function(place, insert, before) {
+        this.vertexShader = this.insertGlsl(this.vertexShader, place, insert, before);
+    };
+
+    NewMaterial.prototype.updateFragmentShader = function(place, insert, before) {
+        this.fragmentShader = this.insertGlsl(this.fragmentShader, place, insert, before);
+    };
+
+    NewMaterial.prototype.insertGlsl = function(glsl, place, insert, before) {
+        if (before) {
+            return glsl.replace(place, insert + '\n' + place);
+        }
+        var a = glsl.replace(place, place + '\n' + insert);
+        return a;
+    };
+
+    return NewMaterial;
 }
