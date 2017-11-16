@@ -34,18 +34,62 @@ module.exports.containerBack = new THREE.MeshBasicMaterial({
 /* Crystals
    ========================================================================== */
 
-module.exports.crystal = new THREE.ShaderMaterial({
-    vertexShader: glslify('./shaders/crystal.vert'),
-    fragmentShader: glslify('./shaders/crystal.frag'),
-    fog: true,
-    uniforms: {
-        seed: {type: 'f'},
-        time: {type: 'f', value: 0},
-        bottomClip: {type: 'f'},
-        height: {type: 'f'},
-        scale: {type: 'f'},
-    }
-});
+
+var crystal = new ShadablePhongMaterial();
+
+crystal.uniforms.seed = {type: 'f'};
+crystal.uniforms.time = {type: 'f', value: 0};
+crystal.uniforms.bottomClip = {type: 'f'};
+crystal.uniforms.height = {type: 'f'};
+crystal.uniforms.scale = {type: 'f'};
+
+crystal.updateVertexShader(
+    '#include <common>',
+    'varying vec3 vPosition;'
+);
+
+crystal.updateVertexShader(
+    '#include <uv_vertex>',
+    'vPosition = position;'
+);
+
+crystal.updateFragmentShader(
+    '#include <common>',
+    [
+        'varying vec3 vPosition;',
+        'uniform float seed;',
+        'uniform float time;',
+        'uniform float bottomClip;',
+        'uniform float height;',
+        'uniform float scale;',
+        glslify('./shaders/lib/spectrum.glsl'),
+        glslify('./shaders/lib/gamma.glsl'),
+        glslify('./shaders/lib/crystal-map.glsl')
+    ].join('\n')
+);
+
+crystal.updateFragmentShader(
+    '#include <logdepthbuf_fragment>',
+    [
+        'if (vPosition.z < bottomClip) { discard; }',
+        'vec3 positon = vPosition;',
+        'positon *= scale;',
+        'positon.z += height * .5;',
+        'vec4 m = map(seed, time, positon);',
+        'float e = m.w;',
+        'float angleOfIncidence = acos(dot(normalize(vNormal + m.xyz * .25), normalize(vViewPosition)));',
+        'angleOfIncidence = 1.75 - angleOfIncidence * .5;',
+        'angleOfIncidence += e * 1.5;',
+        'diffuseColor.rgb = spectrum(angleOfIncidence);',
+        'diffuseColor.rgb = linearToScreen(diffuseColor.rgb);',
+        'gl_FragColor = diffuseColor;',
+        'return;'
+    ].join('\n'),
+    true
+);
+
+module.exports.crystal = crystal;
+
 
 
 /* Soil Cursor
@@ -253,6 +297,17 @@ function ShadableMixin(SourceMaterial) {
         }
         var a = glsl.replace(place, place + '\n' + insert);
         return a;
+    };
+
+    NewMaterial.prototype.copy = function(source) {
+        SourceMaterial.prototype.copy.call(this, source);
+
+        this.fragmentShader = source.fragmentShader;
+        this.vertexShader = source.vertexShader;
+
+        this.uniforms = THREE.UniformsUtils.clone(source.uniforms);
+
+        return this;
     };
 
     return NewMaterial;

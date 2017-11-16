@@ -4,6 +4,9 @@ TODO
 * fix 180 on start
 * limit zoom
 * fix highlight artifacts
+* fix autospin
+** doesn't start sometimes
+** spins fast when tabbing back to window
 
 perf tweaks
 
