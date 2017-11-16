@@ -18,13 +18,16 @@ const Space = function(parent, app) {
 
     const t = {t: 0};
     const axis = new THREE.Vector3(1,1,0).normalize();
-    new app.TWEEN.Tween(t)
+    var rotate = new app.TWEEN.Tween(t)
         .to({t: 1}, 1000000)
         .onUpdate(object => {
             group.quaternion.setFromAxisAngle(axis, object.t * Math.PI * 2);
         })
-        .repeat(Infinity)
-        .start();
+        .repeat(Infinity);
+
+    app.eventMediator.on('start', function() {
+        rotate.start();
+    });
 };
 
 Space.prototype.setVisible = function(value) {
@@ -99,7 +102,7 @@ Space.prototype.addPlanets = function() {
     );
     var instancedMeshA = new THREE.Mesh(instancedGeometryA.geometry, materials.planetWireframe);
     instancedMeshA.onBeforeRender = function() {
-        instancedGeometryA.updateRotation(this.app.elapsed * .00005);
+        instancedGeometryA.animate(this.app.elapsed);
     }.bind(this);
     this.group.add(instancedMeshA);
     instancedMeshA.renderOrder = -1;
@@ -111,7 +114,7 @@ Space.prototype.addPlanets = function() {
     );
     var instancedMeshB = new THREE.Mesh(instancedGeometryB.geometry, materials.planetSolid);
     instancedMeshB.onBeforeRender = function() {
-        instancedGeometryB.updateRotation(this.app.elapsed * .0001);
+        instancedGeometryB.animate(this.app.elapsed);
     }.bind(this);
     this.group.add(instancedMeshB);
 };
@@ -158,6 +161,9 @@ Space.prototype.planetsSpec = function() {
         position = vert.clone().multiplyScalar(dist).add(direction);
         
         rotateSpeed = THREE.Math.lerp(1, .1, size);
+        if (isSolid) {
+            rotateSpeed *= 2;
+        }
 
         size = size * 6 + 1;
 
@@ -228,7 +234,8 @@ Space.prototype.createInstancedGeometry = function(bufferGeometry, parentSpecs, 
 
     return {
         geometry: instancedGeometry,
-        updateRotation: function(d) {
+        animate: function(d) {
+            d *= .00005;
             parentSpecs.forEach((spec, p) => {
                 rotationA.makeRotationZ(d * spec.rotateSpeed);
                 rotationB.makeRotationZ(d * spec.rotateSpeed * 3);

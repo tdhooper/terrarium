@@ -36,8 +36,9 @@ const Main = function() {
     this.initScene();
     window.addEventListener('resize', this.onResize.bind(this), false);
     this.onResize();
-    this.animate(0);
+    requestAnimationFrame(this.animate.bind(this));
     setTimeout(() => {
+        this.startTime = Date.now();
         this.eventMediator.emit('start');
     }, 100);
 };
@@ -178,7 +179,9 @@ Main.prototype.render = function() {
 };
 
 Main.prototype.animate = function(elapsed) {
-    this.app.elapsed = elapsed;
+    if (this.startTime) {
+        this.app.elapsed = Date.now() - this.startTime;
+    }
     // setTimeout(this.animate.bind(this), Math.random() * 70);
     requestAnimationFrame(this.animate.bind(this));
     this.stats.begin();
