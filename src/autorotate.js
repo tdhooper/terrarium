@@ -99,7 +99,11 @@ Autorotate.prototype.update = function(time) {
     const delta = time - this.time;
     this.time = time;
     const change = (this.targetSpeed - this.currentSpeed) * acceleration * delta;
-    this.currentSpeed = this.currentSpeed + change;
+    if (change > 0) {
+        this.currentSpeed = Math.min(this.targetSpeed, this.currentSpeed + change);
+    } else {
+        this.currentSpeed = Math.max(this.targetSpeed, this.currentSpeed + change);
+    }
     this.rotation += this.currentSpeed * delta;
     this.object.setRotation(this.rotation);
 };
