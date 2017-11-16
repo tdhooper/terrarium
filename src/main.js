@@ -1,4 +1,4 @@
-global.THREE = require('three/build/three.min');
+global.THREE = require('three/build/three');
 
 require('three/examples/js/controls/OrbitControls');
 
