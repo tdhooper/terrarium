@@ -225,7 +225,9 @@ module.exports.planetSolid = planetSolid;
 
 
 const planetWireframe = new ShadableMeshBasicMaterial({
-    color: planetColor
+    color: planetColor,
+    opacity: .5,
+    transparent: true
 });
 
 planetWireframe.updateVertexShader('#include <common>', instancedHead);

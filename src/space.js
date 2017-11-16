@@ -75,7 +75,7 @@ Space.prototype.addPlanets = function() {
 
     var wireframeGeometry = new THREE.OctahedronGeometry();
     wireframeGeometry.scale(.2,.2,.5);
-    wireframeGeometry = geometryTools.wireframeMesh(wireframeGeometry, .001);
+    wireframeGeometry = geometryTools.wireframeMesh(wireframeGeometry, .002);
     var wireframeBufferGeometry = new THREE.BufferGeometry().fromGeometry(wireframeGeometry);
 
     var origin = new THREE.Vector3();
