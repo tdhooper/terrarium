@@ -32,14 +32,17 @@ const Terrarium = function(parent, app) {
         .to({x: 1, y: 1, z: 1}, 1250)
         .easing(TWEEN.Easing.Cubic.Out)
         .onComplete(() => {
-            this.ready = true;
             app.eventMediator.emit('ready');
         });
 
-    group.rotation.y = 0;
+    this.rotateLock = true;
+    group.rotation.y = -Math.PI;
     const spinTween = new TWEEN.Tween(group.rotation)
-        .to({y: Math.PI}, 1500)
-        .easing(TWEEN.Easing.Cubic.Out);
+        .to({y: 0}, 1500)
+        .easing(TWEEN.Easing.Cubic.Out)
+        .onComplete(() => {
+            this.rotateLock = false;
+        });
 
     app.eventMediator.on('start', function() {
         inTween.start();
@@ -48,7 +51,7 @@ const Terrarium = function(parent, app) {
 };
 
 Terrarium.prototype.setRotation = function(rotation) {
-    if ( ! this.ready) {
+    if (this.rotateLock) {
         return;
     }
     this.group.rotation.y = rotation % (Math.PI * 2);
