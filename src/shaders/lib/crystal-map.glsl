@@ -51,7 +51,7 @@ float fbm ( in vec3 _st) {
     return v;
 }
 
-#define NUM_OCTAVES2 5
+#define NUM_OCTAVES2 4
 
 float fbm2 ( in vec3 _st) {
     float v = 0.0;
@@ -70,6 +70,56 @@ float fbm2 ( in vec3 _st) {
     return v;
 }
 
+float pattern(float seed, float time, vec3 st ) {
+    // st *= 3.5;
+
+    st.x += seed * 100.;
+    
+    vec3 color = vec3(0.);
+    vec3 a, b, c;
+    
+    a.x = fbm2( st);
+    a.y = fbm2( st + vec3(1.0));
+    a.z = fbm2( st + vec3(2.0));
+    
+    b.x = fbm2( st + 4.*a);
+    b.y = fbm2( st);
+    b.z = fbm2( st + 10. * a);
+
+    c.x = fbm2( st + 7.0*b + vec3(10.7,.2,0)+ 0.215 * time );
+    c.y = fbm2( st + 3.944*b + vec3(.3,12.8,0)+ 0.16 * time );
+    c.z = fbm2( st + 1.8*b + vec3(8.3,1.8,0)+ 0.16 * time );
+
+    float f = fbm2(st+b+c);
+
+    // f -= c.x;
+    // f += c.y;
+
+    f -= (c.x / b.y) * .25;
+    f += (c.y / b.x) * .25;
+
+    // f /= a.y * 1.55;
+
+    float o = .2;
+    float s = .3;
+    float g = f;
+
+    float gg = smoothstep(o, o + s, g) - smoothstep(o + s, o + s * 2., g);
+
+    f = mix(f, c.x, gg);
+
+    f = pow(c.x*2., 2.);
+
+    float j = floor(f * 2.) / 2.;
+
+    j = hash(j);
+
+    f = j * f;
+
+    f = pow(f,3.);
+
+    return clamp(f, 0., 1.);
+}
 
 vec4 map(float seed, float time, vec3 st) {
 
@@ -86,7 +136,7 @@ vec4 map(float seed, float time, vec3 st) {
     b.y = fbm( st + time * .2);
     b.z = fbm( st + 10. * a + time * .1);
 
-    return vec4(normalize(b * 2. - 1.), fbm2(b) * 2. - 1.);
+    return vec4(normalize(b * 2. - 1.), 0.);
 }
 
 #pragma glslify: export(map)
