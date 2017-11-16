@@ -45,18 +45,26 @@ crystal.uniforms.scale = {type: 'f'};
 
 crystal.updateVertexShader(
     '#include <common>',
-    'varying vec3 vPosition;'
+    [
+        'varying vec3 vPosition;',
+        'varying vec3 vReflect;'
+    ].join('\n'),
+    true
 );
 
 crystal.updateVertexShader(
-    '#include <uv_vertex>',
-    'vPosition = position;'
+    '#include <fog_vertex>',
+    [
+        'vPosition = position;',
+        'vReflect = reflect(vec3(0,0,-1), transformedNormal);'
+    ].join('\n')
 );
 
 crystal.updateFragmentShader(
     '#include <common>',
     [
         'varying vec3 vPosition;',
+        'varying vec3 vReflect;',
         'uniform float seed;',
         'uniform float time;',
         'uniform float bottomClip;',
@@ -80,8 +88,22 @@ crystal.updateFragmentShader(
         'float angleOfIncidence = acos(dot(normalize(vNormal + m.xyz * .25), normalize(vViewPosition)));',
         'angleOfIncidence = 1.75 - angleOfIncidence * .5;',
         'angleOfIncidence += e * 1.5;',
-        'diffuseColor.rgb = spectrum(angleOfIncidence);',
-        'diffuseColor.rgb = linearToScreen(diffuseColor.rgb);',
+        'vec3 col = spectrum(angleOfIncidence);',
+
+        'float sp;',
+        'sp += clamp(dot(normalize(vec3(-1,0,0)), vReflect), 0., 1.);',
+        'sp += clamp(dot(normalize(vec3(0,1,0)), vReflect), 0., 1.);',
+        'sp += clamp(dot(normalize(vec3(-1,-.5,0)), vReflect), 0., 1.);',
+        'sp /= 3.;',
+        'sp = pow(sp, 3.);',
+        'sp = clamp(sp, 0., 1.);',
+        'col = mix(col, vec3(1), sp * .5);',
+        'sp = pow(sp * 3., 10.);',
+        'sp = clamp(sp, 0., 1.);',
+        'col = mix(col, vec3(1), sp * .5);',
+
+        'col = linearToScreen(col);',
+        'diffuseColor.rgb = col;',
         'gl_FragColor = diffuseColor;',
         'return;'
     ].join('\n'),

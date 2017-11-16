@@ -18,13 +18,24 @@ const CrystalPlanter = function(parent, app) {
     // const sphere = new THREE.Mesh(sphereGeom, this.material);
     // this.object.add(sphere);
 
-    // const boxGeom = new THREE.BoxGeometry(.2, 1, .2);
-    // const box = new THREE.Mesh(boxGeom, this.material);
+    // var boxGeom = new THREE.BoxGeometry(.2, 1, .2);
+    // var box = new THREE.Mesh(boxGeom, this.material);
+    // box.position.x = .5;
     // this.object.add(box);
 
     // box.onBeforeRender = function() {
     //     this.material.uniforms.time.value = this.app.elapsed / 500;
     // }.bind(this);
+
+    // var m = new THREE.MeshPhongMaterial({
+    //     color: 0x666666,
+    //     shininess: 100000,
+    //     specular: 0xffffff
+    // });
+    // var boxGeom = new THREE.BoxGeometry(.2, 1, .2);
+    // var box = new THREE.Mesh(boxGeom, m);
+    // box.position.x = -.5;
+    // this.object.add(box);
 
     app.eventMediator.on('soil-cursor.down', this.onMouseDown.bind(this));
     app.eventMediator.on('soil-cursor.up', this.onMouseUp.bind(this));
