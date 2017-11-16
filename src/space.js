@@ -1,7 +1,8 @@
 const random = require('random-seed').create('escher/fuller/moebius');
-const crystalGen = require('./crystal-gen');
 
-var materials = require('./materials');
+const crystalGen = require('./crystal-gen');
+const geometryTools = require('./geometry-tools');
+const materials = require('./materials');
 
 
 const Space = function(parent, app) {
@@ -185,7 +186,7 @@ Space.prototype.planetsSpec = function() {
         
         rotateSpeed = THREE.Math.lerp(15000, 300000, size);
 
-        size = size * 5 + 1;
+        size = size * 6 + 1;
 
         rotation = new THREE.Euler(
             random.random() * Math.PI * 2,
@@ -244,21 +245,27 @@ Space.prototype.test = function() {
     var bufferGeometry = new THREE.OctahedronBufferGeometry();
     bufferGeometry.scale(.2,.2,.5);
 
+    var wireframeGeometry = new THREE.OctahedronGeometry();
+    wireframeGeometry.scale(.2,.2,.5);
+    wireframeGeometry = geometryTools.wireframeMesh(wireframeGeometry, .001);
+    var wireframeBufferGeometry = new THREE.BufferGeometry().fromGeometry(wireframeGeometry);
+
     var origin = new THREE.Vector3();
     var up = new THREE.Vector3(0,1,0);
 
     var icoDistribution = new THREE.IcosahedronGeometry(1);
+
     var snowflakeMatricies = icoDistribution.vertices.map(vertex => {
         var matrix = new THREE.Matrix4();
         matrix.lookAt(vertex, origin, up);
-        matrix.setPosition(vertex);
+        matrix.setPosition(vertex.clone().multiplyScalar(.75));
         return matrix;
     });
 
     var specs = this.planetsSpec();
 
     var instancedGeometryA = this.createInstancedGeometry(
-        bufferGeometry,
+        wireframeBufferGeometry,
         specs.wireframe,
         snowflakeMatricies
     );
