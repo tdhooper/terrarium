@@ -85,9 +85,10 @@ crystal.updateFragmentShader(
         'positon.z += height * .5;',
         'vec4 m = map(seed, time, positon);',
         'float e = m.w;',
-        'float angleOfIncidence = acos(dot(normalize(vNormal + m.xyz * .25), normalize(vViewPosition)));',
+        'float angleOfIncidence = acos(dot(normalize(vNormal + m.xyz * .2), normalize(vViewPosition)));',
         'angleOfIncidence = 1.75 - angleOfIncidence * .5;',
-        'angleOfIncidence += e * 1.5;',
+        'angleOfIncidence += e * .2;',
+        'angleOfIncidence = pow(angleOfIncidence, 2.);',
         'vec3 col = spectrum(angleOfIncidence);',
 
         'float sp;',
