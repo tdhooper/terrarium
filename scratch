@@ -4,9 +4,9 @@ TODO
 * limit zoom
 * fix highlight artifacts
 * fix autospin
-** doesn't start sometimes
-** spins fast when tabbing back to window
+** spins fast when tabbing back to window?
 * Reduce poly count of soil bottom
+
 
 perf tweaks
 
@@ -22,6 +22,12 @@ Appearance
 * Add specular reflections
 * Ambient dust/snow billboards
 
+
 Features
 
 * Switch container
+* Switch crystal material
+* Add space creature
+** Floats around the back
+** Moves closer when you plant crystals
+** Eats your crystals when you plant lots

@@ -67,6 +67,12 @@ Autorotate.prototype.resume = function() {
     if (this.wasRotating) {
         this.wasRotating = false;
         this.start();
+    } else if (this.wasWaiting) {
+        this.wasWaiting = false;
+        this.start(3000);
+    } else if (this.delay) {
+        this.stop();
+        this.start(3000);
     }
 };
 
@@ -75,7 +81,7 @@ Autorotate.prototype.start = function(delay) {
         this.rotating = true;
         this.rotateOn();
     }
-    if (delay && ! self.delay) {
+    if (delay && ! this.delay) {
         this.delay = setTimeout(() => {
             delete this.delay;
             this.start();
@@ -87,6 +93,7 @@ Autorotate.prototype.stop = function() {
     if (this.delay) {
         clearTimeout(this.delay);
         delete this.delay;
+        this.wasWaiting = true;
     }
     if (this.rotating) {
         this.rotating = false;
