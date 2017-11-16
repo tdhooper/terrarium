@@ -6,6 +6,7 @@ TODO
 * fix autospin
 ** doesn't start sometimes
 ** spins fast when tabbing back to window
+* Reduce poly count of soil bottom
 
 perf tweaks
 

@@ -3,6 +3,20 @@ var glslify = require('glslify');
 
 const ShadablePointsMaterial = ShadableMixin(THREE.PointsMaterial);
 const ShadablePhongMaterial = ShadableMixin(THREE.MeshPhongMaterial);
+const ShadableMeshBasicMaterial = ShadableMixin(THREE.MeshBasicMaterial);
+
+const instancedHead = [
+    'attribute vec3 instancePosition;',
+    'attribute vec4 instanceQuaternion;',
+    'attribute vec3 instanceScale;',
+    'vec3 applyTRS( vec3 position, vec3 translation, vec4 quaternion, vec3 scale ) {',
+        'position *= scale;',
+        'position += 2.0 * cross( quaternion.xyz, cross( quaternion.xyz, position ) + quaternion.w * position );',
+        'return position + translation;',
+    '}'
+].join('\n');
+
+const instancedBody = 'transformed = applyTRS(transformed.xyz, instancePosition, instanceQuaternion, instanceScale);';
 
 
 /* Container
@@ -199,15 +213,26 @@ module.exports.soilTop = soilTop;
 
 const planetColor = new THREE.Color(0x5cbcff);
 
-module.exports.planetSolid = new THREE.MeshPhongMaterial({
-    color: planetColor,
-    transparent: true,
-    opacity: .5
+const planetSolid = new ShadablePhongMaterial({
+    color: 0xffffff,
+    shininess: 0
 });
 
-module.exports.planetWireframe = new THREE.LineBasicMaterial({
-    color: planetColor
+planetSolid.updateVertexShader('#include <common>', instancedHead);
+planetSolid.updateVertexShader('#include <begin_vertex>', instancedBody);
+
+module.exports.planetSolid = planetSolid;
+
+
+const planetWireframe = new ShadableMeshBasicMaterial({
+    color: front
 });
+
+planetWireframe.updateVertexShader('#include <common>', instancedHead);
+planetWireframe.updateVertexShader('#include <begin_vertex>', instancedBody);
+
+module.exports.planetWireframe = planetWireframe;
+
 
 
 /* Stars
