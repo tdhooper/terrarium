@@ -31,7 +31,7 @@ Space.prototype.setVisible = function(value) {
 
 Space.prototype.addStars = function() {
     const geometry = new THREE.BufferGeometry();
-    const count = 1000;
+    const count = 5000;
     const vertices = new Float32Array(count * 3);
     const size = new Float32Array(count);
     const seed = new Float32Array(count);
@@ -44,7 +44,7 @@ Space.prototype.addStars = function() {
         vertices[i * 3 + 0] = vertex[0];
         vertices[i * 3 + 1] = vertex[1];
         vertices[i * 3 + 2] = vertex[2];
-        size[i] = random.floatBetween(.02, .25);
+        size[i] = 0.05 + Math.pow(random.random(), 4) * .2;
         seed[i] = random.random();
     }
 
