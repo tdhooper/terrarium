@@ -107,7 +107,7 @@ crystal.updateFragmentShader(
         'float ee = pat * .2 + .8;',
         'col = spectrum(angleOfIncidence * ee);',
 
-        'float sp;',
+        'float sp = 0.;',
         'sp += clamp(dot(normalize(vec3(-1,0,0)), vReflect), 0., 1.);',
         'sp += clamp(dot(normalize(vec3(0,1,0)), vReflect), 0., 1.);',
         'sp += clamp(dot(normalize(vec3(-1,-.5,0)), vReflect), 0., 1.);',

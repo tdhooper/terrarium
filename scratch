@@ -31,3 +31,6 @@ Features
 ** Floats around the back
 ** Moves closer when you plant crystals
 ** Eats your crystals when you plant lots
+* Click crystals to make them spin
+** Make the background go progressively crazy too
+* Create an env map with low res fbm texture
