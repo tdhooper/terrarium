@@ -75,7 +75,36 @@ Space.prototype.addStars = function() {
 
 Space.prototype.addPlanets = function() {
 
-    var specs = this.planetsSpec();
+    var arrangements = this.planetArrangements();
+    var geometries = this.planetGeometries();
+
+    const specs = [
+        {
+            geometry: geometries.snowflakeSolid.geometry,
+            material: materials.planetSolid,
+            objects: arrangements[2].map(this.createPlanet.bind(this, {
+                object: geometries.snowflakeSolid.object,
+                size: [1.5, 3],
+                dist: [20, 30],
+                speed: [5, 2]
+            })),
+        },
+        {
+            geometry: geometries.snowflakeWireframe.geometry,
+            material: materials.planetWireframe,
+            objects: arrangements[0].map(this.createPlanet.bind(this, {
+                object: geometries.snowflakeWireframe.object,
+                size: [10, 15],
+                dist: [40, 50],
+                speed: [1, .5]
+            })).concat(arrangements[1].map(this.createPlanet.bind(this, {
+                object: geometries.snowflakeWireframe.object,
+                size: [3, 5],
+                dist: [20, 30],
+                speed: [1, .5]
+            })))
+        }
+    ];
 
     specs.forEach(spec => {
 
@@ -112,57 +141,8 @@ Space.prototype.addPlanets = function() {
     });
 };
 
-Space.prototype.planetsSpec = function() {
 
-    var spec, direction, position, size, dist, isSolid, rotateSpeed, rotation, factor, factor2, point;
-    var quaternion = new THREE.Quaternion();
-    var scale = new THREE.Vector3();
-
-    var createObject = function(spec, normal, i) {
-
-        if (i % 2 === 0) {
-            factor = random.floatBetween(0, .5);    
-        } else {
-            factor = random.floatBetween(.5, 1);
-        }
-        
-        factor = Math.pow(factor, 2);
-
-        size = THREE.Math.lerp(spec.size[0], spec.size[1], factor);
-        rotateSpeed = THREE.Math.lerp(spec.speed[0], spec.speed[1], factor);
-
-        dist = random.floatBetween(spec.dist[0], spec.dist[1]);
-        position = normal.clone().multiplyScalar(dist);
-
-        direction = new THREE.Vector3().fromArray(this.randomPointOnSphere(1, random.random));
-        direction.cross(normal).normalize();
-        direction.multiplyScalar(spec.dist[0] * 0.1);
-        position.add(direction);
-
-        rotation = new THREE.Euler(
-            random.random() * Math.PI * 2,
-            random.random() * Math.PI,
-            0
-        );
-
-        var matrix = new THREE.Matrix4().compose(
-            position,
-            quaternion.setFromEuler(rotation),
-            scale.set(size, size, size)
-        );
-
-        var object = spec.object.clone();
-
-        object.applyMatrix(matrix);
-
-        object.spec = {
-            rotateSpeed: rotateSpeed
-        };
-
-        return object;
-    };
-
-
+Space.prototype.planetArrangements = function() {
     const solid = polyhedra.archimedean.Icosidodecahedron;
 
     const vertices = solid.vertex.map(vertex => {
@@ -175,25 +155,28 @@ Space.prototype.planetsSpec = function() {
         }, new THREE.Vector3()).normalize();
     };
 
+    var sets = [];
+
     var faceTypes = solid.face.reduce((acc, value) => {
         const normals = acc[value.length] = acc[value.length] || [];
         normals.push(findFaceNormal(value));
         return acc;
     }, {});
 
-    const keys = Object.keys(faceTypes).sort((a, b) => {
-        return parseInt(a) - parseInt(b);
-    });
-    faceTypes = keys.map(key => {
-        return faceTypes[key];
+    Object.keys(faceTypes).forEach(key => {
+        sets.push(faceTypes[key]);
     });
 
-    const vertNormals = vertices.map(vertex => {
+    sets.push(vertices.map(vertex => {
         return vertex.normalize();
-    });
+    }));
 
+    sets.sort((a, b) => a.length - b.length);
 
+    return sets;
+};
 
+Space.prototype.planetGeometries = function() {
     var bufferGeometry = new THREE.OctahedronBufferGeometry();
     bufferGeometry.scale(.2,.2,.5);
 
@@ -202,54 +185,65 @@ Space.prototype.planetsSpec = function() {
     wireframeGeometry = geometryTools.wireframeMesh(wireframeGeometry, .002);
     var wireframeBufferGeometry = new THREE.BufferGeometry().fromGeometry(wireframeGeometry);
 
-    var origin = new THREE.Vector3();
-    var up = new THREE.Vector3(0,1,0);
-
-    var icoDistribution = new THREE.IcosahedronGeometry(1);
-
-    var snowflakeMatricies = icoDistribution.vertices.map(vertex => {
-        var matrix = new THREE.Matrix4();
-        matrix.lookAt(vertex, origin, up);
-        matrix.setPosition(vertex.clone().multiplyScalar(.75));
-        return matrix;
-    });
-
     var snowflakeObject = new THREE.Object3D();
-    snowflakeMatricies.forEach(matrix => {
+    var icoDistribution = new THREE.IcosahedronGeometry(1);
+    icoDistribution.vertices.forEach(vertex => {
         var object = new THREE.Object3D();
-        object.applyMatrix(matrix);
+        object.lookAt(vertex);
+        object.position.copy(vertex).multiplyScalar(.75);
         snowflakeObject.add(object);
     });
 
-    const specs = [
-        {
+    return {
+        snowflakeSolid: {
             geometry: bufferGeometry,
-            material: materials.planetSolid,
-            objects: vertNormals.map(createObject.bind(this, {
-                object: snowflakeObject,
-                size: [1.5, 3],
-                dist: [20, 30],
-                speed: [5, 2]
-            })),
+            object: snowflakeObject
         },
-        {
+        snowflakeWireframe: {
             geometry: wireframeBufferGeometry,
-            material: materials.planetWireframe,
-            objects: faceTypes[1].map(createObject.bind(this, {
-                object: snowflakeObject,
-                size: [10, 15],
-                dist: [40, 50],
-                speed: [1, .5]
-            })).concat(faceTypes[0].map(createObject.bind(this, {
-                object: snowflakeObject,
-                size: [3, 5],
-                dist: [20, 30],
-                speed: [1, .5]
-            })))
+            object: snowflakeObject
         }
-    ];
+    };
+};
 
-    return specs;
+Space.prototype.createPlanet = function(spec, normal, i) {
+
+    if (i % 2 === 0) {
+        factor = random.floatBetween(0, .5);    
+    } else {
+        factor = random.floatBetween(.5, 1);
+    }
+    
+    var factor = Math.pow(factor, 2);
+
+    var size = THREE.Math.lerp(spec.size[0], spec.size[1], factor);
+    var rotateSpeed = THREE.Math.lerp(spec.speed[0], spec.speed[1], factor);
+
+    var dist = random.floatBetween(spec.dist[0], spec.dist[1]);
+    var position = normal.clone().multiplyScalar(dist);
+
+    var direction = new THREE.Vector3().fromArray(this.randomPointOnSphere(1, random.random));
+    direction.cross(normal).normalize();
+    direction.multiplyScalar(spec.dist[0] * 0.1);
+    position.add(direction);
+
+    var rotation = new THREE.Euler(
+        random.random() * Math.PI * 2,
+        random.random() * Math.PI,
+        0
+    );
+
+    var object = spec.object.clone();
+
+    object.position.copy(position);
+    object.quaternion.setFromEuler(rotation);
+    object.scale.set(size, size, size);
+
+    object.spec = {
+        rotateSpeed: rotateSpeed
+    };
+
+    return object;
 };
 
 Space.prototype.randomPointOnSphere = function(radius, rand) {
