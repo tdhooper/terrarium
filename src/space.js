@@ -1,4 +1,5 @@
 const random = require('random-seed').create('escher/fuller/moebius');
+const polyhedra = require('polyhedra');
 
 const crystalGen = require('./crystal-gen');
 const geometryTools = require('./geometry-tools');
@@ -164,15 +165,34 @@ Space.prototype.planetsSpec = function() {
         };
     };
 
+    const solid = polyhedra.archimedean.Icosidodecahedron;
 
-    const distribution = new THREE.IcosahedronGeometry();
-    distribution.rotateX(1.1);
-
-    const vertNormals = distribution.vertices.map(vertex => {
-        return vertex.normalize();
+    const vertices = solid.vertex.map(vertex => {
+        return new THREE.Vector3().fromArray(vertex);
     });
-    const faceNormals = distribution.faces.map(face => {
-        return face.normal;
+
+    var findFaceNormal = function(face) {
+        return face.reduce((acc, value) => {
+            return acc.add(vertices[value]);
+        }, new THREE.Vector3()).normalize();
+    };
+
+    var faceTypes = solid.face.reduce((acc, value) => {
+        const normals = acc[value.length] = acc[value.length] || [];
+        normals.push(findFaceNormal(value));
+        return acc;
+    }, {});
+
+    const keys = Object.keys(faceTypes).sort((a, b) => {
+        return parseInt(a) - parseInt(b);
+    });
+    console.log(keys);
+    faceTypes = keys.map(key => {
+        return faceTypes[key];
+    });
+
+    const vertNormals = vertices.map(vertex => {
+        return vertex.normalize();
     });
 
     const specs = {
@@ -181,11 +201,17 @@ Space.prototype.planetsSpec = function() {
             dist: [20, 30],
             speed: [5, 2]
         })),
-        wireframe: faceNormals.map(createSpec.bind(this, {
-            size: [5, 8],
+        wireframe: faceTypes[1].map(createSpec.bind(this, {
+            size: [10, 15],
+            dist: [40, 50],
+            speed: [1, .5]
+        })).concat(
+        faceTypes[0].map(createSpec.bind(this, {
+            size: [3, 5],
             dist: [20, 30],
             speed: [1, .5]
-        })),
+        }))
+        ),
     };
 
     return specs;
