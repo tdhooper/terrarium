@@ -1,6 +1,7 @@
 const random = require('random-seed').create('escher/fuller/moebius');
 const polyhedra = require('polyhedra');
 
+const InstancedMesh = require('./instanced-mesh');
 const crystalGen = require('./crystal-gen');
 const geometryTools = require('./geometry-tools');
 const materials = require('./materials');
@@ -96,28 +97,75 @@ Space.prototype.addPlanets = function() {
 
     var specs = this.planetsSpec();
 
-    var instancedGeometryA = this.createInstancedGeometry(
-        wireframeBufferGeometry,
-        specs.wireframe,
-        snowflakeMatricies
-    );
-    var instancedMeshA = new THREE.Mesh(instancedGeometryA.geometry, materials.planetWireframe);
-    instancedMeshA.onBeforeRender = function() {
-        instancedGeometryA.animate(this.app.elapsed);
-    }.bind(this);
-    this.group.add(instancedMeshA);
-    instancedMeshA.renderOrder = -1;
+    var snowflakeObject = new THREE.Object3D();
+    snowflakeMatricies.forEach(matrix => {
+        var object = new THREE.Object3D();
+        object.applyMatrix(matrix);
+        snowflakeObject.add(object);
+    });
 
-    var instancedGeometryB = this.createInstancedGeometry(
-        bufferGeometry,
-        specs.solid,
-        snowflakeMatricies
-    );
-    var instancedMeshB = new THREE.Mesh(instancedGeometryB.geometry, materials.planetSolid);
-    instancedMeshB.onBeforeRender = function() {
-        instancedGeometryB.animate(this.app.elapsed);
+    var objects = [];
+
+    specs.solid.forEach(spec => {
+        var object = snowflakeObject.clone();
+        object.applyMatrix(spec.matrix);
+        object.spec = spec;
+        objects.push(object);
+    });
+
+    var instanced = new InstancedMesh(bufferGeometry, materials.planetSolid, objects);
+    this.group.add(instanced.mesh);
+
+    var z = new THREE.Vector3(0,0,1);
+    var quatA = new THREE.Quaternion();
+    var quatB = new THREE.Quaternion();
+
+    var elapsed = 0;
+
+    instanced.mesh.onBeforeRender = function() {
+        var d = (this.app.elapsed - elapsed) * .00005;
+        elapsed = this.app.elapsed;
+
+        objects.forEach(object => {
+
+            quatA.setFromAxisAngle(z, object.spec.rotateSpeed * d);
+            quatB.setFromAxisAngle(z, object.spec.rotateSpeed * d * 3);
+
+            object.quaternion.multiply(quatA);
+            object.updateMatrixWorld(true);
+
+            if (object.children) {
+                object.children.forEach(child => {
+                    child.quaternion.multiply(quatB);
+                });
+            }
+        });
+
+        instanced.update();
     }.bind(this);
-    this.group.add(instancedMeshB);
+
+    // var instancedGeometryA = this.createInstancedGeometry(
+    //     wireframeBufferGeometry,
+    //     specs.wireframe,
+    //     snowflakeMatricies
+    // );
+    // var instancedMeshA = new THREE.Mesh(instancedGeometryA.geometry, materials.planetWireframe);
+    // instancedMeshA.onBeforeRender = function() {
+    //     instancedGeometryA.animate(this.app.elapsed);
+    // }.bind(this);
+    // this.group.add(instancedMeshA);
+    // instancedMeshA.renderOrder = -1;
+
+    // var instancedGeometryB = this.createInstancedGeometry(
+    //     bufferGeometry,
+    //     specs.solid,
+    //     snowflakeMatricies
+    // );
+    // var instancedMeshB = new THREE.Mesh(instancedGeometryB.geometry, materials.planetSolid);
+    // instancedMeshB.onBeforeRender = function() {
+    //     instancedGeometryB.animate(this.app.elapsed);
+    // }.bind(this);
+    // this.group.add(instancedMeshB);
 };
 
 Space.prototype.planetsSpec = function() {
