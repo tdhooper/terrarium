@@ -121,51 +121,30 @@ Space.prototype.addPlanets = function() {
 
 Space.prototype.planetsSpec = function() {
 
-    var specs = {
-        solid: [],
-        wireframe: []
-    };
-
-    const radius = 20;
-
-    const distributionA = new THREE.IcosahedronGeometry(radius);
-    const distributionB = new THREE.DodecahedronGeometry(radius);
-
-    distributionB.rotateX(Math.PI * .5);
-
-    distributionA.rotateX(1.1);
-    distributionB.rotateX(1.1);
-
-    var verts = distributionA.vertices.concat(distributionB.vertices);
-
-    var spec, direction, position, size, dist, isSolid, rotateSpeed, rotation;
-
+    var spec, direction, position, size, dist, isSolid, rotateSpeed, rotation, factor, factor2, point;
     var quaternion = new THREE.Quaternion();
     var scale = new THREE.Vector3();
 
-    verts.forEach((vert, i) => {
+    var createSpec = function(spec, normal, i) {
 
-        if (i < distributionA.vertices.length) {
-            isSolid = true;
-            size = random.floatBetween(0, 1/3);
-        } else if (i % 2 === 0){
-            size = random.floatBetween(1/3, 2/3);
-            isSolid = false;
+        if (i % 2 === 0) {
+            factor = random.floatBetween(0, .5);    
         } else {
-            size = random.floatBetween(2/3, 1);
-            isSolid = false;
+            factor = random.floatBetween(.5, 1);
         }
-
-        dist = random.floatBetween(1, 1.3);
-        direction = new THREE.Vector3().fromArray(this.randomPointOnSphere(3, random.random));
-        position = vert.clone().multiplyScalar(dist).add(direction);
         
-        rotateSpeed = THREE.Math.lerp(1, .1, size);
-        if (isSolid) {
-            rotateSpeed *= 2;
-        }
+        factor = Math.pow(factor, 2);
 
-        size = size * 6 + 1;
+        size = THREE.Math.lerp(spec.size[0], spec.size[1], factor);
+        rotateSpeed = THREE.Math.lerp(spec.speed[0], spec.speed[1], factor);
+
+        dist = random.floatBetween(spec.dist[0], spec.dist[1]);
+        position = normal.clone().multiplyScalar(dist);
+
+        direction = new THREE.Vector3().fromArray(this.randomPointOnSphere(1, random.random));
+        direction.cross(normal).normalize();
+        direction.multiplyScalar(spec.dist[0] * 0.1);
+        position.add(direction);
 
         rotation = new THREE.Euler(
             random.random() * Math.PI * 2,
@@ -179,18 +158,35 @@ Space.prototype.planetsSpec = function() {
             scale.set(size, size, size)
         );
 
-        if (isSolid) {
-            specs.solid.push({
-                matrix: matrix,
-                rotateSpeed: rotateSpeed
-            });
-        } else {
-            specs.wireframe.push({
-                matrix: matrix,
-                rotateSpeed: rotateSpeed
-            });
-        }
+        return {
+            matrix: matrix,
+            rotateSpeed: rotateSpeed
+        };
+    };
+
+
+    const distribution = new THREE.IcosahedronGeometry();
+    distribution.rotateX(1.1);
+
+    const vertNormals = distribution.vertices.map(vertex => {
+        return vertex.normalize();
     });
+    const faceNormals = distribution.faces.map(face => {
+        return face.normal;
+    });
+
+    const specs = {
+        solid: vertNormals.map(createSpec.bind(this, {
+            size: [1.5, 3],
+            dist: [20, 30],
+            speed: [5, 2]
+        })),
+        wireframe: faceNormals.map(createSpec.bind(this, {
+            size: [5, 8],
+            dist: [20, 30],
+            speed: [1, .5]
+        })),
+    };
 
     return specs;
 };
