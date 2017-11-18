@@ -195,8 +195,8 @@ soilTop.updateFragmentShader(
         'highlightGap2 = step(highlightGap2, .5);',
         'highlightGap = highlightGap * highlightGap2;',
         'float highlightFade = min(pow(magnitude * 1.5, 2.), 1.);',
-        'float highlightStep = (1. - highlightSize) * highlightGap;',
-        'diffuseColor = mix(diffuseColor, highlightColor, step(highlight, highlightStep) * (1. - highlightFade));'
+        'float highlightStep = 1. - highlightSize;',
+        'diffuseColor = mix(diffuseColor, highlightColor, step(highlight, highlightStep) * (1. - highlightFade) * highlightGap);',
     ].join('\n')
 );
 
