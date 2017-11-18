@@ -224,6 +224,28 @@ planetSolid.updateVertexShader('#include <begin_vertex>', instancedBody);
 module.exports.planetSolid = planetSolid;
 
 
+const planetSolid2 = new ShadablePhongMaterial({
+    color: 0x4BAFE2,
+    shininess: 0
+});
+
+planetSolid2.updateVertexShader('#include <common>', instancedHead);
+planetSolid2.updateVertexShader('#include <begin_vertex>', instancedBody);
+
+module.exports.planetSolid2 = planetSolid2;
+
+
+const planetBackground = new ShadablePhongMaterial({
+    color: 0x43367A,
+    shininess: 0
+});
+
+planetBackground.updateVertexShader('#include <common>', instancedHead);
+planetBackground.updateVertexShader('#include <begin_vertex>', instancedBody);
+
+module.exports.planetBackground = planetBackground;
+
+
 const planetWireframe = new ShadableMeshBasicMaterial({
     color: planetColor,
     opacity: .5,
@@ -234,7 +256,6 @@ planetWireframe.updateVertexShader('#include <common>', instancedHead);
 planetWireframe.updateVertexShader('#include <begin_vertex>', instancedBody);
 
 module.exports.planetWireframe = planetWireframe;
-
 
 
 /* Stars
