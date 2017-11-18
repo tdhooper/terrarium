@@ -66,6 +66,7 @@ var InstancedMesh = function(bufferGeometry, material, objects) {
     var scale = new THREE.Vector3();
 
     var addObject = function(object) {
+        object.updateMatrixWorld();
         if (object.children.length) {
             object.children.forEach(addObject.bind(this));
             return;
