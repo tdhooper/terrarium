@@ -1,6 +1,6 @@
 const random = require('random-seed').create('escher/fuller/moebius');
-const polyhedra = require('polyhedra');
 
+const polyhedra = require('./lib/polyhedra');
 const InstancedMesh = require('./instanced-mesh');
 const crystalGen = require('./crystal-gen');
 const geometryTools = require('./geometry-tools');
