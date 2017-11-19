@@ -1,5 +1,6 @@
 var materials = require('./materials');
 const Crystal = require('./crystal');
+const CrystalClick = require('./crystal-click');
 
 
 const CrystalPlanter = function(parent, app) {
@@ -39,6 +40,8 @@ const CrystalPlanter = function(parent, app) {
 
     app.eventMediator.on('soil-cursor.down', this.onMouseDown.bind(this));
     app.eventMediator.on('soil-cursor.up', this.onMouseUp.bind(this));
+
+    new CrystalClick(this.object, app);
 };
 
 CrystalPlanter.prototype.onMouseDown = function(intersection) {

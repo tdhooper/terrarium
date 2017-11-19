@@ -120,6 +120,7 @@ SoilCursor.prototype.show = function() {
     this.isOver = true;
     this.visible = true;
     this.mesh.visible = true;
+    this.app.eventMediator.emit('soil-cursor.visible');
 };
 
 SoilCursor.prototype.hide = function() {
@@ -133,6 +134,7 @@ SoilCursor.prototype.hide = function() {
     }
     this.visible = false;
     this.mesh.visible = false;
+    this.app.eventMediator.emit('soil-cursor.hidden');
 };
 
 SoilCursor.prototype.setVisible = function(value) {
