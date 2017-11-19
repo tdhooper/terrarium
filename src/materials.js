@@ -253,7 +253,7 @@ planetSolid2.updateFragmentShader(
 planetSolid2.updateFragmentShader(
     '#include <color_fragment>',
     [
-        'diffuseColor.xyz = vVariant == 1. ? colorA : diffuseColor.xyz;',
+        'diffuseColor.xyz = mix(diffuseColor.xyz, colorA, vVariant);',
     ].join('\n')
 );
 
