@@ -2,7 +2,6 @@ TODO
 
 * On mobile, pause before starting cursor timer
 * limit zoom
-* fix highlight artifacts
 * fix autospin
 ** spins fast when tabbing back to window?
 * Reduce poly count of soil bottom
@@ -12,14 +11,12 @@ perf tweaks
 
 * Simplify crystal texture
 * Use top-down shadows, and drop update rate
-* Only import necessary js
 
 
 Appearance
 
 * Make crystals iridescent on bottom, refractive on top
 ** Or allow choosing between two materials
-* Add specular reflections
 * Ambient dust/snow billboards
 
 
