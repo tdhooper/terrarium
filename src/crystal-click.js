@@ -2,6 +2,8 @@
 const CrystalClick = function(parent, app) {
     app.interactionPublisher.add(parent, 'crystal', true);
 
+    this.eventMediator = app.eventMediator;
+
     const state = {
         isDown: false,
         cursorVisible: false,
@@ -83,9 +85,8 @@ CrystalClick.prototype.hover = function(on) {
     }
 };
 
-
 CrystalClick.prototype.click = function() {
-    console.log('click');
+    this.eventMediator.emit('crystal.click');
 };
 
 

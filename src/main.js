@@ -59,7 +59,8 @@ Main.prototype.initApp = function() {
         history: history,
         log: this.log,
         scene: this.scene,
-        elapsed: 0
+        elapsed: 0,
+        delta: 0
     };
     const controls = new Controls(document.body, this.app);
 
@@ -73,6 +74,7 @@ Main.prototype.initScene = function() {
     this.lights = new Lights(this.scene);
     this.terrarium = new Terrarium(this.scene, this.app);
     this.space = new Space(this.scene, this.app);
+    this.app.space = this.space;
     this.adjust = new QualityAdjust(this);
     this.app.terrarium = this.terrarium;
     const controller = new Controller(this.app);
@@ -179,9 +181,14 @@ Main.prototype.render = function() {
 };
 
 Main.prototype.animate = function(elapsed) {
+    var now = Date.now();
     if (this.startTime) {
-        this.app.elapsed = Date.now() - this.startTime;
+        this.app.elapsed = now - this.startTime;
     }
+    this.lastNow = this.lastNow || now;
+    this.app.delta = now - this.lastNow;
+    this.lastNow = now;
+
     // setTimeout(this.animate.bind(this), Math.random() * 70);
     requestAnimationFrame(this.animate.bind(this));
     this.stats.begin();

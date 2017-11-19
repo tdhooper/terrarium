@@ -18,6 +18,8 @@ const Space = function(parent, app) {
     this.addPlanets();
     this.addStars();
 
+    this.hyperMultiplier = 0;
+
     const t = {t: 0};
     const axis = new THREE.Vector3(1,1,0).normalize();
     var rotate = new app.TWEEN.Tween(t)
@@ -174,16 +176,15 @@ Space.prototype.addPlanets = function() {
         var quatA = new THREE.Quaternion();
         var quatB = new THREE.Quaternion();
 
-        var elapsed = 0;
-
         instanced.mesh.onBeforeRender = function() {
-            var d = (this.app.elapsed - elapsed) * .000025;
-            elapsed = this.app.elapsed;
+            var d = this.app.delta * .000025;
 
             spec.objects.forEach(object => {
 
-                quatA.setFromAxisAngle(z, object.spec.rotateSpeed * d);
-                quatB.setFromAxisAngle(z, object.spec.rotateSpeed * d * 5);
+                var extra = Math.min(this.hyperMultiplier * 40, 500) * d;
+
+                quatA.setFromAxisAngle(z, extra + object.spec.rotateSpeed * d);
+                quatB.setFromAxisAngle(z, extra + object.spec.rotateSpeed * d * 5);
 
                 object.quaternion.multiply(quatA);
                 object.updateMatrixWorld(true);
