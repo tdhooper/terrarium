@@ -122,7 +122,7 @@ Space.prototype.addPlanets = function() {
                 object: geometries.snowballSolid.object,
                 size: [.2, .4],
                 dist: [10, 15],
-                speed: [5, 2],
+                speed: [10, 5],
                 variants: 2
             })),
         },
@@ -133,7 +133,7 @@ Space.prototype.addPlanets = function() {
                 object: geometries.snowballSolid.object,
                 size: [.2, .4],
                 dist: [20, 30],
-                speed: [5, 2],
+                speed: [10, 5],
                 variants: 2
             })),
         },
@@ -142,7 +142,7 @@ Space.prototype.addPlanets = function() {
             material: materials.planetWireframe,
             objects: largeB.map(this.createPlanet.bind(this, {
                 object: geometries.snowflakeWireframe.object,
-                size: [5, 8],
+                size: [6, 9],
                 dist: [20, 30],
                 speed: [1, .5],
                 variants: 2
