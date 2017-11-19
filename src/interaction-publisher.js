@@ -17,6 +17,7 @@ const InteractionPublisher = function(
     element.addEventListener('mousemove', this.mouseMove.bind(this), false);
     element.addEventListener('mousedown', this.mouseDown.bind(this), false);
     element.addEventListener('mouseup', this.mouseUp.bind(this), false);
+
     element.addEventListener('touchstart', this.touchStart.bind(this), false);
     element.addEventListener('touchmove', this.touchMove.bind(this), false);
     element.addEventListener('touchend', this.touchEnd.bind(this), false);
@@ -205,20 +206,38 @@ InteractionPublisher.prototype.findIntersections = function(event) {
         }
     });
 
-    const intersections = this.rayCaster.intersectObjects(this.objects);
-    
+    const rootMap = {};
+    const objects = [];
+    this.flattenObjects(this.objects, objects, rootMap);
+    const intersections = this.rayCaster.intersectObjects(objects);
+
     shown.forEach(function(object) {
         object.visible = false;
     });
 
     const intersectedStates = intersections.map(function(intersect) {
         const object = intersect.object;
-        const state  = this.objectStateMap[object.id];
+        const id = rootMap[object.id];
+        const state  = this.objectStateMap[id];
         state.intersect = intersect;
         return state;
     }.bind(this));
 
     return intersectedStates;
+};
+
+InteractionPublisher.prototype.flattenObjects = function(objects, result, rootMap, rootId) {
+    var len = objects.length;
+    for (var i = 0; i < len; i++) {
+        var object = objects[i];
+        var id = rootId || object.id;
+        if (object.children.length) {
+            this.flattenObjects(object.children, result, rootMap, id);
+        } else {
+            result.push(object);
+            rootMap[object.id] = id;
+        }
+    }
 };
 
 InteractionPublisher.prototype.eventPosition = function(event) {
