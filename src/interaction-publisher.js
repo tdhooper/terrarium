@@ -30,7 +30,6 @@ InteractionPublisher.prototype.add = function(object, namespace, alwaysVisible) 
     var state = {
         namespace: namespace,
         isOver: false,
-        isDown: false,
         isTouchDown: false,
         isTouchHoldDown: false
     };
@@ -72,6 +71,8 @@ InteractionPublisher.prototype.mouseMove = function(event) {
         }
 
     }.bind(this));
+
+    this.eventMediator.emit('scene.movemove');
 };
 
 InteractionPublisher.prototype.mouseDown = function(event) {
@@ -81,13 +82,11 @@ InteractionPublisher.prototype.mouseDown = function(event) {
     }
 
     var intersections = this.findIntersections(event);
-
     intersections.forEach(function(state) {
-
         this.eventMediator.emit(state.namespace + '.mousedown', state.intersect);
-        state.isDown = true;
-
     }.bind(this));
+
+    this.eventMediator.emit('scene.movedown');
 };
 
 InteractionPublisher.prototype.mouseUp = function(event) {
@@ -96,14 +95,12 @@ InteractionPublisher.prototype.mouseUp = function(event) {
         return;
     }
 
-    this.objectStates.forEach(function(state) {
-
-        if (state.isDown) {
-            this.eventMediator.emit(state.namespace + '.mouseup');
-            state.isDown = false;
-        }
-
+    var intersections = this.findIntersections(event);
+    intersections.forEach(function(state) {
+        this.eventMediator.emit(state.namespace + '.mouseup', state.intersect);
     }.bind(this));
+
+    this.eventMediator.emit('scene.mouseup');
 };
 
 InteractionPublisher.prototype.touchHoldDown = function(state) {
@@ -128,13 +125,15 @@ InteractionPublisher.prototype.touchStart = function(event) {
             this.initTouchHold(event, state);
         }
     }.bind(this));
+
+    this.eventMediator.emit('scene.touchstart');
 };
 
 InteractionPublisher.prototype.initTouchHold = function(event, state) {
     state.touchStartPosition = this.eventPositionPx(event);
     var touchHoldDown = this.touchHoldDown.bind(this, state);
     state.touchHoldTimeout = setTimeout(touchHoldDown, this.TOUCH_HOLD_DELAY);
-    this.eventMediator.emit(state.namespace + '.touchholdstart', state.intersect);
+    this.eventMediator.emit(state.namespace + '.touchholdstart');
 };
 
 InteractionPublisher.prototype.touchMove = function(event) {
@@ -163,15 +162,16 @@ InteractionPublisher.prototype.touchMove = function(event) {
             this.initTouchHold(event, state);
         }
     }.bind(this));
+
+    this.eventMediator.emit('scene.touchmove');
 };
 
 InteractionPublisher.prototype.touchEnd = function(event) {
     event.preventDefault();
-    event = event.touches[0];
+    event = event.changedTouches[0];
 
     this.objectStates.forEach(function(state) {
         if (state.isTouchDown) {
-            this.eventMediator.emit(state.namespace + '.touchend');
             state.isTouchDown = false;
         }
         if (state.touchHoldTimeout || state.isTouchHoldDown) {
@@ -185,6 +185,13 @@ InteractionPublisher.prototype.touchEnd = function(event) {
             delete state.touchHoldTimeout;
         }
     }.bind(this));
+
+    var intersections = this.findIntersections(event);
+    intersections.forEach(function(state) {
+        this.eventMediator.emit(state.namespace + '.touchend', state.intersect);
+    }.bind(this));
+
+    this.eventMediator.emit('scene.touchend');
 };
 
 InteractionPublisher.prototype.findIntersections = function(event) {

@@ -47,10 +47,10 @@ const SoilCursor = function(parent, app) {
     app.eventMediator.on('soil.touchstart', this.show.bind(this));
 
     app.eventMediator.on('soil.mousemove', this.position.bind(this));
-    app.eventMediator.on('soil.touchstart', this.position.bind(this)); // TODO make touch/mouse over/move behave the same
+    app.eventMediator.on('soil.touchstart', this.position.bind(this)); // TODO make touch/mouse over/move behave the same (make mouse over not trigger move)
 
     app.eventMediator.on('soil.mouseout', this.hide.bind(this));
-    app.eventMediator.on('soil.touchend', this.hide.bind(this));
+    app.eventMediator.on('scene.touchend', this.hide.bind(this));
 
     app.eventMediator.on('crystal.growth', this.showProgress.bind(this));
 
@@ -77,8 +77,8 @@ SoilCursor.prototype.enable = function() {
     app.eventMediator.on('soil.mousedown', this.highlightOn.bind(this));
     app.eventMediator.on('soil.touchholddown', this.highlightOn.bind(this));
 
-    app.eventMediator.on('soil.mouseup', this.highlightOff.bind(this));
-    app.eventMediator.on('soil.touchend', this.highlightOff.bind(this));
+    app.eventMediator.on('scene.mouseup', this.highlightOff.bind(this));
+    app.eventMediator.on('scene.touchend', this.highlightOff.bind(this));
 
 };
 
@@ -145,7 +145,7 @@ SoilCursor.prototype.position = function(intersect) {
 };
 
 SoilCursor.prototype.setPosition = function() {
-    if (this.isHeld) {
+    if (this.isHeld || ! this.intersect) {
         return;
     }
 

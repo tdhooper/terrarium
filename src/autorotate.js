@@ -16,7 +16,7 @@ const Autorotate = function(app, object) {
     app.eventMediator.on('soil.touchstart', this.interactBegin.bind(this));
 
     app.eventMediator.on('soil.mouseout', this.interactEnd.bind(this));
-    app.eventMediator.on('soil.touchend', this.interactEnd.bind(this));
+    app.eventMediator.on('scene.touchend', this.interactEnd.bind(this));
 
     var azimuth = 0;
     var azimuthMoving = false;
