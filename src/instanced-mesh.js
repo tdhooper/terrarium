@@ -10,6 +10,7 @@ var InstancedMesh = function(bufferGeometry, material, objects) {
     var instancePositions = [];
     var instanceQuaternions = [];
     var instanceScales = [];
+    var instanceVariants = [];
 
     var matrix = new THREE.Matrix4();
     var position = new THREE.Vector3();
@@ -26,6 +27,7 @@ var InstancedMesh = function(bufferGeometry, material, objects) {
         instancePositions.push(position.x, position.y, position.z);
         instanceQuaternions.push(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
         instanceScales.push(scale.x, scale.y, scale.z);
+        instanceVariants.push(object.spec && object.spec.variant || 0);
         var i = this.objectMap.length;
         this.objectMap.push(object);
     };
@@ -35,10 +37,12 @@ var InstancedMesh = function(bufferGeometry, material, objects) {
     this.positionAttr = new THREE.InstancedBufferAttribute(new Float32Array(instancePositions), 3).setDynamic(true);
     this.quaternionAttr = new THREE.InstancedBufferAttribute(new Float32Array(instanceQuaternions), 4).setDynamic(true);
     this.scaleAttr = new THREE.InstancedBufferAttribute(new Float32Array(instanceScales), 3).setDynamic(true);
+    this.variantAttr = new THREE.InstancedBufferAttribute(new Float32Array(instanceVariants), 1);
 
     instancedGeometry.addAttribute('instancePosition', this.positionAttr);
     instancedGeometry.addAttribute('instanceQuaternion', this.quaternionAttr);
     instancedGeometry.addAttribute('instanceScale', this.scaleAttr);
+    instancedGeometry.addAttribute('instanceVariant', this.variantAttr);
 
     this.mesh = new THREE.Mesh(instancedGeometry, material);
 };

@@ -9,6 +9,8 @@ const instancedHead = [
     'attribute vec3 instancePosition;',
     'attribute vec4 instanceQuaternion;',
     'attribute vec3 instanceScale;',
+    'attribute float instanceVariant;',
+    'varying float vVariant;',
     'vec3 applyTRS( vec3 position, vec3 translation, vec4 quaternion, vec3 scale ) {',
         'position *= scale;',
         'position += 2.0 * cross( quaternion.xyz, cross( quaternion.xyz, position ) + quaternion.w * position );',
@@ -16,7 +18,13 @@ const instancedHead = [
     '}'
 ].join('\n');
 
-const instancedBody = 'transformed = applyTRS(transformed.xyz, instancePosition, instanceQuaternion, instanceScale);';
+const instancedBody = [
+    'transformed = applyTRS(transformed.xyz, instancePosition, instanceQuaternion, instanceScale);',
+    'vVariant = instanceVariant;'
+].join('\n');
+
+
+const white = new THREE.Color(0xffffff);
 
 
 /* Container
@@ -149,7 +157,7 @@ module.exports.soilCursor = new THREE.ShaderMaterial({
    ========================================================================== */
 
 module.exports.soilBottom = new THREE.MeshPhongMaterial({
-    color: 0xffffff,
+    color: white,
     shininess: 0
 });
 
@@ -212,9 +220,10 @@ module.exports.soilTop = soilTop;
    ========================================================================== */
 
 const planetColor = new THREE.Color(0x5cbcff);
+const planetBgColor = new THREE.Color(0x43367A);
 
 const planetSolid = new ShadablePhongMaterial({
-    color: 0xffffff,
+    color: white,
     shininess: 0
 });
 
@@ -225,18 +234,34 @@ module.exports.planetSolid = planetSolid;
 
 
 const planetSolid2 = new ShadablePhongMaterial({
-    color: 0x4BAFE2,
+    color: white,
     shininess: 0
 });
 
 planetSolid2.updateVertexShader('#include <common>', instancedHead);
 planetSolid2.updateVertexShader('#include <begin_vertex>', instancedBody);
 
+planetSolid2.uniforms.colorA = {type: 'v3', value: planetBgColor};
+
+planetSolid2.updateFragmentShader(
+    '#include <common>',
+    [
+        'varying float vVariant;',
+        'uniform vec3 colorA;',
+    ].join('\n')
+);
+planetSolid2.updateFragmentShader(
+    '#include <color_fragment>',
+    [
+        'diffuseColor.xyz = vVariant == 1. ? colorA : diffuseColor.xyz;',
+    ].join('\n')
+);
+
 module.exports.planetSolid2 = planetSolid2;
 
 
 const planetBackground = new ShadablePhongMaterial({
-    color: 0x43367A,
+    color: planetBgColor,
     shininess: 0
 });
 

@@ -111,7 +111,8 @@ Space.prototype.addPlanets = function() {
                 object: geometries.snowflakeSolid.object,
                 size: [.75, 2],
                 dist: [10, 15],
-                speed: [5, 2]
+                speed: [5, 2],
+                variants: 2
             })),
         },
         {
@@ -121,7 +122,8 @@ Space.prototype.addPlanets = function() {
                 object: geometries.snowballSolid.object,
                 size: [.2, .4],
                 dist: [10, 15],
-                speed: [5, 2]
+                speed: [5, 2],
+                variants: 2
             })),
         },
         {
@@ -131,7 +133,8 @@ Space.prototype.addPlanets = function() {
                 object: geometries.snowballSolid.object,
                 size: [.2, .4],
                 dist: [20, 30],
-                speed: [5, 2]
+                speed: [5, 2],
+                variants: 2
             })),
         },
         {
@@ -141,7 +144,8 @@ Space.prototype.addPlanets = function() {
                 object: geometries.snowflakeWireframe.object,
                 size: [5, 8],
                 dist: [20, 30],
-                speed: [1, .5]
+                speed: [1, .5],
+                variants: 2
             }))
         },
         {
@@ -151,7 +155,8 @@ Space.prototype.addPlanets = function() {
                 object: geometries.snowballSolid.object,
                 size: [12, 17],
                 dist: [50, 60],
-                speed: [1, .5]
+                speed: [1, .5],
+                variants: 2
             }))
         }
     ];
@@ -327,7 +332,8 @@ Space.prototype.createPlanet = function(spec, normal, i) {
     object.scale.set(size, size, size);
 
     object.spec = {
-        rotateSpeed: rotateSpeed
+        rotateSpeed: rotateSpeed,
+        variant: random.intBetween(0, spec.variants - 1)
     };
 
     return object;
@@ -343,5 +349,6 @@ Space.prototype.randomPointOnSphere = function(radius, rand) {
     var z = radius * Math.cos(theta);
     return [x, y, z];
 };
+
 
 module.exports = Space;
