@@ -114,30 +114,26 @@ Space.prototype.addPlanets = function() {
                 size: [.75, 2],
                 dist: [10, 15],
                 speed: [5, 2],
-                variants: 2
+                variants: 1
             })),
         },
         {
             geometry: geometries.snowballSolid.geometry,
-            material: materials.planetSolid2,
+            material: materials.planetSolid,
             objects: smallB.map(this.createPlanet.bind(this, {
                 object: geometries.snowballSolid.object,
                 size: [.2, .4],
                 dist: [10, 15],
                 speed: [10, 5],
                 variants: 2
-            })),
-        },
-        {
-            geometry: geometries.snowballSolid.geometry,
-            material: materials.planetSolid2,
-            objects: arrangements[2].map(this.createPlanet.bind(this, {
+            })).concat(
+            arrangements[2].map(this.createPlanet.bind(this, {
                 object: geometries.snowballSolid.object,
                 size: [.2, .4],
                 dist: [20, 30],
                 speed: [10, 5],
                 variants: 2
-            })),
+            }))),
         },
         {
             geometry: geometries.snowflakeWireframe.geometry,

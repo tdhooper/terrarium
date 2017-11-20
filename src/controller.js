@@ -1,3 +1,5 @@
+const materials = require('./materials');
+
 
 const Controller = function(app) {
 
@@ -27,9 +29,9 @@ const Controller = function(app) {
     app.eventMediator.on('update', function() {
         if (app.delta) {
             var decay = THREE.Math.lerp(1, hyperDecay, app.delta / 1000);
-            // console.log(decay, app.space.hyperMultiplier);
-            app.space.hyperMultiplier = Math.max(0, app.space.hyperMultiplier * decay);    
+            app.space.hyperMultiplier = Math.max(0, app.space.hyperMultiplier * decay);
         }
+        app.hyperMap.set(Math.random());
     });
 
     app.eventMediator.on('crystal.click', function() {

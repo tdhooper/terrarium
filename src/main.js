@@ -20,6 +20,7 @@ const Controls = require('./controls');
 const QualityAdjust = require('./quality-adjust');
 const Controller = require('./controller');
 const Autorotate = require('./autorotate');
+const HyperMap = require('./hyper-map');
 
 
 const Main = function() {
@@ -51,6 +52,8 @@ Main.prototype.initApp = function() {
         this.log
     );
     const history = new History(this.eventMediator);
+    const hyperMap = new HyperMap();
+    materials.addHyperMap(hyperMap);
     this.app = {
         TWEEN: TWEEN,
         eventMediator: this.eventMediator,
@@ -60,7 +63,8 @@ Main.prototype.initApp = function() {
         log: this.log,
         scene: this.scene,
         elapsed: 0,
-        delta: 0
+        delta: 0,
+        hyperMap: hyperMap
     };
     const controls = new Controls(document.body, this.app);
 

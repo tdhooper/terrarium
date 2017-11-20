@@ -1,9 +1,14 @@
-var glslify = require('glslify');
+const glslify = require('glslify');
 
+const white = new THREE.Color(0xffffff);
 
 const ShadablePointsMaterial = ShadableMixin(THREE.PointsMaterial);
 const ShadablePhongMaterial = ShadableMixin(THREE.MeshPhongMaterial);
 const ShadableMeshBasicMaterial = ShadableMixin(THREE.MeshBasicMaterial);
+
+
+/* Instanced
+   ========================================================================== */
 
 const instancedHead = [
     'attribute vec3 instancePosition;',
@@ -24,8 +29,22 @@ const instancedBody = [
 ].join('\n');
 
 
-const white = new THREE.Color(0xffffff);
+/* Hyper
+   ========================================================================== */
 
+const hyperHead = [
+    'uniform sampler2D hyperMap;',
+    'vec3 hyperColor(vec3 color) {',
+        'float t = texture2D(hyperMap, vec2(.5,.5)).g;',
+        'return mix(color, vec3(1,0,0), t);',
+    '}',
+].join('\n');
+
+const hyperBody = 'gl_FragColor.rgb = hyperColor(gl_FragColor.rgb);';
+
+module.exports.addHyperMap = function(hyperMap) {
+    planetSolid.enableHyper(hyperMap.dataTexture);
+};
 
 /* Container
    ========================================================================== */
@@ -230,34 +249,24 @@ const planetSolid = new ShadablePhongMaterial({
 planetSolid.updateVertexShader('#include <common>', instancedHead);
 planetSolid.updateVertexShader('#include <begin_vertex>', instancedBody);
 
-module.exports.planetSolid = planetSolid;
+planetSolid.uniforms.colorA = {type: 'v3', value: planetBgColor};
 
-
-const planetSolid2 = new ShadablePhongMaterial({
-    color: white,
-    shininess: 0
-});
-
-planetSolid2.updateVertexShader('#include <common>', instancedHead);
-planetSolid2.updateVertexShader('#include <begin_vertex>', instancedBody);
-
-planetSolid2.uniforms.colorA = {type: 'v3', value: planetBgColor};
-
-planetSolid2.updateFragmentShader(
+planetSolid.updateFragmentShader(
     '#include <common>',
     [
         'varying float vVariant;',
-        'uniform vec3 colorA;',
+        'uniform vec3 colorA;'
     ].join('\n')
 );
-planetSolid2.updateFragmentShader(
+
+planetSolid.updateFragmentShader(
     '#include <color_fragment>',
     [
         'diffuseColor.xyz = mix(diffuseColor.xyz, colorA, vVariant);',
     ].join('\n')
 );
 
-module.exports.planetSolid2 = planetSolid2;
+module.exports.planetSolid = planetSolid;
 
 
 const planetBackground = new ShadablePhongMaterial({
@@ -380,6 +389,12 @@ function ShadableMixin(SourceMaterial) {
 
     NewMaterial.prototype = Object.create(SourceMaterial.prototype);
     NewMaterial.prototype.constructor = NewMaterial;
+
+    NewMaterial.prototype.enableHyper = function(hyperMap) {
+        this.updateFragmentShader('#include <common>', hyperHead);
+        this.updateFragmentShader('#include <fog_fragment>', hyperBody);
+        this.uniforms.hyperMap = {value: hyperMap};
+    };
 
     NewMaterial.prototype.updateVertexShader = function(place, insert, before) {
         this.vertexShader = this.insertGlsl(this.vertexShader, place, insert, before);
