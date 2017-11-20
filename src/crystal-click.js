@@ -5,7 +5,6 @@ const CrystalClick = function(parent, app) {
     this.eventMediator = app.eventMediator;
 
     const state = {
-        isDown: false,
         cursorVisible: false,
         isOver: false,
         hover: function(state) {
@@ -51,14 +50,10 @@ const CrystalClick = function(parent, app) {
     });
 
     app.eventMediator.on('crystal.mousedown', function() {
-        state.isDown = true;
-        publishState();
-    });
-
-    app.eventMediator.on('crystal.mouseup', function() {
-        if (state.isDown && ! state.cursorVisible) {
+        if ( ! state.cursorVisible) {
             this.click();
         }
+        publishState();
     }.bind(this));
 
     app.eventMediator.on('scene.mouseup', function() {
