@@ -32,18 +32,38 @@ const instancedBody = [
 /* Hyper
    ========================================================================== */
 
-const hyperHead = [
+const hyperVertHead = [
+    'varying float hyperPosition;',
+    'uniform vec2 uResolution;',
+].join('\n');
+
+const hyperVertBody = [
+    'vec2 xy = uResolution.xy;', 
+    'vec2 ratio = xy / vec2(max(xy.x, xy.y));',
+    'hyperPosition = length((gl_Position.xy / gl_Position.w) * ratio);'
+].join('\n');
+
+const hyperFragHead = [
     'uniform sampler2D hyperMap;',
+    'varying float hyperPosition;',
     'vec3 hyperColor(vec3 color) {',
-        'float t = texture2D(hyperMap, vec2(.5,.5)).g;',
+        'float t = texture2D(hyperMap, vec2(hyperPosition,0)).g;',
         'return mix(color, vec3(1,0,0), t);',
     '}',
 ].join('\n');
 
-const hyperBody = 'gl_FragColor.rgb = hyperColor(gl_FragColor.rgb);';
+const hyperFragBody = 'gl_FragColor.rgb = hyperColor(gl_FragColor.rgb);';
 
 module.exports.addHyperMap = function(hyperMap) {
     planetSolid.enableHyper(hyperMap.dataTexture);
+    planetBackground.enableHyper(hyperMap.dataTexture);
+};
+
+module.exports.setResolution = function(x, y) {
+    var xy = [x, y];
+    planetSolid.uniforms.uResolution.value = xy;
+    planetBackground.uniforms.uResolution.value = xy;
+    stars.uniforms.uResolution.value = xy;
 };
 
 /* Container
@@ -391,9 +411,12 @@ function ShadableMixin(SourceMaterial) {
     NewMaterial.prototype.constructor = NewMaterial;
 
     NewMaterial.prototype.enableHyper = function(hyperMap) {
-        this.updateFragmentShader('#include <common>', hyperHead);
-        this.updateFragmentShader('#include <fog_fragment>', hyperBody);
+        this.updateVertexShader('#include <common>', hyperVertHead);
+        this.updateVertexShader('#include <fog_vertex>', hyperVertBody);
+        this.updateFragmentShader('#include <common>', hyperFragHead);
+        this.updateFragmentShader('#include <fog_fragment>', hyperFragBody);
         this.uniforms.hyperMap = {value: hyperMap};
+        this.uniforms.uResolution = {type: 'v2', value: [0, 0]};
     };
 
     NewMaterial.prototype.updateVertexShader = function(place, insert, before) {

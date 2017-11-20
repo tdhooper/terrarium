@@ -212,10 +212,7 @@ Main.prototype.onResize = function() {
     this.renderer.setSize(width, height);
 
     var size = this.renderer.getDrawingBufferSize();
-    materials.stars.uniforms.uResolution.value = [
-        size.width,
-        size.height
-    ];
+    materials.setResolution(size.width, size.height);
 
     // Fixes https://github.com/mrdoob/three.js/issues/9500
     // From https://bugs.webkit.org/show_bug.cgi?id=152556#c2
