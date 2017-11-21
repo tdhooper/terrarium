@@ -34,21 +34,26 @@ const instancedBody = [
 
 const hyperVertHead = [
     'varying vec2 screenUv;',
+    'varying vec3 hyperPosition;'
 ].join('\n');
 
 const hyperVertBody = [
-    'screenUv = gl_Position.xy / gl_Position.w;'
+    'screenUv = gl_Position.xy / gl_Position.w;',
+    'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;'
 ].join('\n');
 
 const hyperFragHead = [
     'uniform vec2 uResolution;',
     'uniform sampler2D hyperMap;',
     'varying vec2 screenUv;',
+    'varying vec3 hyperPosition;',
     'vec3 hyperColor(vec3 color) {',
         'vec2 xy = uResolution.xy;', 
         'vec2 ratio = xy / sqrt(pow(xy.x, 2.) + pow(xy.y, 2.));',
         'float radial = length(screenUv * ratio);',
-        'float t = texture2D(hyperMap, vec2(radial, 0)).a;',
+        'float sphere = length(hyperPosition / 90.); //35',
+        'float offset = mix(radial, sphere, .5);',
+        'float t = texture2D(hyperMap, vec2(offset, 0)).a;',
         'return mix(color, vec3(1,0,0), t);',
     '}',
 ].join('\n');
@@ -58,13 +63,19 @@ const hyperFragBody = 'gl_FragColor.rgb = hyperColor(gl_FragColor.rgb);';
 module.exports.addHyperMap = function(hyperMap) {
     planetSolid.enableHyper(hyperMap.dataTexture);
     planetBackground.enableHyper(hyperMap.dataTexture);
+    planetWireframe.enableHyper(hyperMap.dataTexture);
+    soilTop.enableHyper(hyperMap.dataTexture);
+    soilBottom.enableHyper(hyperMap.dataTexture);
 };
 
 module.exports.setResolution = function(x, y) {
     var xy = [x, y];
+    stars.uniforms.uResolution.value = xy;
     planetSolid.uniforms.uResolution.value = xy;
     planetBackground.uniforms.uResolution.value = xy;
-    stars.uniforms.uResolution.value = xy;
+    planetWireframe.uniforms.uResolution.value = xy;
+    soilTop.uniforms.uResolution.value = xy;
+    soilBottom.uniforms.uResolution.value = xy;
 };
 
 /* Container
@@ -196,10 +207,12 @@ module.exports.soilCursor = new THREE.ShaderMaterial({
 /* Soil Bottom
    ========================================================================== */
 
-module.exports.soilBottom = new THREE.MeshPhongMaterial({
+const soilBottom = new ShadablePhongMaterial({
     color: white,
     shininess: 0
 });
+
+module.exports.soilBottom = soilBottom;
 
 
 /* Soil top

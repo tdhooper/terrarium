@@ -2,11 +2,13 @@ const TWEEN = require('@tweenjs/tween.js');
 
 
 const HyperMap = function(easing) {
-    this.easing = TWEEN.Easing.Quadratic.Out;
+    this.easing = TWEEN.Easing.Quadratic.In;
+    // this.easing = x => Math.pow(x, 2);
     this.waves = [];
     this.wavelength = 1;
     this.waveDuration = 1000; // milliseconds
-    const waveResolution = 12;
+    this.wavePower = .75;
+    const waveResolution = 32;
     this.size = THREE.Math.ceilPowerOfTwo(waveResolution / this.wavelength);
     this.amount = this.size * 4;
     this.data = new Uint8Array(this.amount);
@@ -42,7 +44,7 @@ HyperMap.prototype.updateTexture = function() {
             waveX = x - offset + this.wavelength * (1 - offset);
             waveX = THREE.Math.clamp(waveX / this.wavelength, 0, 1);
             waveX = waveX === 1 ? 0 : waveX;
-            value += this.waveShape(waveX);
+            value += this.waveShape(waveX) * this.wavePower;
         }
         this.data[i] = Math.min(value, 1) * 255;
     }
@@ -50,6 +52,7 @@ HyperMap.prototype.updateTexture = function() {
 };
 
 HyperMap.prototype.waveShape = function(x) {
+    return x;
     return THREE.Math.smoothstep(x, 0, .75) - THREE.Math.smoothstep(x, .75, 1);
 };
 
