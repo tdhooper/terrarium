@@ -46,7 +46,7 @@ const hyperFragHead = [
     'varying vec2 screenUv;',
     'vec3 hyperColor(vec3 color) {',
         'vec2 xy = uResolution.xy;', 
-        'vec2 ratio = xy / vec2(max(xy.x, xy.y));',
+        'vec2 ratio = xy / sqrt(pow(xy.x, 2.) + pow(xy.y, 2.));',
         'float radial = length(screenUv * ratio);',
         'float t = texture2D(hyperMap, vec2(radial, 0)).a;',
         'return mix(color, vec3(1,0,0), t);',
