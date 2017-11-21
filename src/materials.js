@@ -33,21 +33,22 @@ const instancedBody = [
    ========================================================================== */
 
 const hyperVertHead = [
-    'varying float hyperPosition;',
-    'uniform vec2 uResolution;',
+    'varying vec2 screenUv;',
 ].join('\n');
 
 const hyperVertBody = [
-    'vec2 xy = uResolution.xy;', 
-    'vec2 ratio = xy / vec2(max(xy.x, xy.y));',
-    'hyperPosition = length((gl_Position.xy / gl_Position.w) * ratio);'
+    'screenUv = gl_Position.xy / gl_Position.w;'
 ].join('\n');
 
 const hyperFragHead = [
+    'uniform vec2 uResolution;',
     'uniform sampler2D hyperMap;',
-    'varying float hyperPosition;',
+    'varying vec2 screenUv;',
     'vec3 hyperColor(vec3 color) {',
-        'float t = texture2D(hyperMap, vec2(hyperPosition,0)).g;',
+        'vec2 xy = uResolution.xy;', 
+        'vec2 ratio = xy / vec2(max(xy.x, xy.y));',
+        'float radial = length(screenUv * ratio);',
+        'float t = texture2D(hyperMap, vec2(radial, 0)).a;',
         'return mix(color, vec3(1,0,0), t);',
     '}',
 ].join('\n');

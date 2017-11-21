@@ -35,6 +35,7 @@ const Main = function() {
     this.initThree();
     this.initApp();
     this.initScene();
+
     window.addEventListener('resize', this.onResize.bind(this), false);
     this.onResize();
     requestAnimationFrame(this.animate.bind(this));
@@ -53,6 +54,12 @@ Main.prototype.initApp = function() {
     );
     const history = new History(this.eventMediator);
     const hyperMap = new HyperMap();
+
+    // var boxMaterial = new THREE.MeshBasicMaterial({map:hyperMap.dataTexture});
+    // var boxGeometry2 = new THREE.BoxGeometry( 2, 2, 2 );
+    // var mainBoxObject = new THREE.Mesh(boxGeometry2,boxMaterial);
+    // this.scene.add(mainBoxObject);
+
     materials.addHyperMap(hyperMap);
     this.app = {
         TWEEN: TWEEN,

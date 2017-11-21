@@ -27,7 +27,7 @@
     "polyhedra": "^1.0.0",
     "random-seed": "^0.3.0",
     "stats.js": "^0.17.0",
-    "three": "^0.87.1",
+    "three": "^0.88",
     "threejs-slice-geometry": "^0.1.1",
     "uglify-js": "^3.1.5",
     "what-input": "^5.0.3"

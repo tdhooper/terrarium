@@ -31,7 +31,7 @@ const Controller = function(app) {
             var decay = THREE.Math.lerp(1, hyperDecay, app.delta / 1000);
             app.space.hyperMultiplier = Math.max(0, app.space.hyperMultiplier * decay);
         }
-        app.hyperMap.set(Math.random());
+        // app.hyperMap.update();
     });
 
     app.eventMediator.on('crystal.click', function() {
