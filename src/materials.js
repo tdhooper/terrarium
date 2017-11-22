@@ -48,6 +48,7 @@ const hyperFragHead = [
     'varying vec2 screenUv;',
     'varying vec3 hyperPosition;',
     'vec3 hyperColor(vec3 color) {',
+        // 'return vec3(0,1,1);',
         'vec2 xy = uResolution.xy;', 
         'vec2 ratio = xy / sqrt(pow(xy.x, 2.) + pow(xy.y, 2.));',
         'float radial = length(screenUv * ratio);',
@@ -66,6 +67,7 @@ module.exports.addHyperMap = function(hyperMap) {
     planetWireframe.enableHyper(hyperMap.dataTexture);
     soilTop.enableHyper(hyperMap.dataTexture);
     soilBottom.enableHyper(hyperMap.dataTexture);
+    containerWireframe.enableHyper(hyperMap.dataTexture);
 };
 
 module.exports.setResolution = function(x, y) {
@@ -76,6 +78,7 @@ module.exports.setResolution = function(x, y) {
     planetWireframe.uniforms.uResolution.value = xy;
     soilTop.uniforms.uResolution.value = xy;
     soilBottom.uniforms.uResolution.value = xy;
+    containerWireframe.uniforms.uResolution.value = xy;
 };
 
 /* Container
@@ -86,15 +89,49 @@ const back = new THREE.Color(0x322f57);
 
 back.lerp(front, .25);
 
-module.exports.containerWireframe = new THREE.ShaderMaterial({
-    vertexShader: glslify('./shaders/container.vert'),
-    fragmentShader: glslify('./shaders/container.frag'),
-    vertexColors: THREE.VertexColors,
-    uniforms: {
-        frontColor: {type: 'v3', value: front.toArray()},
-        backColor: {type: 'v3', value: back.toArray()}
-    }
+const containerWireframe = new ShadablePhongMaterial({
+    vertexColors: THREE.VertexColors
 });
+
+containerWireframe.uniforms.frontColor = {type: 'v3', value: front.toArray()};
+containerWireframe.uniforms.backColor = {type: 'v3', value: back.toArray()};
+
+containerWireframe.updateVertexShader(
+    '#include <common>',
+    'varying float vAngleOfIncidence;'
+);
+
+containerWireframe.updateVertexShader(
+    '#include <fog_vertex>',
+    [
+        'vec3 sourceNormal = color;',
+        'vec3 modelPosition = (modelMatrix * vec4(position, 1)).xyz;',
+        'vec3 cameraRay = normalize(cameraPosition - modelPosition);',
+        'vec3 modelNormal = normalize((modelMatrix * vec4(sourceNormal, 1)).xyz);',
+        'vAngleOfIncidence = dot(cameraRay, modelNormal);'
+    ].join('\n')
+);
+
+containerWireframe.updateFragmentShader(
+    '#include <common>',
+    [
+        'varying float vAngleOfIncidence;',
+        'uniform vec3 frontColor;',
+        'uniform vec3 backColor;'
+    ].join('\n')
+);
+
+containerWireframe.updateFragmentShader(
+    '#include <fog_fragment>',
+    [
+        'vec3 color = mix(frontColor, backColor, smoothstep(.0, -.5, vAngleOfIncidence));',
+        'gl_FragColor = vec4(color, 1);'
+    ].join('\n'),
+    true
+);
+
+module.exports.containerWireframe = containerWireframe;
+
 
 module.exports.containerBack = new THREE.MeshBasicMaterial({
     color: 0x1c1833,
