@@ -34,42 +34,47 @@ const instancedBody = [
 
 const hyperVertHead = [
     'varying vec2 screenUv;',
-    'varying vec3 hyperPosition;',
+    'varying float hyperPower;',
+    'uniform sampler2D hyperMap;',
     'uniform float time;',
+    'uniform vec2 uResolution;',
+    'float calcHyperPower(vec3 hyperPos) {',
+        'vec2 xy = uResolution.xy;', 
+        'vec2 ratio = xy / sqrt(pow(xy.x, 2.) + pow(xy.y, 2.));',
+        'float radial = length(screenUv * ratio);',
+        'float sphere = length(hyperPos / 90.); //35',
+        'float offset = mix(radial, sphere, .95);',
+        'offset = pow(offset, 1./4.);',
+        'float t = texture2D(hyperMap, vec2(offset, 0)).a;',
+        'return t;',
+    '}',
 ].join('\n');
 
 const hyperVertDeform = [
     // 'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
     // 'float vibrate = sin(time * .001) * .1;',
     'vec3 hyperPos = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
+    'hyperPower = calcHyperPower(hyperPos);',
     'float dist = length(hyperPos / 400.) + .02;',
-    'float str = 1. - mod(time * .001, 1.);',
-    'transformed += sin(hyperPos * dist * 400. + str * 100.) * dist * str;',
+    // 'float str = 1. - mod(time * .001, 1.);',
+    'float str = hyperPower;',
+    'transformed += sin(hyperPos * dist * 400. + time * .1) * dist * str * 1.5;',
     // 'transformed += sin(transformed * 10. + time * .01) * .01;'
 ].join('\n');
 
 const hyperVertBody = [
-    'screenUv = gl_Position.xy / gl_Position.w;',
-    'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
+    // 'screenUv = gl_Position.xy / gl_Position.w;',
+    // 'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
     // 'float vibrate = sin(time * .001) * .1;',
     // 'gl_Position.xyz += sin(hyperPosition.xyz * 10. + time * .001) * ((length(hyperPosition) / 200.) + .01);'
      // 'gl_Position.xyz += gl_Position.xyz * ((length(hyperPosition) / 200.) + .01);'
 ].join('\n');
 
 const hyperFragHead = [
-    'uniform vec2 uResolution;',
-    'uniform sampler2D hyperMap;',
-    'varying vec2 screenUv;',
-    'varying vec3 hyperPosition;',
+    'varying float hyperPower;',
     'vec3 hyperColor(vec3 color) {',
-        // 'return vec3(0,1,1);',
-        'vec2 xy = uResolution.xy;', 
-        'vec2 ratio = xy / sqrt(pow(xy.x, 2.) + pow(xy.y, 2.));',
-        'float radial = length(screenUv * ratio);',
-        'float sphere = length(hyperPosition / 90.); //35',
-        'float offset = mix(radial, sphere, .95);',
-        'offset = pow(offset, 1./4.);',
-        'float t = texture2D(hyperMap, vec2(offset, 0)).a;',
+        // 'return color;',
+        'float t = hyperPower;',
         'return mix(color, vec3(1,0,0), t);',
     '}',
 ].join('\n');

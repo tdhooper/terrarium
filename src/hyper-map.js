@@ -6,10 +6,10 @@ const HyperMap = function(easing) {
     this.easing = x => Math.pow(x, 2);
     this.easing = x => x;
     this.waves = [0, -1, -2, -3, -4, -5, -6, -7, -8, -9];
-    this.waves = [];
-    this.wavelengthStart = .1;
-    this.wavelengthEnd = .75;
-    this.waveDuration = 3000; // milliseconds
+    // this.waves = [];
+    this.wavelengthStart = .3;
+    this.wavelengthEnd = 1;
+    this.waveDuration = 1500; // milliseconds
     this.wavePower = 1;
     const waveResolution = 12;
     this.size = THREE.Math.ceilPowerOfTwo(
