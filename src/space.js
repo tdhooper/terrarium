@@ -62,12 +62,6 @@ Space.prototype.addStars = function() {
     geometry.addAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
 
     const material = materials.stars;
-
-    new this.app.TWEEN.Tween(material.uniforms.time)
-        .to({value: 1}, 6000)
-        .repeat(Infinity)
-        .start();
-    
     const particles = new THREE.Points(geometry, material);
 
     particles.renderOrder = -1;

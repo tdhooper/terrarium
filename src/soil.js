@@ -21,7 +21,7 @@ const Soil = function(parent, container, app) {
 
     var TWEEN = app.TWEEN;
 
-    this.highlightTween = new TWEEN.Tween(material.uniforms.time)
+    this.highlightTween = new TWEEN.Tween(material.uniforms.highlightTime)
         .to({value: 1}, 2000)
         .repeat(Infinity);
 

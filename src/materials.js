@@ -34,12 +34,24 @@ const instancedBody = [
 
 const hyperVertHead = [
     'varying vec2 screenUv;',
-    'varying vec3 hyperPosition;'
+    'varying vec3 hyperPosition;',
+    'uniform float time;',
+].join('\n');
+
+const hyperVertDeform = [
+    // 'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
+    // 'float vibrate = sin(time * .001) * .1;',
+    'float dist = length(transformed / 400.) + .02;',
+    'float str = 1. - mod(time * .001, 1.);',
+    'transformed += sin(transformed * dist * 400. + str * 100.) * dist * str;'
 ].join('\n');
 
 const hyperVertBody = [
     'screenUv = gl_Position.xy / gl_Position.w;',
-    'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;'
+    'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
+    // 'float vibrate = sin(time * .001) * .1;',
+    // 'gl_Position.xyz += sin(hyperPosition.xyz * 10. + time * .001) * ((length(hyperPosition) / 200.) + .01);'
+     // 'gl_Position.xyz += gl_Position.xyz * ((length(hyperPosition) / 200.) + .01);'
 ].join('\n');
 
 const hyperFragHead = [
@@ -80,6 +92,16 @@ module.exports.setResolution = function(x, y) {
     soilTop.uniforms.uResolution.value = xy;
     soilBottom.uniforms.uResolution.value = xy;
     containerWireframe.uniforms.uResolution.value = xy;
+};
+
+module.exports.setTime = function(time) {
+    stars.uniforms.time.value = time;
+    planetSolid.uniforms.time.value = time;
+    planetBackground.uniforms.time.value = time;
+    planetWireframe.uniforms.time.value = time;
+    soilTop.uniforms.time.value = time;
+    soilBottom.uniforms.time.value = time;
+    containerWireframe.uniforms.time.value = time;
 };
 
 /* Container
@@ -272,7 +294,7 @@ soilTop.updateFragmentShader(
     '#include <common>',
     [
         'varying vec3 vPosition;',
-        'uniform float time;',
+        'uniform float highlightTime;',
         'uniform vec3 highlightColor3;'
     ].join('\n')
 );
@@ -282,7 +304,7 @@ soilTop.updateFragmentShader(
     [
         'float magnitude = length(vPosition.xz);',
         'vec4 highlightColor = vec4(highlightColor3,1);',
-        'float highlightAnim = magnitude * 35. + time * -40.;',
+        'float highlightAnim = magnitude * 35. + highlightTime * -40.;',
         'float highlight = sin(highlightAnim) * .5 + .5;',
         'float highlightSize = mix(.2, 1., magnitude * 1.2);',
         'highlightSize = pow(highlightSize, .5);',
@@ -301,7 +323,7 @@ soilTop.updateFragmentShader(
 
 const highlightColor = new THREE.Color(0xFC38A3);
 
-soilTop.uniforms.time = {type: 'f', value: 0};
+soilTop.uniforms.highlightTime = {type: 'f', value: 0};
 soilTop.uniforms.highlightColor3 = {type: 'v3', value: highlightColor.toArray()};
 
 module.exports.soilTop = soilTop;
@@ -413,7 +435,7 @@ stars.updateFragmentShader(
         'float r = dot(cxy, cxy);',
         'float delta = fwidth(r);',
         'diffuseColor.a = 1.0 - smoothstep(1.0 - delta, 1.0 + delta, r);',
-        'diffuseColor.xyz = spectrum(vSeed * 6. + time * ceil(vSeed * 6.));',
+        'diffuseColor.xyz = spectrum(vSeed * 6. + time * .0002 * ceil(vSeed * 6.));',
         'diffuseColor.xyz = mix(diffuseColor.xyz, vec3(1), hash11(vSeed));'
     ].join('\n')
 );
@@ -464,11 +486,13 @@ function ShadableMixin(SourceMaterial) {
 
     NewMaterial.prototype.enableHyper = function(hyperMap) {
         this.updateVertexShader('#include <common>', hyperVertHead);
+        this.updateVertexShader('#include <skinning_vertex>', hyperVertDeform);
         this.updateVertexShader('#include <fog_vertex>', hyperVertBody);
         this.updateFragmentShader('#include <common>', hyperFragHead);
         this.updateFragmentShader('#include <fog_fragment>', hyperFragBody);
         this.uniforms.hyperMap = {value: hyperMap};
         this.uniforms.uResolution = {type: 'v2', value: [0, 0]};
+        this.uniforms.time = {type: 'f', value: 0};
     };
 
     NewMaterial.prototype.updateVertexShader = function(place, insert, before) {

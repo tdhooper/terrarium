@@ -3,8 +3,10 @@ const TWEEN = require('@tweenjs/tween.js');
 
 const HyperMap = function(easing) {
     // this.easing = TWEEN.Easing.Quadratic.In;
-    this.easing = x => Math.pow(x, 4);
+    this.easing = x => Math.pow(x, 2);
+    this.easing = x => x;
     this.waves = [0, -1, -2, -3, -4, -5, -6, -7, -8, -9];
+    this.waves = [];
     this.wavelengthStart = .1;
     this.wavelengthEnd = .75;
     this.waveDuration = 3000; // milliseconds
@@ -16,18 +18,7 @@ const HyperMap = function(easing) {
     this.amount = this.size * 4;
     this.data = new Uint8Array(this.amount);
     for (var i = 0; i < this.amount; i++) {
-        var x = i / (this.size - 1);
-        if (x <= 1) {
-            // var steps = 50;
-            x = Math.pow(x, 4);
-            // x = x > .9 ? x : 0;
-            // console.log(x);
-            this.data[i] = x * 255;
-            // this.data[i] = (i % 2) * 255;
-        }
         this.data[i] = 0;
-        // this.data[i] = ((Math.floor(x * steps)) % 2) * 255;
-        // this.data[i] = i < 17 ? 0 : 255;
     }
     this.dataTexture = new THREE.DataTexture(this.data, this.size, 1, THREE.AlphaFormat, THREE.UnsignedByteType);
     this.dataTexture.needsUpdate = true;

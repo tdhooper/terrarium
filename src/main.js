@@ -195,6 +195,7 @@ Main.prototype.animate = function(elapsed) {
     var now = Date.now();
     if (this.startTime) {
         this.app.elapsed = now - this.startTime;
+        materials.setTime(this.app.elapsed);
     }
     this.lastNow = this.lastNow || now;
     this.app.delta = now - this.lastNow;

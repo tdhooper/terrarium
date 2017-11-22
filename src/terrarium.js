@@ -4,6 +4,7 @@ const ContainerBackground = require('./container-background');
 const Soil = require('./soil');
 const SoilCursor = require('./soil-cursor');
 const CrystalPlanter = require('./crystal-planter');
+const materials = require('./materials');
 
 const Terrarium = function(parent, app) {
     const group = new THREE.Group();
@@ -22,6 +23,11 @@ const Terrarium = function(parent, app) {
     this.soil = soil;
     this.soilCursor = soilCursor;
     this.crystalPlanter = crystalPlanter;
+
+    // var planeGeom = new THREE.PlaneGeometry(1, 1);
+    // var plane = new THREE.Mesh(planeGeom, materials.soilBottom);
+    // plane.rotateY(Math.PI / 2);
+    // parent.add(plane);
 
     // Animations
 
