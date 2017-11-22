@@ -3,15 +3,15 @@ const TWEEN = require('@tweenjs/tween.js');
 
 const HyperMap = function(easing) {
     // this.easing = TWEEN.Easing.Quadratic.In;
-    this.easing = x => Math.pow(x, 2);
+    // this.easing = x => Math.pow(x, 1/2);
     this.easing = x => x;
-    this.waves = [0, -1, -2, -3, -4, -5, -6, -7, -8, -9];
+    this.waves = [0, -1, -2, -3, -4];
     // this.waves = [];
-    this.wavelengthStart = .3;
-    this.wavelengthEnd = 1;
-    this.waveDuration = 1500; // milliseconds
-    this.wavePower = 1;
-    const waveResolution = 12;
+    this.wavelengthStart = 3;
+    this.wavelengthEnd = 3;
+    this.waveDuration = 3000; // milliseconds
+    this.wavePower = .75;
+    const waveResolution = 128;
     this.size = THREE.Math.ceilPowerOfTwo(
         waveResolution / Math.min(this.wavelengthStart, this.wavelengthEnd)
     );

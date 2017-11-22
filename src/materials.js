@@ -59,10 +59,10 @@ const hyperVertDeform = [
     // 'float vibrate = sin(time * .001) * .1;',
     'hyperPos = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
     'float hyperPower = calcHyperPower(hyperPos);',
-    'float dist = length(hyperPos / 400.) + .02;',
+    'float dist = length(hyperPos / 400.) + .01;',
     // 'float str = 1. - mod(time * .001, 1.);',
     'float str = hyperPower;',
-    'transformed += sin(hyperPos * dist * 400. + time * .1) * dist * str * 1.5;',
+    'transformed += sin(hyperPos * dist * 400. + time * .1) * dist * str;',
     // 'transformed += sin(transformed * 10. + time * .01) * .01;'
 ].join('\n');
 
@@ -82,9 +82,10 @@ const hyperFragHead = [
     glslify('./shaders/lib/gamma.glsl'),
     'vec3 hyperColor(vec3 color) {',
         'float hyperPower = calcHyperPower(hyperPos);',
+        'hyperPower = max(0., hyperPower * 2. - 1.);',
         'float t = hyperPower;',
-        'float dist = pow(length(hyperPos), .25);',
-        'vec3 col = spectrum(dist * 2. - time * .001);',
+        'float dist = pow(length(hyperPos), 1./4.);',
+        'vec3 col = spectrum(dist * 4. - time * .001);',
         'col = linearToScreen(col);',
         'return mix(color, col, t);',
     '}',
