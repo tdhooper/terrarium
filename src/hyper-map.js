@@ -4,19 +4,25 @@ const TWEEN = require('@tweenjs/tween.js');
 const HyperMap = function(easing) {
     this.easing = TWEEN.Easing.Quadratic.In;
     // this.easing = x => Math.pow(x, 2);
-    this.waves = [];
+    this.waves = [.5, -1, -2, -3, -4, -5, -6];
     this.wavelength = 1;
     this.waveDuration = 1000; // milliseconds
-    this.wavePower = .75;
-    const waveResolution = 64;
+    this.wavePower = 1;
+    const waveResolution = 8;
     this.size = THREE.Math.ceilPowerOfTwo(waveResolution / this.wavelength);
     this.amount = this.size * 4;
     this.data = new Uint8Array(this.amount);
     for (var i = 0; i < this.amount; i++) {
-        this.data[i] = 0;
+        var x = i / (this.size);
+        var steps = 50;
+        x = Math.pow(x, 4);
+        this.data[i] = x * 255;
+        // this.data[i] = ((Math.floor(x * steps)) % 2) * 255;
+        // this.data[i] = i < 17 ? 0 : 255;
     }
     this.dataTexture = new THREE.DataTexture(this.data, this.size, 1, THREE.AlphaFormat, THREE.UnsignedByteType);
-    this.dataTexture.magFilter = THREE.LinearFilter;
+    this.dataTexture.needsUpdate = true;
+    // this.dataTexture.magFilter = THREE.LinearFilter;
     // this.updateTexture();
 };
 
@@ -25,7 +31,7 @@ HyperMap.prototype.addWave = function() {
 };
 
 HyperMap.prototype.update = function(delta) {
-    // return;
+    return;
     delta /= this.waveDuration;
     this.waves = this.waves
         .map(wave => wave + delta)
@@ -40,7 +46,7 @@ HyperMap.prototype.updateTexture = function() {
         x = i / (this.size - 1);
         value = 0;
         for (var w = 0; w < numWaves; w++) {
-            offset = this.easing(this.waves[w]);
+            offset = (this.waves[w]);
             waveX = x - offset + this.wavelength * (1 - offset);
             waveX = THREE.Math.clamp(waveX / this.wavelength, 0, 1);
             waveX = waveX === 1 ? 0 : waveX;
