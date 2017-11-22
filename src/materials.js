@@ -41,9 +41,11 @@ const hyperVertHead = [
 const hyperVertDeform = [
     // 'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
     // 'float vibrate = sin(time * .001) * .1;',
-    'float dist = length(transformed / 400.) + .02;',
+    'vec3 hyperPos = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
+    'float dist = length(hyperPos / 400.) + .02;',
     'float str = 1. - mod(time * .001, 1.);',
-    'transformed += sin(transformed * dist * 400. + str * 100.) * dist * str;'
+    'transformed += sin(hyperPos * dist * 400. + str * 100.) * dist * str;',
+    // 'transformed += sin(transformed * 10. + time * .01) * .01;'
 ].join('\n');
 
 const hyperVertBody = [
@@ -81,6 +83,7 @@ module.exports.addHyperMap = function(hyperMap) {
     soilTop.enableHyper(hyperMap.dataTexture);
     soilBottom.enableHyper(hyperMap.dataTexture);
     containerWireframe.enableHyper(hyperMap.dataTexture);
+    crystal.enableHyper(hyperMap.dataTexture);
 };
 
 module.exports.setResolution = function(x, y) {
@@ -92,6 +95,7 @@ module.exports.setResolution = function(x, y) {
     soilTop.uniforms.uResolution.value = xy;
     soilBottom.uniforms.uResolution.value = xy;
     containerWireframe.uniforms.uResolution.value = xy;
+    crystal.uniforms.uResolution.value = xy;
 };
 
 module.exports.setTime = function(time) {
@@ -102,6 +106,7 @@ module.exports.setTime = function(time) {
     soilTop.uniforms.time.value = time;
     soilBottom.uniforms.time.value = time;
     containerWireframe.uniforms.time.value = time;
+    crystal.uniforms.time.value = time;
 };
 
 /* Container
@@ -171,7 +176,6 @@ module.exports.containerBack = new THREE.MeshBasicMaterial({
 var crystal = new ShadablePhongMaterial();
 
 crystal.uniforms.seed = {type: 'f'};
-crystal.uniforms.time = {type: 'f', value: 0};
 crystal.uniforms.bottomClip = {type: 'f'};
 crystal.uniforms.height = {type: 'f'};
 crystal.uniforms.scale = {type: 'f'};
@@ -216,13 +220,14 @@ crystal.updateFragmentShader(
         'vec3 positon = vPosition;',
         'positon *= scale;',
         'positon.z += height * .5;',
-        'vec4 m = map(seed, time, positon);',
+        'float cTime = time * .0025;',
+        'vec4 m = map(seed, cTime, positon);',
         'float angleOfIncidence = acos(dot(normalize(vNormal + m.xyz * .2), normalize(vViewPosition)));',
         // 'angleOfIncidence = 1.75 - angleOfIncidence * .5;',
         // 'angleOfIncidence += e * .2;',
         // 'angleOfIncidence = pow(angleOfIncidence, 2.);',
         'vec3 col = spectrum(angleOfIncidence);',
-        'float pat = pattern(seed, time * .5, positon + vec3(0,0,time * .01));',
+        'float pat = pattern(seed, cTime * .5, positon + vec3(0,0,cTime * .01));',
         'float ee = pat * .2 + .8;',
         'col = spectrum(angleOfIncidence * ee);',
 
@@ -518,6 +523,16 @@ function ShadableMixin(SourceMaterial) {
         this.vertexShader = source.vertexShader;
 
         this.uniforms = THREE.UniformsUtils.clone(source.uniforms);
+
+        if (this.uniforms.hyperMap) {
+            this.uniforms.hyperMap = source.uniforms.hyperMap;
+        }
+        if (this.uniforms.uResolution) {
+            this.uniforms.uResolution = source.uniforms.uResolution;
+        }
+        if (this.uniforms.time) {
+            this.uniforms.time = source.uniforms.time;
+        }
 
         return this;
     };
