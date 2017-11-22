@@ -32,11 +32,9 @@ const instancedBody = [
 /* Hyper
    ========================================================================== */
 
-const hyperVertHead = [
+const calcHyperPower = [
     'varying vec2 screenUv;',
-    'varying float hyperPower;',
     'uniform sampler2D hyperMap;',
-    'uniform float time;',
     'uniform vec2 uResolution;',
     'float calcHyperPower(vec3 hyperPos) {',
         'vec2 xy = uResolution.xy;', 
@@ -50,11 +48,17 @@ const hyperVertHead = [
     '}',
 ].join('\n');
 
+const hyperVertHead = [
+    'uniform float time;',
+    'varying vec3 hyperPos;',
+    calcHyperPower
+].join('\n');
+
 const hyperVertDeform = [
     // 'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
     // 'float vibrate = sin(time * .001) * .1;',
-    'vec3 hyperPos = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
-    'hyperPower = calcHyperPower(hyperPos);',
+    'hyperPos = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
+    'float hyperPower = calcHyperPower(hyperPos);',
     'float dist = length(hyperPos / 400.) + .02;',
     // 'float str = 1. - mod(time * .001, 1.);',
     'float str = hyperPower;',
@@ -71,11 +75,18 @@ const hyperVertBody = [
 ].join('\n');
 
 const hyperFragHead = [
-    'varying float hyperPower;',
+    'varying vec3 hyperPos;',
+    'uniform float time;',
+    calcHyperPower,
+    glslify('./shaders/lib/spectrum.glsl'),
+    glslify('./shaders/lib/gamma.glsl'),
     'vec3 hyperColor(vec3 color) {',
-        // 'return color;',
+        'float hyperPower = calcHyperPower(hyperPos);',
         'float t = hyperPower;',
-        'return mix(color, vec3(1,0,0), t);',
+        'float dist = pow(length(hyperPos), .25);',
+        'vec3 col = spectrum(dist * 2. - time * .001);',
+        'col = linearToScreen(col);',
+        'return mix(color, col, t);',
     '}',
 ].join('\n');
 
@@ -208,12 +219,9 @@ crystal.updateFragmentShader(
         'varying vec3 vPosition;',
         'varying vec3 vReflect;',
         'uniform float seed;',
-        'uniform float time;',
         'uniform float bottomClip;',
         'uniform float height;',
         'uniform float scale;',
-        glslify('./shaders/lib/spectrum.glsl'),
-        glslify('./shaders/lib/gamma.glsl'),
         glslify('./shaders/lib/crystal-map.glsl')
     ].join('\n')
 );
