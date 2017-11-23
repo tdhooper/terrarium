@@ -49,17 +49,14 @@ const CrystalClick = function(parent, app) {
         publishState();
     });
 
-    app.eventMediator.on('crystal.mousedown', function() {
-        if ( ! state.cursorVisible) {
+    var downHandler = function(intersection, alsoIntersected) {
+        if (alsoIntersected.indexOf('soil') == -1) {
             this.click();
         }
-        publishState();
-    }.bind(this));
+    }.bind(this);
 
-    app.eventMediator.on('scene.mouseup', function() {
-        state.isDown = false;
-        publishState();
-    });
+    app.eventMediator.on('crystal.mousedown', downHandler);
+    app.eventMediator.on('crystal.touchstart', downHandler);
 
     app.eventMediator.on('crystal.mouseover', function() {
         state.isOver = true;

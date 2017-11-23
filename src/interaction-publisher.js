@@ -58,22 +58,22 @@ InteractionPublisher.prototype.mouseMove = function(event) {
         const hit = intersections.indexOf(state) !== -1;
 
         if (hit && ! state.isOver) {
-            this.eventMediator.emit(state.namespace + '.mouseover', state.intersect);
+            this.emit('mouseover', state);
             state.isOver = true;
         }
 
         if ( ! hit && state.isOver) {
-            this.eventMediator.emit(state.namespace + '.mouseout');
+            this.emit('mouseout', state, false);
             state.isOver = false;
         }
 
         if (hit) {
-            this.eventMediator.emit(state.namespace + '.mousemove', state.intersect);
+            this.emit('mousemove', state);
         }
 
     }.bind(this));
 
-    this.eventMediator.emit('scene.movemove');
+    this.emit('mousemove');
 };
 
 InteractionPublisher.prototype.mouseDown = function(event) {
@@ -84,10 +84,10 @@ InteractionPublisher.prototype.mouseDown = function(event) {
 
     var intersections = this.findIntersections(event);
     intersections.forEach(function(state) {
-        this.eventMediator.emit(state.namespace + '.mousedown', state.intersect);
+        this.emit('mousedown', state);
     }.bind(this));
 
-    this.eventMediator.emit('scene.movedown');
+    this.emit('mousedown');
 };
 
 InteractionPublisher.prototype.mouseUp = function(event) {
@@ -98,15 +98,15 @@ InteractionPublisher.prototype.mouseUp = function(event) {
 
     var intersections = this.findIntersections(event);
     intersections.forEach(function(state) {
-        this.eventMediator.emit(state.namespace + '.mouseup', state.intersect);
+        this.emit('mouseup', state);
     }.bind(this));
 
-    this.eventMediator.emit('scene.mouseup');
+    this.emit('mouseup');
 };
 
 InteractionPublisher.prototype.touchHoldDown = function(state) {
     state.isTouchHoldDown = true;
-    this.eventMediator.emit(state.namespace + '.touchholddown', state.intersect);
+    this.emit('touchholddown', state);
 };
 
 InteractionPublisher.prototype.touchStart = function(event) {
@@ -120,21 +120,21 @@ InteractionPublisher.prototype.touchStart = function(event) {
 
     var intersections = this.findIntersections(event);
     intersections.forEach(function(state) {
-        this.eventMediator.emit(state.namespace + '.touchstart', state.intersect);
+        this.emit('touchstart', state);
         state.isTouchDown = true;
         if ( ! state.isTouchHoldDown) {
             this.initTouchHold(event, state);
         }
     }.bind(this));
 
-    this.eventMediator.emit('scene.touchstart');
+    this.emit('touchstart');
 };
 
 InteractionPublisher.prototype.initTouchHold = function(event, state) {
     state.touchStartPosition = this.eventPositionPx(event);
     var touchHoldDown = this.touchHoldDown.bind(this, state);
     state.touchHoldTimeout = setTimeout(touchHoldDown, this.TOUCH_HOLD_DELAY);
-    this.eventMediator.emit(state.namespace + '.touchholdstart');
+    this.emit('touchholdstart', state, false);
 };
 
 InteractionPublisher.prototype.touchMove = function(event) {
@@ -143,7 +143,7 @@ InteractionPublisher.prototype.touchMove = function(event) {
 
     var intersections = this.findIntersections(event);
     intersections.forEach(function(state) {
-        this.eventMediator.emit(state.namespace + '.touchmove', state.intersect);
+        this.emit('touchmove', state);
     }.bind(this));
 
     this.objectStates.forEach(function(state) {
@@ -159,12 +159,12 @@ InteractionPublisher.prototype.touchMove = function(event) {
             clearTimeout(state.touchHoldTimeout);
             delete state.touchHoldTimeout;
 
-            this.eventMediator.emit(state.namespace + '.touchholdend');
+            this.emit('touchholdend', state, false);
             this.initTouchHold(event, state);
         }
     }.bind(this));
 
-    this.eventMediator.emit('scene.touchmove');
+    this.emit('touchmove');
 };
 
 InteractionPublisher.prototype.touchEnd = function(event) {
@@ -176,7 +176,7 @@ InteractionPublisher.prototype.touchEnd = function(event) {
             state.isTouchDown = false;
         }
         if (state.touchHoldTimeout || state.isTouchHoldDown) {
-            this.eventMediator.emit(state.namespace + '.touchholdend');
+            this.emit('touchholdend', state, false);
         }
         if (state.isTouchHoldDown) {
             state.isTouchHoldDown = false;
@@ -189,7 +189,7 @@ InteractionPublisher.prototype.touchEnd = function(event) {
 
     var intersections = this.findIntersections(event);
     intersections.forEach(function(state) {
-        this.eventMediator.emit(state.namespace + '.touchend', state.intersect);
+        this.emit('touchend', state);
     }.bind(this));
 
     this.eventMediator.emit('scene.touchend');
@@ -215,13 +215,20 @@ InteractionPublisher.prototype.findIntersections = function(event) {
         object.visible = false;
     });
 
+    const intersectedNamespaces = [];
+
     const intersectedStates = intersections.map(function(intersect) {
         const object = intersect.object;
         const id = rootMap[object.id];
         const state  = this.objectStateMap[id];
         state.intersect = intersect;
+        intersectedNamespaces.push(state.namespace);
         return state;
     }.bind(this));
+
+    intersectedStates.forEach(function(state) {
+        state.alsoIntersected = intersectedNamespaces;
+    });
 
     return intersectedStates;
 };
@@ -249,6 +256,17 @@ InteractionPublisher.prototype.eventPosition = function(event) {
 
 InteractionPublisher.prototype.eventPositionPx = function(event) {
     return new THREE.Vector2(event.clientX, event.clientY);
+};
+
+InteractionPublisher.prototype.emit = function(type, state, sendIntersection) {
+    sendIntersection = sendIntersection !== undefined ? sendIntersection : true;
+    const namespace = state ? state.namespace : 'scene';
+    const name = [namespace, type].join('.');
+    if (state && sendIntersection) {
+        this.eventMediator.emit(name, state.intersect, state.alsoIntersected);
+    } else {
+        this.eventMediator.emit(name);
+    }
 };
 
 module.exports = InteractionPublisher;
