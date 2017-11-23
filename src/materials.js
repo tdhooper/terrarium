@@ -37,14 +37,16 @@ const calcHyperPower = [
     'uniform sampler2D hyperMap;',
     'uniform vec2 uResolution;',
     'float calcHyperPower(vec3 hyperPos) {',
+        'return 0.;',
         'vec2 xy = uResolution.xy;', 
         'vec2 ratio = xy / sqrt(pow(xy.x, 2.) + pow(xy.y, 2.));',
         'float radial = length(screenUv * ratio);',
         'float sphere = length(hyperPos / 90.); //35',
         'float offset = mix(radial, sphere, .95);',
         'offset = pow(offset, 1./4.);',
+        'return offset;',
         'float t = texture2D(hyperMap, vec2(offset, 0)).a;',
-        'return t;',
+        // 'return t;',
     '}',
 ].join('\n');
 
@@ -55,15 +57,11 @@ const hyperVertHead = [
 ].join('\n');
 
 const hyperVertDeform = [
-    // 'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
-    // 'float vibrate = sin(time * .001) * .1;',
-    'hyperPos = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
-    'float hyperPower = calcHyperPower(hyperPos);',
-    'float dist = length(hyperPos / 400.) + .01;',
-    // 'float str = 1. - mod(time * .001, 1.);',
-    'float str = hyperPower;',
-    'transformed += sin(hyperPos * dist * 400. + time * .1) * dist * str;',
-    // 'transformed += sin(transformed * 10. + time * .01) * .01;'
+    // 'hyperPos = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
+    // 'float hyperPower = calcHyperPower(hyperPos);',
+    // 'float dist = length(hyperPos / 400.) + .01;',
+    // 'float str = hyperPower;',
+    // 'transformed += sin(hyperPos * dist * 400. + time * .1) * dist * str;',
 ].join('\n');
 
 const hyperVertBody = [
@@ -81,26 +79,28 @@ const hyperFragHead = [
     glslify('./shaders/lib/spectrum.glsl'),
     glslify('./shaders/lib/gamma.glsl'),
     'vec3 hyperColor(vec3 color) {',
+        'return color;',
         'float hyperPower = calcHyperPower(hyperPos);',
-        'hyperPower = max(0., hyperPower * 2. - 1.);',
-        'float t = hyperPower;',
-        'float dist = pow(length(hyperPos), 1./4.);',
-        'vec3 col = spectrum(dist * 4. - time * .001);',
-        'col = linearToScreen(col);',
-        'return mix(color, col, t);',
+        // 'hyperPower = max(0., hyperPower * 2. - 1.);',
+        // 'float t = hyperPower;',
+        // 'float dist = pow(length(hyperPos), 1./4.);',
+        // 'vec3 col = spectrum(dist * 4. - time * .001);',
+        // 'col = linearToScreen(col);',
+        // 'return mix(color, col, t);',
     '}',
 ].join('\n');
 
 const hyperFragBody = 'gl_FragColor.rgb = hyperColor(gl_FragColor.rgb);';
+// const hyperFragBody = '';
 
 module.exports.addHyperMap = function(hyperMap) {
-    planetSolid.enableHyper(hyperMap.dataTexture);
-    planetBackground.enableHyper(hyperMap.dataTexture);
-    planetWireframe.enableHyper(hyperMap.dataTexture);
-    soilTop.enableHyper(hyperMap.dataTexture);
-    soilBottom.enableHyper(hyperMap.dataTexture);
-    containerWireframe.enableHyper(hyperMap.dataTexture);
-    crystal.enableHyper(hyperMap.dataTexture);
+    planetSolid.enableHyper(hyperMap);
+    planetBackground.enableHyper(hyperMap);
+    planetWireframe.enableHyper(hyperMap);
+    soilTop.enableHyper(hyperMap);
+    soilBottom.enableHyper(hyperMap);
+    containerWireframe.enableHyper(hyperMap);
+    crystal.enableHyper(hyperMap);
 };
 
 module.exports.setResolution = function(x, y) {
@@ -505,13 +505,17 @@ function ShadableMixin(SourceMaterial) {
 
     NewMaterial.prototype.enableHyper = function(hyperMap) {
         this.updateVertexShader('#include <common>', hyperVertHead);
-        this.updateVertexShader('#include <skinning_vertex>', hyperVertDeform);
-        this.updateVertexShader('#include <fog_vertex>', hyperVertBody);
         this.updateFragmentShader('#include <common>', hyperFragHead);
-        this.updateFragmentShader('#include <fog_fragment>', hyperFragBody);
-        this.uniforms.hyperMap = {value: hyperMap};
+        
         this.uniforms.uResolution = {type: 'v2', value: [0, 0]};
         this.uniforms.time = {type: 'f', value: 0};
+
+        if (hyperMap) {
+            this.uniforms.hyperMap = {value: hyperMap.dataTexture};
+            // this.updateVertexShader('#include <skinning_vertex>', hyperVertDeform);
+            // this.updateVertexShader('#include <fog_vertex>', hyperVertBody);
+            this.updateFragmentShader('#include <fog_fragment>', hyperFragBody);
+        }
     };
 
     NewMaterial.prototype.updateVertexShader = function(place, insert, before) {

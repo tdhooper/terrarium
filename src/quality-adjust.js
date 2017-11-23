@@ -21,6 +21,7 @@ QualityAdjust.prototype.update = function() {
 };
 
 QualityAdjust.prototype.adjust = function(quality) {
+    quality = 4;
     this.main.log.log('Switching quality to ' + quality);
 
     const lights = this.main.lights;
