@@ -139,7 +139,11 @@ Main.prototype.render = function() {
     var rotation = new THREE.Euler(0, this.cameraControls.getAzimuthalAngle(), 0);
     this.lights.setRotation(rotation);
 
-    this.renderer.clear(true, true, true);
+    if (this.afterFirstPaint) {
+        this.renderer.clear();
+    }
+
+    this.afterFirstPaint = true;
 
     if (this.terrarium.soilCursor.renderOnTop) {
 
