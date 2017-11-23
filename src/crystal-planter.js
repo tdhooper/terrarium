@@ -15,6 +15,11 @@ const CrystalPlanter = function(parent, app) {
     this.material.uniforms.height.value = 1;
     this.material.uniforms.scale.value = 1;
 
+    const sphereGeom = new THREE.SphereGeometry(.1, 2, 2);
+    const sphere = new THREE.Mesh(sphereGeom, this.material);
+    sphere.position.set(0,-.6,0);
+    this.object.add(sphere);
+
     // const sphereGeom = new THREE.SphereGeometry(.5, 20, 20);
     // const sphere = new THREE.Mesh(sphereGeom, this.material);
     // this.object.add(sphere);
