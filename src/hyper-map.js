@@ -3,8 +3,8 @@ const TWEEN = require('@tweenjs/tween.js');
 
 const HyperMap = function(easing) {
     // this.easing = TWEEN.Easing.Quadratic.In;
-    // this.easing = x => Math.pow(x, 1/2);
-    this.easing = x => x;
+    this.easing = x => Math.pow(x, 1.25);
+    // this.easing = x => x;
     // this.waves = [0, -1, -2, -3, -4];
     this.waves = [];
     this.wavelengthStart = 3;
