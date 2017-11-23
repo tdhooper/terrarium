@@ -210,7 +210,6 @@ Main.prototype.animate = function(elapsed) {
     this.stats.begin();
     this.eventMediator.emit('update');
     TWEEN.update();
-    this.autorotate.update(elapsed);
     this.render();
     this.stats.end();
     this.adjust.update();

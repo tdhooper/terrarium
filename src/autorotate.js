@@ -1,6 +1,7 @@
 
 const Autorotate = function(app, object) {
 
+    this.app = app;
     this.object = object;
 
     this.speed = .000075;
@@ -17,6 +18,8 @@ const Autorotate = function(app, object) {
 
     app.eventMediator.on('soil.mouseout', this.interactEnd.bind(this));
     app.eventMediator.on('scene.touchend', this.interactEnd.bind(this));
+
+    app.eventMediator.on('update', this.update.bind(this));
 
     var azimuth = 0;
     var azimuthMoving = false;
@@ -101,7 +104,8 @@ Autorotate.prototype.stop = function() {
     }
 };
 
-Autorotate.prototype.update = function(time) {
+Autorotate.prototype.update = function() {
+    const time = this.app.elapsed;
     const acceleration = this.rotating ? this.startAcceleration : this.stopAcceleration;
     const delta = time - this.time;
     this.time = time;
