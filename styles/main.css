@@ -27,7 +27,16 @@ body {
     display: block;
     width: 100% !important;
     height: 100% !important;
+    transition-property: opacity;
+    transition-timing-function: ease-out;
+    transition-duration: 1s;
+    opacity: 1;
 }
+
+.hide-canvas .container canvas {
+    opacity: 0;
+}
+
 
 .log {
     position: fixed;

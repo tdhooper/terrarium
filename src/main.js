@@ -38,10 +38,15 @@ const Main = function() {
 
     window.addEventListener('resize', this.onResize.bind(this), false);
     this.onResize();
-    requestAnimationFrame(this.animate.bind(this));
     setTimeout(() => {
         this.startTime = Date.now();
-        this.eventMediator.emit('start');
+        requestAnimationFrame(this.animate.bind(this));
+        setTimeout(() => {
+            this.eventMediator.emit('start');
+            setTimeout(() => {
+                this.adjust.enable();
+            }, 1000);
+        }, 100);
     }, 100);
 };
 
@@ -106,6 +111,7 @@ Main.prototype.initThree = function() {
     this.renderer.autoClearDepth = false;
     this.renderer.autoClearStencil = false;
     this.renderer.shadowMap.enabled = true;
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     // this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.container = document.createElement('div');
@@ -141,6 +147,8 @@ Main.prototype.render = function() {
 
     if (this.afterFirstPaint) {
         this.renderer.clear();
+    } else {
+        this.fadeIn();
     }
 
     this.afterFirstPaint = true;
@@ -241,6 +249,10 @@ Main.prototype.setPixelRatio = function(value) {
     this.renderer.setPixelRatio(value);
     this.onResize();
     this.render();
+};
+
+Main.prototype.fadeIn = function() {
+    document.body.classList.remove('hide-canvas');
 };
 
 module.exports = Main;

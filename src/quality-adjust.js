@@ -3,18 +3,21 @@ var QualityThrottle = require('./quality-throttle');
 
 const QualityAdjust = function(main) {
     this.main = main;
-    const qualityRange = 5;
-    const initialQuality = qualityRange - 1;
-    this.adjust(initialQuality);
+    this.qualityRange = 5;
+    this.initialQuality = this.qualityRange - 1;
+    this.adjust(this.initialQuality);
+};
+
+QualityAdjust.prototype.enable = function() {
     this.throttle = new QualityThrottle(
-        qualityRange,
-        initialQuality,
+        this.qualityRange,
+        this.initialQuality,
         this.adjust.bind(this)
     );
 };
 
 QualityAdjust.prototype.update = function() {
-    this.throttle.update();
+    this.throttle && this.throttle.update();
 };
 
 QualityAdjust.prototype.adjust = function(quality) {
