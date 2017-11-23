@@ -33,6 +33,7 @@ const SoilCursor = function(parent, app) {
 
     const mesh = new THREE.Mesh(geometry, material);
     mesh.visible = false;
+    this.visible = false;
 
     parent.add(mesh);
 

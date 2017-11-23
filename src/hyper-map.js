@@ -5,8 +5,8 @@ const HyperMap = function(easing) {
     // this.easing = TWEEN.Easing.Quadratic.In;
     // this.easing = x => Math.pow(x, 1/2);
     this.easing = x => x;
-    this.waves = [0, -1, -2, -3, -4];
-    // this.waves = [];
+    // this.waves = [0, -1, -2, -3, -4];
+    this.waves = [];
     this.wavelengthStart = 3;
     this.wavelengthEnd = 3;
     this.waveDuration = 3000; // milliseconds
