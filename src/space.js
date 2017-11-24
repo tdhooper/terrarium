@@ -64,8 +64,6 @@ Space.prototype.addStars = function() {
     const material = materials.stars;
     const particles = new THREE.Points(geometry, material);
 
-    particles.renderOrder = -1;
-
     this.group.add(particles);
 };
 

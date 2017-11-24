@@ -422,7 +422,10 @@ module.exports.planetWireframe = planetWireframe;
    ========================================================================== */
 
 const stars = new ShadablePointsMaterial({
-    transparent: true
+    transparent: true,
+    // depthTest: false,
+    depthWrite: false,
+    // blending: THREE.AdditiveBlending
 });
 
 stars.extensions = {derivatives: true};
