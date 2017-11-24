@@ -68,23 +68,15 @@ const hyperVertHead = [
 ].join('\n');
 
 const hyperVertDeform = [
-    // 'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
-    // 'float vibrate = sin(time * .001) * .1;',
     'hyperPos = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
     'float hyperPower = calcHyperPower(hyperPos);',
     'float dist = length(hyperPos / 400.) + .01;',
-    // 'float str = 1. - mod(time * .001, 1.);',
     'float str = hyperPower;',
     'transformed += sin(hyperPos * dist * 400. + time * .1) * dist * str;',
-    // 'transformed += sin(transformed * 10. + time * .01) * .01;'
 ].join('\n');
 
 const hyperVertBody = [
-    // 'screenUv = gl_Position.xy / gl_Position.w;',
-    // 'hyperPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
-    // 'float vibrate = sin(time * .001) * .1;',
-    // 'gl_Position.xyz += sin(hyperPosition.xyz * 10. + time * .001) * ((length(hyperPosition) / 200.) + .01);'
-     // 'gl_Position.xyz += gl_Position.xyz * ((length(hyperPosition) / 200.) + .01);'
+    'screenUv = gl_Position.xy / gl_Position.w;',
 ].join('\n');
 
 const hyperFragHead = [
@@ -98,7 +90,7 @@ const hyperFragHead = [
         'hyperPower = max(0., hyperPower * 2. - 1.);',
         'float t = hyperPower;',
         'float dist = pow(length(hyperPos), 1./4.);',
-        'vec3 col = spectrum(dist * 4. - time * .001);',
+        'vec3 col = spectrum(dist * 4. - time * .0005);',
         'col = linearToScreen(col);',
         'return mix(color, col, t);',
     '}',
