@@ -32,18 +32,31 @@ const instancedBody = [
 /* Hyper
    ========================================================================== */
 
+var matrixLookup = '';
+
+const size = 3;
+matrixLookup += 'float matrixLookup(mat4 mat, int i) {';
+for (var i = size * size - 1; i >= 0; i--) {
+    var x = i % size;
+    var y = Math.floor(i / size);
+    matrixLookup += '\nif (i == '+i+') { return mat['+x+']['+y+']; }';
+}
+matrixLookup += '\n}';
+
+
 const calcHyperPower = [
     'varying vec2 screenUv;',
-    'uniform sampler2D hyperMap;',
+    'uniform mat4 hyperMap;',
     'uniform vec2 uResolution;',
+    matrixLookup,
+    glslify('./shaders/lib/hyper-value.glsl'),
     'float calcHyperPower(vec3 hyperPos) {',
         'vec2 xy = uResolution.xy;', 
         'vec2 ratio = xy / sqrt(pow(xy.x, 2.) + pow(xy.y, 2.));',
         'float radial = length(screenUv * ratio);',
         'float sphere = length(hyperPos / 90.); //35',
         'float offset = mix(radial, sphere, .95);',
-        'offset = pow(offset, 1./4.);',
-        'float t = texture2D(hyperMap, vec2(offset, 0)).a;',
+        'float t = hyperValue(hyperMap, offset);',
         'return t;',
     '}',
 ].join('\n');
@@ -509,7 +522,7 @@ function ShadableMixin(SourceMaterial) {
         this.updateVertexShader('#include <fog_vertex>', hyperVertBody);
         this.updateFragmentShader('#include <common>', hyperFragHead);
         this.updateFragmentShader('#include <fog_fragment>', hyperFragBody);
-        this.uniforms.hyperMap = {value: hyperMap};
+        this.uniforms.hyperMap = {type: 'm3', value: hyperMap};
         this.uniforms.uResolution = {type: 'v2', value: [0, 0]};
         this.uniforms.time = {type: 'f', value: 0};
     };
