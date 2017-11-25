@@ -148,8 +148,8 @@ Space.prototype.addPlanets = function() {
             material: materials.planetBackground,
             objects: largeA.map(this.createPlanet.bind(this, {
                 object: geometries.snowballSolid.object,
-                size: [12, 17],
-                dist: [50, 60],
+                size: [15, 20],
+                dist: [65, 75],
                 speed: [1, .5],
                 variants: 2
             }))

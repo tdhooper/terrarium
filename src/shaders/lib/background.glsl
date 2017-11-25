@@ -134,7 +134,7 @@ vec4 bgPattern(vec3 pos, vec3 cam) {
 
     float alpha = 1. - fill;
     alpha = alpha * hp;
-    vec3 color = mix(vec3(.3,.19,.5) * 2., vec3(.3,.19,.5) * .25, clamp(hp * 1.5 - .5, 0., 1.));
+    vec3 color = mix(vec3(.3,.19,.5) * 2., vec3(.3,.19,.5) * .1, clamp(hp * 1.5 - .5, 0., 1.));
 
     return vec4(color, alpha);
 }
