@@ -59,6 +59,15 @@ const calcHyperPower = [
         'float t = hyperValue(hyperMap, offset);',
         'return t;',
     '}',
+    'float calcHyperPowerRadial() {',
+        'vec2 xy = uResolution.xy;', 
+        'vec2 ratio = xy / sqrt(pow(xy.x, 2.) + pow(xy.y, 2.));',
+        'float radial = length(screenUv * ratio);',
+        'float offset = radial;',
+        // 'offset = pow(offset, 2.);',
+        'float t = hyperValueSmooth(hyperMap, offset);',
+        'return t;',
+    '}',
 ].join('\n');
 
 const hyperVertHead = [
@@ -106,6 +115,7 @@ module.exports.addHyperMap = function(hyperMap) {
     soilBottom.enableHyper(hyperMap.dataTexture);
     containerWireframe.enableHyper(hyperMap.dataTexture);
     crystal.enableHyper(hyperMap.dataTexture);
+    background.enableHyper(hyperMap.dataTexture, true);
 };
 
 module.exports.setResolution = function(x, y) {
@@ -118,6 +128,7 @@ module.exports.setResolution = function(x, y) {
     soilBottom.uniforms.uResolution.value = xy;
     containerWireframe.uniforms.uResolution.value = xy;
     crystal.uniforms.uResolution.value = xy;
+    background.uniforms.uResolution.value = xy;
 };
 
 module.exports.setTime = function(time) {
@@ -480,7 +491,7 @@ module.exports.stars = stars;
 const background = new ShadablePhongMaterial({
     color: 0x000000,
     side: THREE.BackSide,
-    transparent: true,
+    transparent: true
 });
 
 background.updateVertexShader(
@@ -504,7 +515,6 @@ background.updateFragmentShader(
     [
         'varying vec3 vCameraPosition;',
         'varying vec3 vPosition;',
-        'uniform float time;',
         glslify('./shaders/lib/background.glsl')
     ].join('\n')
 );
@@ -514,11 +524,11 @@ background.updateFragmentShader(
     [
         'vec4 pattern = bgPattern(vPosition, vCameraPosition);',
         'diffuseColor = pattern;',
+        // 'gl_FragColor = diffuseColor;',
+        // 'return;'
     ].join('\n')
 );
 
-
-background.uniforms.time = {type: 'f', value: 0};
 
 // console.log(background.fragmentShader);
 
@@ -562,15 +572,17 @@ function ShadableMixin(SourceMaterial) {
     NewMaterial.prototype = Object.create(SourceMaterial.prototype);
     NewMaterial.prototype.constructor = NewMaterial;
 
-    NewMaterial.prototype.enableHyper = function(hyperMap) {
+    NewMaterial.prototype.enableHyper = function(hyperMap, headOnly) {
         this.updateVertexShader('#include <common>', hyperVertHead);
-        this.updateVertexShader('#include <skinning_vertex>', hyperVertDeform);
         this.updateVertexShader('#include <fog_vertex>', hyperVertBody);
         this.updateFragmentShader('#include <common>', hyperFragHead);
-        this.updateFragmentShader('#include <fog_fragment>', hyperFragBody);
         this.uniforms.hyperMap = {type: 'm3', value: hyperMap};
         this.uniforms.uResolution = {type: 'v2', value: [0, 0]};
         this.uniforms.time = {type: 'f', value: 0};
+        if ( ! headOnly) {
+            this.updateVertexShader('#include <skinning_vertex>', hyperVertDeform);
+            this.updateFragmentShader('#include <fog_fragment>', hyperFragBody);            
+        }
     };
 
     NewMaterial.prototype.updateVertexShader = function(place, insert, before) {

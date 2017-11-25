@@ -2,6 +2,7 @@ const TWEEN = require('@tweenjs/tween.js');
 
 
 const HyperMap = function(easing) {
+    // this.waves = [.1, -1, -2, -3, -4];
     this.waves = [];
     this.waveDuration = 3000; // milliseconds
     this.wavePower = .75;
@@ -13,6 +14,7 @@ HyperMap.prototype.addWave = function() {
 };
 
 HyperMap.prototype.update = function(delta) {
+    // return;
     delta /= this.waveDuration;
     this.waves = this.waves
         .map(wave => wave + delta)

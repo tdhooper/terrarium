@@ -67,7 +67,31 @@ vec4 bgPattern(vec3 pos, vec3 cam) {
     vec2 p = c.xy;
     vec2 r = c.zw;
 
+    float crop = .25;
+    float hp = max(0., (calcHyperPowerRadial() - crop) * (1./(1.-crop)));
+    // float hp = calcHyperPowerRadial();
+
+    // 0 -> 0
+    // 1 -> 0
+    // .9 -> 1
+    // .8 -> 0
+
+    // float ss = .1;
+
+    // hp = hp == 0. ? 1. : hp;
+    // hp = smoothstep(1., 1. - ss, hp) - smoothstep(1. - ss, .5, hp);
+
+    // hp = (hp - .9) * 10.;
+
+    // vec3 ee = spectrum(hp);
+    // ee = hp <= 0. || hp >= 1. ? vec3(0.) : ee;
+    // return vec4(vec3(hp), 1);
+
     r.x = pow(r.x * 5., 1./2.);
+
+    // r.x += mix(-.5, 0., hp);
+
+    r *= 1.5;
 
     r.x -= time * .0001;
 
@@ -92,11 +116,14 @@ vec4 bgPattern(vec3 pos, vec3 cam) {
     // w *= 1. - c.z * .5;
     // ww *= 1. - c.z * .5;
 
-    float pat = smoothstep(0., .005, d - w);
-    float pat2 = smoothstep(0., .005, d - ww);
-    float pat3 = smoothstep(0., .005, d - w3);
+    float po = sin(time * .005) * .5 + .5;
+    po = hp;
 
-    float fill = mix(0., .5, pat2);
+    float pat = smoothstep(0., .005, d - w - .1 * (1. - po));
+    float pat2 = smoothstep(0., .005 * po, d - ww * po);
+    float pat3 = smoothstep(0., .005, d - w3 - .075 * (1. - po));
+
+    float fill = mix(0., mix(1., .5, hp), pat2);
     fill = mix(fill, .2, pat);
     fill = mix(fill, .0, pat3);
 
@@ -104,5 +131,10 @@ vec4 bgPattern(vec3 pos, vec3 cam) {
 
     // fill = pat;
     // return vec4(vec3(fill), 1.);
-    return vec4(0, 0, 0, 1.-fill);
+
+    float alpha = 1. - fill;
+    alpha = alpha * hp;
+    vec3 color = mix(vec3(.3,.19,.5) * 2., vec3(.3,.19,.5) * .25, clamp(hp * 1.5 - .5, 0., 1.));
+
+    return vec4(color, alpha);
 }
