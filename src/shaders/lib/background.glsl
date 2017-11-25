@@ -67,13 +67,13 @@ vec4 bgPattern(vec3 pos, vec3 cam) {
     vec2 p = c.xy;
     vec2 r = c.zw;
 
-    r.x = pow(r.x * 1000., 1./5.);
+    r.x = pow(r.x * 5., 1./2.);
 
     r.x -= time * .0001;
 
     pR(r, PI / 4.);
 
-    float rep = 15.;
+    float rep = 11.;
     pMod2(r, vec2(2.2222 / rep));
 
     float d = 1e12;
@@ -81,8 +81,9 @@ vec4 bgPattern(vec3 pos, vec3 cam) {
 
     float o = c.w * 2.;
     o = 0.5;
-    float w = (sin(c.z * 12. + time * .0001 - o) * .5 + .5) * .05;
-    float ww = (sin(c.z * 12. + time * .0001 - o) * .5 + .4) * .03;
+    float w = (sin(c.z * 12. + time * .001 - o) * .5 + .5) * .05;
+    float ww = (sin(c.z * 12. + time * .001 - o) * .5 + .3) * .05;
+    float w3 = (sin(c.z * 12. + time * .001 - o) * .5 + .8) * .08;
 
     float partA = abs(dot(r, vec2(1,0)));
     float partB = abs(dot(r, vec2(0,1)));
@@ -93,9 +94,14 @@ vec4 bgPattern(vec3 pos, vec3 cam) {
 
     float pat = smoothstep(0., .005, d - w);
     float pat2 = smoothstep(0., .005, d - ww);
+    float pat3 = smoothstep(0., .005, d - w3);
 
-    float fill = mix(.2, .5, pat2);
-    fill = mix(fill, 0., pat);
+    float fill = mix(0., .5, pat2);
+    fill = mix(fill, .2, pat);
+    fill = mix(fill, .0, pat3);
+
+    // fill = 1.-pat3;
+
     // fill = pat;
     // return vec4(vec3(fill), 1.);
     return vec4(0, 0, 0, 1.-fill);
