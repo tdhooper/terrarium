@@ -129,6 +129,7 @@ module.exports.setTime = function(time) {
     soilBottom.uniforms.time.value = time;
     containerWireframe.uniforms.time.value = time;
     crystal.uniforms.time.value = time;
+    background.uniforms.time.value = time;
 };
 
 /* Container
@@ -472,6 +473,56 @@ stars.uniforms.time = {type: 'float', value: 0};
 
 module.exports.stars = stars;
 
+
+/* Background
+   ========================================================================== */
+
+const background = new ShadablePhongMaterial({
+    color: 0x000000,
+    side: THREE.BackSide,
+    transparent: true,
+});
+
+background.updateVertexShader(
+    '#include <common>',
+    [
+        'varying vec3 vCameraPosition;',
+        'varying vec3 vPosition;'
+    ].join('\n')
+);
+
+background.updateVertexShader(
+    '#include <fog_vertex>',
+    [
+        'vCameraPosition = cameraPosition;',
+        'vPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;'
+    ].join('\n')
+);
+
+background.updateFragmentShader(
+    '#include <common>',
+    [
+        'varying vec3 vCameraPosition;',
+        'varying vec3 vPosition;',
+        'uniform float time;',
+        glslify('./shaders/lib/background.glsl')
+    ].join('\n')
+);
+
+background.updateFragmentShader(
+    '#include <color_fragment>',
+    [
+        'vec4 pattern = bgPattern(vPosition, vCameraPosition);',
+        'diffuseColor = pattern;',
+    ].join('\n')
+);
+
+
+background.uniforms.time = {type: 'f', value: 0};
+
+// console.log(background.fragmentShader);
+
+module.exports.background = background;
 
 /* ShadableMixin
    ========================================================================== */
