@@ -20,19 +20,14 @@ void calcWave(inout float value, float x, float offset) {
     }
 }
 
-float hyperValue(mat3 waves, float x) {
+float hyperValue(vec4 waves, float x) {
 
     float value = 0.;
 
-    calcWave(value, x, waves[2][2]);
-    calcWave(value, x, waves[1][2]);
-    calcWave(value, x, waves[0][2]);
-    calcWave(value, x, waves[2][1]);
-    calcWave(value, x, waves[1][1]);
-    calcWave(value, x, waves[0][1]);
-    calcWave(value, x, waves[2][0]);
-    calcWave(value, x, waves[1][0]);
-    calcWave(value, x, waves[0][0]);
+    calcWave(value, x, waves.x);
+    calcWave(value, x, waves.y);
+    calcWave(value, x, waves.z);
+    calcWave(value, x, waves.w);
 
     value = min(value, 1.);
 
@@ -62,21 +57,16 @@ void calcWaveSmooth(inout float value, float x, float offset) {
 }
 
 // Blend the leading edge
-float hyperValueSmooth(mat3 waves, float x) {
+float hyperValueSmooth(vec4 waves, float x) {
 
     x -= .5;
 
     float value = 0.;
 
-    calcWaveSmooth(value, x, waves[2][2]);
-    calcWaveSmooth(value, x, waves[1][2]);
-    calcWaveSmooth(value, x, waves[0][2]);
-    calcWaveSmooth(value, x, waves[2][1]);
-    calcWaveSmooth(value, x, waves[1][1]);
-    calcWaveSmooth(value, x, waves[0][1]);
-    calcWaveSmooth(value, x, waves[2][0]);
-    calcWaveSmooth(value, x, waves[1][0]);
-    calcWaveSmooth(value, x, waves[0][0]);
+    calcWaveSmooth(value, x, waves.x);
+    calcWaveSmooth(value, x, waves.y);
+    calcWaveSmooth(value, x, waves.z);
+    calcWaveSmooth(value, x, waves.w);
 
     value = min(value, 1.);
 

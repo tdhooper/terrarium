@@ -18,7 +18,7 @@ const Space = function(parent, app) {
     this.addPlanets();
     this.addStars();
 
-    var sphereGeom = new THREE.IcosahedronGeometry(36, 2);
+    var sphereGeom = new THREE.IcosahedronGeometry(36, 3);
     var sphere = new THREE.Mesh(sphereGeom, materials.background);
     sphere.renderOrder = -1;
     group.add(sphere);

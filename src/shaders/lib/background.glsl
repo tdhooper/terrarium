@@ -68,7 +68,7 @@ vec4 bgPattern(vec3 pos, vec3 cam) {
     vec2 r = c.zw;
 
     float crop = .25;
-    float hp = max(0., (calcHyperPowerRadial() - crop) * (1./(1.-crop)));
+    float hp = max(0., (hyperPowerRadial - crop) * (1./(1.-crop)));
     // float hp = calcHyperPowerRadial();
 
     // 0 -> 0

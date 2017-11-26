@@ -34,7 +34,7 @@ const instancedBody = [
 
 const calcHyperPower = [
     'varying vec2 screenUv;',
-    'uniform mat3 hyperMap;',
+    'uniform vec4 hyperMap;',
     'uniform vec2 uResolution;',
     glslify('./shaders/lib/hyper-value.glsl'),
     'float calcHyperPower(vec3 hyperPos) {',
@@ -485,7 +485,8 @@ background.updateVertexShader(
     '#include <common>',
     [
         'varying vec3 vCameraPosition;',
-        'varying vec3 vPosition;'
+        'varying vec3 vPosition;',
+        'varying float hyperPowerRadial;'
     ].join('\n')
 );
 
@@ -493,7 +494,8 @@ background.updateVertexShader(
     '#include <fog_vertex>',
     [
         'vCameraPosition = cameraPosition;',
-        'vPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;'
+        'vPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
+        'hyperPowerRadial = calcHyperPowerRadial();'
     ].join('\n')
 );
 
@@ -502,6 +504,7 @@ background.updateFragmentShader(
     [
         'varying vec3 vCameraPosition;',
         'varying vec3 vPosition;',
+        'varying float hyperPowerRadial;',
         glslify('./shaders/lib/background.glsl')
     ].join('\n')
 );
@@ -563,7 +566,7 @@ function ShadableMixin(SourceMaterial) {
         this.updateVertexShader('#include <common>', hyperVertHead);
         this.updateVertexShader('#include <fog_vertex>', hyperVertBody);
         this.updateFragmentShader('#include <common>', hyperFragHead);
-        this.uniforms.hyperMap = {type: 'm3', value: hyperMap};
+        this.uniforms.hyperMap = {type: 'v4', value: hyperMap};
         this.uniforms.uResolution = {type: 'v2', value: [0, 0]};
         this.uniforms.time = {type: 'f', value: 0};
         if ( ! headOnly) {
