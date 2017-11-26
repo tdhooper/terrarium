@@ -32,23 +32,10 @@ const instancedBody = [
 /* Hyper
    ========================================================================== */
 
-var matrixLookup = '';
-
-const size = 3;
-matrixLookup += 'float matrixLookup(mat3 mat, int i) {';
-for (var i = size * size - 1; i >= 0; i--) {
-    var x = i % size;
-    var y = Math.floor(i / size);
-    matrixLookup += '\nif (i == '+i+') { return mat['+x+']['+y+']; }';
-}
-matrixLookup += '\n}';
-
-
 const calcHyperPower = [
     'varying vec2 screenUv;',
     'uniform mat3 hyperMap;',
     'uniform vec2 uResolution;',
-    matrixLookup,
     glslify('./shaders/lib/hyper-value.glsl'),
     'float calcHyperPower(vec3 hyperPos) {',
         'vec2 xy = uResolution.xy;', 

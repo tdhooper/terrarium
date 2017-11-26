@@ -5,25 +5,35 @@ float hyperEasing(float x) {
 
 const int NUM_WAVES = 9;
 
-float hyperValue(mat3 waves, float x) {
-
+void calcWave(inout float value, float x, float offset) {
     float wavelengthStart = 3.;
     float wavelengthEnd = 3.;
     float wavePower = .75;
 
+    if (offset > 0. && offset <= 1.) {
+        offset = hyperEasing(offset);
+        float wavelength = mix(wavelengthStart, wavelengthEnd, offset);
+        float waveX = x - offset + wavelength * (1. - offset);
+        waveX = max(waveX / wavelength, 0.);
+        waveX = waveX > 1. ? 0. : waveX;
+        value += waveX * wavePower;
+    }
+}
+
+float hyperValue(mat3 waves, float x) {
+
     float value = 0.;
 
-    for (int w = 0; w < NUM_WAVES; w++) {
-        float offset = matrixLookup(waves, w);
-        if (offset > 0. && offset <= 1.) {
-            offset = hyperEasing(offset);
-            float wavelength = mix(wavelengthStart, wavelengthEnd, offset);
-            float waveX = x - offset + wavelength * (1. - offset);
-            waveX = max(waveX / wavelength, 0.);
-            waveX = waveX > 1. ? 0. : waveX;
-            value += waveX * wavePower;
-        }
-    }
+    calcWave(value, x, waves[2][2]);
+    calcWave(value, x, waves[1][2]);
+    calcWave(value, x, waves[0][2]);
+    calcWave(value, x, waves[2][1]);
+    calcWave(value, x, waves[1][1]);
+    calcWave(value, x, waves[0][1]);
+    calcWave(value, x, waves[2][0]);
+    calcWave(value, x, waves[1][0]);
+    calcWave(value, x, waves[0][0]);
+
     value = min(value, 1.);
 
     return value;
@@ -36,28 +46,38 @@ float waveShape(float x) {
     return x;
 }
 
+void calcWaveSmooth(inout float value, float x, float offset) {
+    float wavelengthStart = 3.;
+    float wavelengthEnd = 3.;
+    float wavePower = .75;
+
+    if (offset > 0. && offset <= 1.) {
+        offset = hyperEasing(offset);
+        float wavelength = mix(wavelengthStart, wavelengthEnd, offset);
+        float waveX = x - offset + wavelength * (1. - offset);
+        waveX = max(waveX / wavelength, 0.);
+        waveX = waveX > 1. ? 0. : waveX;
+        value += waveShape(waveX) * wavePower;
+    }
+}
+
 // Blend the leading edge
 float hyperValueSmooth(mat3 waves, float x) {
 
     x -= .5;
 
-    float wavelengthStart = 3.;
-    float wavelengthEnd = 3.;
-    float wavePower = .75;
-
     float value = 0.;
 
-    for (int w = 0; w < NUM_WAVES; w++) {
-        float offset = matrixLookup(waves, w);
-        if (offset > 0. && offset <= 1.) {
-            offset = hyperEasing(offset);
-            float wavelength = mix(wavelengthStart, wavelengthEnd, offset);
-            float waveX = x - offset + wavelength * (1. - offset);
-            waveX = max(waveX / wavelength, 0.);
-            waveX = waveX > 1. ? 0. : waveX;
-            value += waveShape(waveX) * wavePower;
-        }
-    }
+    calcWaveSmooth(value, x, waves[2][2]);
+    calcWaveSmooth(value, x, waves[1][2]);
+    calcWaveSmooth(value, x, waves[0][2]);
+    calcWaveSmooth(value, x, waves[2][1]);
+    calcWaveSmooth(value, x, waves[1][1]);
+    calcWaveSmooth(value, x, waves[0][1]);
+    calcWaveSmooth(value, x, waves[2][0]);
+    calcWaveSmooth(value, x, waves[1][0]);
+    calcWaveSmooth(value, x, waves[0][0]);
+
     value = min(value, 1.);
 
     return value;
