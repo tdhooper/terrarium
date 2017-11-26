@@ -486,7 +486,9 @@ background.updateVertexShader(
     [
         'varying vec3 vCameraPosition;',
         'varying vec3 vPosition;',
-        'varying float hyperPowerRadial;'
+        'varying float hyperPowerRadial;',
+        'varying vec2 cartCoords;',
+        glslify('./shaders/lib/background-vert.glsl')
     ].join('\n')
 );
 
@@ -495,7 +497,8 @@ background.updateVertexShader(
     [
         'vCameraPosition = cameraPosition;',
         'vPosition = (modelMatrix * vec4( transformed, 1.0 )).xyz;',
-        'hyperPowerRadial = calcHyperPowerRadial();'
+        'hyperPowerRadial = calcHyperPowerRadial();',
+        'cartCoords = coords(vPosition, vCameraPosition);'
     ].join('\n')
 );
 
@@ -505,6 +508,7 @@ background.updateFragmentShader(
         'varying vec3 vCameraPosition;',
         'varying vec3 vPosition;',
         'varying float hyperPowerRadial;',
+        'varying vec2 cartCoords;',
         glslify('./shaders/lib/background.glsl')
     ].join('\n')
 );
@@ -512,9 +516,11 @@ background.updateFragmentShader(
 background.updateFragmentShader(
     '#include <color_fragment>',
     [
-        'vec4 pattern = bgPattern(vPosition, vCameraPosition);',
+        'vec2 c = cartCoords;',
+        'vec2 polarCoords = vec2(sqrt(c.x * c.x + c.y * c.y), atan(c.y, c.x));',
+        'vec4 pattern = bgPattern(polarCoords);',
         'diffuseColor = pattern;',
-        // 'gl_FragColor = diffuseColor;',
+        // 'gl_FragColor = vec4(polarCoords,0,1);',
         // 'return;'
     ].join('\n')
 );

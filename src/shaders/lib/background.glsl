@@ -38,38 +38,15 @@ void pR(inout vec2 p, float a) {
     p = cos(a)*p + sin(a)*vec2(p.y, -p.x);
 }
 
-vec4 coords(vec3 pos, vec3 cam) {
-    pos = normalize(pos);
-    cam = normalize(cam);
-    float radius = acos(dot(pos, -cam)) / PI * 4.;
+vec4 bgPattern(vec2 polarCoords) {
 
-    vec3 up = normalize(cross(-cam, vec3(0,1,0)));
-    vec3 left = cross(cam, up);
-    vec3 dir = normalize(cross(cam, cross(pos, cam)));
-    float angle = acos(dot(dir, up)) * sign(dot(dir, left));
-
-    vec2 polar = vec2(
-        radius,
-        angle
-    );
-
-    vec2 cartesian = vec2(
-        radius * cos(angle),
-        radius * sin(angle)
-    );
-
-    return vec4(cartesian, polar);
-}
-
-vec4 bgPattern(vec3 pos, vec3 cam) {
-
-    vec4 c = coords(pos, cam);
-    vec2 p = c.xy;
-    vec2 r = c.zw;
+    vec2 r = polarCoords;
 
     float crop = .25;
     float hp = max(0., (hyperPowerRadial - crop) * (1./(1.-crop)));
     // float hp = calcHyperPowerRadial();
+
+    vec4 c = vec4(0,0,r);
 
     // 0 -> 0
     // 1 -> 0
