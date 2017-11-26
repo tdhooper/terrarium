@@ -5,7 +5,7 @@ float hyperEasing(float x) {
 
 const int NUM_WAVES = 9;
 
-float hyperValue(mat4 waves, float x) {
+float hyperValue(mat3 waves, float x) {
 
     float wavelengthStart = 3.;
     float wavelengthEnd = 3.;
@@ -37,7 +37,7 @@ float waveShape(float x) {
 }
 
 // Blend the leading edge
-float hyperValueSmooth(mat4 waves, float x) {
+float hyperValueSmooth(mat3 waves, float x) {
 
     x -= .5;
 
