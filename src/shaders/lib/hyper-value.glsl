@@ -7,20 +7,12 @@ const int NUM_WAVES = 9;
 
 float hyperValue(vec2 wave, float x) {
     
-    // Wavelengths
-    float frontWl = 0.;
     float backWl = 3.;
 
-    // Front and back edge offsets
     float front = wave[0] * (1. + backWl);
     float back = wave[1];
 
-    // front = pow(front, 1.5);
-    // back = pow(back, .5);
-
-
-
-    float a = 1. - (x - front + frontWl * (1. - front)) / frontWl;
+    float a = 1. - (x - front) / 0.;
     float b = 1. - (x - back + backWl * (1. - back)) / backWl;
     float y = clamp(min(a, 1. - b) * .75, 0., 1.);
 
@@ -60,24 +52,36 @@ float hyperValueSmooth(vec2 wave, float x) {
     // return 0.;
     x -= .5;
 
-    float frontWl = 0.;
+    
     float backWl = 3.;
 
-    // Front and back edge offsets
     float front = wave[0] * (1. + backWl);
     float back = wave[1];
 
-    // front = pow(front, 1.5);
-    // back = pow(back, .5);
-
-
-    float a = 1. - (x - front + frontWl * (1. - front)) / frontWl;
+    float a = 1. - (x - front) / 0.;
     float b = 1. - (x - back + backWl * (1. - back)) / backWl;
-    float y = clamp(waveShape(min(a, 1. - b)) * .66, 0., 1.);
-
-    y = smoothstep(0., 1., y);
+    float y = clamp(min(a, 1. - b) * .75, 0., 1.);
 
     return y;
+
+    // float frontWl = 0.;
+    // float backWl = 3.;
+
+    // // Front and back edge offsets
+    // float front = wave[0] * (1. + backWl);
+    // float back = wave[1];
+
+    // // front = pow(front, 1.5);
+    // // back = pow(back, .5);
+
+
+    // float a = 1. - (x - front + frontWl * (1. - front)) / frontWl;
+    // float b = 1. - (x - back + backWl * (1. - back)) / backWl;
+    // float y = clamp(waveShape(min(a, 1. - b)) * .66, 0., 1.);
+
+    // y = smoothstep(0., 1., y);
+
+    // return y;
 
     // Front and back edge offsets
     // float front = wave[0];
