@@ -2,27 +2,35 @@ const TWEEN = require('@tweenjs/tween.js');
 
 
 const HyperMap = function(easing) {
-    // this.waves = [.1, -1, -2, -3, -4];
-    this.waves = [];
-    this.waveDuration = 3000; // milliseconds
-    this.wavePower = .75;
-    this.dataTexture = new THREE.Matrix3();
+    this.waveFront = 0;
+    this.waveBack = 0;
+    this.waveSpeed = 1/3000;
+    this.backMove = 0;
+    this.materialData = new THREE.Vector2();
 };
 
 HyperMap.prototype.addWave = function() {
-    this.waves.unshift(0);
+    if (this.waveBack >= .5) {
+        this.waveFront = 0;
+        this.waveBack = 0;
+        this.backMove = 0;
+    } else {
+        this.backMove += .1;
+    }
 };
 
 HyperMap.prototype.update = function(delta) {
     // return;
-    delta /= this.waveDuration;
-    this.waves = this.waves
-        .map(wave => wave + delta)
-        .filter(wave => wave <= 1);
-    this.dataTexture.elements = this.dataTexture.elements.map((v, i) => {
-        return i < this.waves.length ? this.waves[i] : 0;
-    });
+    delta *= this.waveSpeed;
+    this.backMove = THREE.Math.clamp(this.backMove - delta * 1.5, 0, .1);
+    this.waveFront += delta;
+    this.waveBack += delta - this.backMove;
+    this.waveBack = Math.max(-1, this.waveBack);
+    // console.log(this.waveFront, this.waveBack, this.backMove);
+    this.materialData.set(this.waveFront, this.waveBack);
+    // console.log(this.materialData);
 };
 
 
 module.exports = HyperMap;
+

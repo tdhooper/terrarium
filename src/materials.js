@@ -32,23 +32,10 @@ const instancedBody = [
 /* Hyper
    ========================================================================== */
 
-var matrixLookup = '';
-
-const size = 3;
-matrixLookup += 'float matrixLookup(mat4 mat, int i) {';
-for (var i = size * size - 1; i >= 0; i--) {
-    var x = i % size;
-    var y = Math.floor(i / size);
-    matrixLookup += '\nif (i == '+i+') { return mat['+x+']['+y+']; }';
-}
-matrixLookup += '\n}';
-
-
 const calcHyperPower = [
     'varying vec2 screenUv;',
-    'uniform mat4 hyperMap;',
+    'uniform vec2 wavePosition;',
     'uniform vec2 uResolution;',
-    matrixLookup,
     glslify('./shaders/lib/hyper-value.glsl'),
     'float calcHyperPower(vec3 hyperPos) {',
         'vec2 xy = uResolution.xy;', 
@@ -56,7 +43,7 @@ const calcHyperPower = [
         'float radial = length(screenUv * ratio);',
         'float sphere = length(hyperPos / 90.); //35',
         'float offset = mix(radial, sphere, .95);',
-        'float t = hyperValue(hyperMap, offset);',
+        'float t = hyperValue(wavePosition, offset);',
         'return t;',
     '}',
     'float calcHyperPowerRadial() {',
@@ -65,7 +52,7 @@ const calcHyperPower = [
         'float radial = length(screenUv * ratio);',
         'float offset = radial;',
         // 'offset = pow(offset, 2.);',
-        'float t = hyperValueSmooth(hyperMap, offset);',
+        'float t = hyperValueSmooth(wavePosition, offset);',
         'return t;',
     '}',
 ].join('\n');
@@ -94,8 +81,8 @@ const hyperFragHead = [
     calcHyperPower,
     glslify('./shaders/lib/spectrum.glsl'),
     glslify('./shaders/lib/gamma.glsl'),
-    'vec3 hyperColor(vec3 color) {',
-        'float hyperPower = calcHyperPower(hyperPos);',
+    'vec3 hyperColor(vec3 color, vec3 pos) {',
+        'float hyperPower = calcHyperPower(pos);',
         'hyperPower = max(0., hyperPower * 2. - 1.);',
         'float t = hyperPower;',
         'float dist = pow(length(hyperPos), 1./4.);',
@@ -105,17 +92,17 @@ const hyperFragHead = [
     '}',
 ].join('\n');
 
-const hyperFragBody = 'gl_FragColor.rgb = hyperColor(gl_FragColor.rgb);';
+const hyperFragBody = 'gl_FragColor.rgb = hyperColor(gl_FragColor.rgb, hyperPos);';
 
 module.exports.addHyperMap = function(hyperMap) {
-    planetSolid.enableHyper(hyperMap.dataTexture);
-    planetBackground.enableHyper(hyperMap.dataTexture);
-    planetWireframe.enableHyper(hyperMap.dataTexture);
-    soilTop.enableHyper(hyperMap.dataTexture);
-    soilBottom.enableHyper(hyperMap.dataTexture);
-    containerWireframe.enableHyper(hyperMap.dataTexture);
-    crystal.enableHyper(hyperMap.dataTexture);
-    background.enableHyper(hyperMap.dataTexture, true);
+    planetSolid.enableHyper(hyperMap.materialData);
+    planetBackground.enableHyper(hyperMap.materialData, true);
+    planetWireframe.enableHyper(hyperMap.materialData);
+    soilTop.enableHyper(hyperMap.materialData);
+    soilBottom.enableHyper(hyperMap.materialData);
+    containerWireframe.enableHyper(hyperMap.materialData);
+    crystal.enableHyper(hyperMap.materialData);
+    background.enableHyper(hyperMap.materialData, true);
 };
 
 module.exports.setResolution = function(x, y) {
@@ -405,7 +392,19 @@ const planetBackground = new ShadablePhongMaterial({
 });
 
 planetBackground.updateVertexShader('#include <common>', instancedHead);
+
 planetBackground.updateVertexShader('#include <begin_vertex>', instancedBody);
+
+planetBackground.updateVertexShader('#include <skinning_vertex>', hyperVertDeform);
+
+planetBackground.updateFragmentShader(
+    '#include <fog_fragment>',
+    [
+
+        'gl_FragColor.rgb = hyperColor(gl_FragColor.rgb, hyperPos);'
+    ].join('\n')
+);
+
 
 module.exports.planetBackground = planetBackground;
 
@@ -572,11 +571,11 @@ function ShadableMixin(SourceMaterial) {
     NewMaterial.prototype = Object.create(SourceMaterial.prototype);
     NewMaterial.prototype.constructor = NewMaterial;
 
-    NewMaterial.prototype.enableHyper = function(hyperMap, headOnly) {
+    NewMaterial.prototype.enableHyper = function(materialData, headOnly) {
         this.updateVertexShader('#include <common>', hyperVertHead);
         this.updateVertexShader('#include <fog_vertex>', hyperVertBody);
         this.updateFragmentShader('#include <common>', hyperFragHead);
-        this.uniforms.hyperMap = {type: 'm3', value: hyperMap};
+        this.uniforms.wavePosition = {type: 'v2', value: materialData};
         this.uniforms.uResolution = {type: 'v2', value: [0, 0]};
         this.uniforms.time = {type: 'f', value: 0};
         if ( ! headOnly) {
@@ -609,8 +608,8 @@ function ShadableMixin(SourceMaterial) {
 
         this.uniforms = THREE.UniformsUtils.clone(source.uniforms);
 
-        if (this.uniforms.hyperMap) {
-            this.uniforms.hyperMap = source.uniforms.hyperMap;
+        if (this.uniforms.wavePosition) {
+            this.uniforms.wavePosition = source.uniforms.wavePosition;
         }
         if (this.uniforms.uResolution) {
             this.uniforms.uResolution = source.uniforms.uResolution;
