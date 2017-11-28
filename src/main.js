@@ -126,6 +126,8 @@ Main.prototype.initThree = function() {
     this.cameraControls.enableDamping = true;
     this.cameraControls.dampingFactor = 0.05;
     this.cameraControls.rotateSpeed = 0.066;
+    this.cameraControls.maxDistance = 20;
+    this.cameraControls.minDistance = .75;
 
     var azimuth = 0;
     this.cameraControls.addEventListener('change', () => {
