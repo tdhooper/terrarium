@@ -68,7 +68,7 @@ const hyperVertDeform = [
     'float hyperPower = calcHyperPower(hyperPos);',
     'float dist = length(hyperPos / 400.) + .01;',
     'float str = hyperPower;',
-    'transformed += sin(hyperPos * dist * 400. + time * .1) * dist * str;',
+    'transformed += sin(hyperPos * dist * 400. + time * 100.) * dist * str;',
 ].join('\n');
 
 const hyperVertBody = [
@@ -86,7 +86,7 @@ const hyperFragHead = [
         'hyperPower = max(0., hyperPower * 2. - 1.);',
         'float t = hyperPower;',
         'float dist = pow(length(hyperPos), 1./4.);',
-        'vec3 col = spectrum(dist * 4. - time * .0005);',
+        'vec3 col = spectrum(dist * 4. - time * .5);',
         'col = linearToScreen(col);',
         'return mix(color, col, t);',
     '}',
@@ -238,7 +238,7 @@ crystal.updateFragmentShader(
         'vec3 positon = vPosition;',
         'positon *= scale;',
         'positon.z += height * .5;',
-        'float cTime = time * .0025;',
+        'float cTime = time * 2.5;',
         'vec4 m = map(seed, cTime, positon);',
         'float angleOfIncidence = acos(dot(normalize(vNormal + m.xyz * .2), normalize(vViewPosition)));',
         // 'angleOfIncidence = 1.75 - angleOfIncidence * .5;',
@@ -461,7 +461,7 @@ stars.updateFragmentShader(
         'float r = dot(cxy, cxy);',
         'float delta = fwidth(r);',
         'diffuseColor.a = 1.0 - smoothstep(1.0 - delta, 1.0 + delta, r);',
-        'diffuseColor.xyz = spectrum(vSeed * 6. + time * .0002 * ceil(vSeed * 6.));',
+        'diffuseColor.xyz = spectrum(vSeed * 6. + time * .2 * ceil(vSeed * 6.));',
         'diffuseColor.xyz = mix(diffuseColor.xyz, vec3(1), hash11(vSeed));'
     ].join('\n')
 );

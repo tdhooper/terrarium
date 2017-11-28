@@ -70,7 +70,7 @@ vec4 bgPattern(vec2 polarCoords) {
 
     r *= 1.5;
 
-    r.x -= time * .0001;
+    r.x -= time * .1;
 
     pR(r, PI / 4.);
 
@@ -82,9 +82,9 @@ vec4 bgPattern(vec2 polarCoords) {
 
     float o = c.w * 2.;
     o = 0.5;
-    float w = (sin(c.z * 12. + time * .001 - o) * .5 + .5) * .05;
-    float ww = (sin(c.z * 12. + time * .001 - o) * .5 + .3) * .05;
-    float w3 = (sin(c.z * 12. + time * .001 - o) * .5 + .8) * .08;
+    float w = (sin(c.z * 12. + time - o) * .5 + .5) * .05;
+    float ww = (sin(c.z * 12. + time - o) * .5 + .3) * .05;
+    float w3 = (sin(c.z * 12. + time - o) * .5 + .8) * .08;
 
     float partA = abs(dot(r, vec2(1,0)));
     float partB = abs(dot(r, vec2(0,1)));
@@ -93,7 +93,7 @@ vec4 bgPattern(vec2 polarCoords) {
     // w *= 1. - c.z * .5;
     // ww *= 1. - c.z * .5;
 
-    float po = sin(time * .005) * .5 + .5;
+    float po = sin(time * 5.) * .5 + .5;
     po = hp;
 
     float pat = smoothstep(0., .005, d - w - .1 * (1. - po));

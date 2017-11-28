@@ -4,13 +4,13 @@ const Autorotate = function(app, object) {
     this.app = app;
     this.object = object;
 
-    this.speed = .000075;
+    this.speed = .075;
     this.time = 0;
     this.rotation = 0;
     this.currentSpeed = 0;
     this.targetSpeed = 0;
-    this.startAcceleration = .001;
-    this.stopAcceleration = .005;
+    this.startAcceleration = 1;
+    this.stopAcceleration = 5;
     this.direction = 1;
 
     app.eventMediator.on('soil.mouseover', this.interactBegin.bind(this));
@@ -105,10 +105,8 @@ Autorotate.prototype.stop = function() {
 };
 
 Autorotate.prototype.update = function() {
-    const time = this.app.elapsed;
+    const delta = this.app.delta;
     const acceleration = this.rotating ? this.startAcceleration : this.stopAcceleration;
-    const delta = time - this.time;
-    this.time = time;
     const change = (this.targetSpeed - this.currentSpeed) * acceleration * delta;
     if (change > 0) {
         this.currentSpeed = Math.min(this.targetSpeed, this.currentSpeed + change);

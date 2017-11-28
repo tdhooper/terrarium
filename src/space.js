@@ -170,7 +170,7 @@ Space.prototype.addPlanets = function() {
         var quatB = new THREE.Quaternion();
 
         instanced.mesh.onBeforeRender = function() {
-            var d = this.app.delta * .000025;
+            var d = this.app.delta * .025;
 
             spec.objects.forEach(object => {
 

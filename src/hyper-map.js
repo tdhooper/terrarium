@@ -4,7 +4,7 @@ const TWEEN = require('@tweenjs/tween.js');
 const HyperMap = function(easing) {
     // this.waves = [.1, -1, -2, -3, -4];
     this.waves = [];
-    this.waveDuration = 3000; // milliseconds
+    this.waveDuration = 3; // seconds
     this.wavePower = .75;
     this.dataTexture = [0,0,0,0];
 };

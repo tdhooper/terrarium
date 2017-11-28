@@ -205,14 +205,14 @@ Main.prototype.render = function() {
     this.terrarium.crystalPlanter.setVisible(true);
 };
 
-Main.prototype.animate = function(elapsed) {
+Main.prototype.animate = function() {
     var now = Date.now();
     if (this.startTime) {
-        this.app.elapsed = now - this.startTime;
+        this.app.elapsed = (now - this.startTime) / 1000;
         materials.setTime(this.app.elapsed);
     }
     this.lastNow = this.lastNow || now;
-    this.app.delta = now - this.lastNow;
+    this.app.delta = (now - this.lastNow) / 1000;
     this.lastNow = now;
 
     // setTimeout(this.animate.bind(this), Math.random() * 70);
