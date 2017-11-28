@@ -51,7 +51,6 @@ const calcHyperPower = [
         'vec2 ratio = xy / sqrt(pow(xy.x, 2.) + pow(xy.y, 2.));',
         'float radial = length(screenUv * ratio);',
         'float offset = radial;',
-        // 'offset = pow(offset, 2.);',
         'float t = hyperValueSmooth(hyperMap, offset);',
         'return t;',
     '}',
@@ -130,6 +129,7 @@ module.exports.setTime = function(time) {
     background.uniforms.time.value = time;
 };
 
+
 /* Container
    ========================================================================== */
 
@@ -192,7 +192,6 @@ module.exports.containerBack = new THREE.MeshBasicMaterial({
 
 /* Crystals
    ========================================================================== */
-
 
 var crystal = new ShadablePhongMaterial();
 
@@ -270,7 +269,6 @@ crystal.updateFragmentShader(
 );
 
 module.exports.crystal = crystal;
-
 
 
 /* Soil Cursor
@@ -414,9 +412,7 @@ module.exports.planetWireframe = planetWireframe;
 
 const stars = new ShadablePointsMaterial({
     transparent: true,
-    // depthTest: false,
     depthWrite: false,
-    // blending: THREE.AdditiveBlending
 });
 
 stars.extensions = {derivatives: true};
@@ -520,19 +516,14 @@ background.updateFragmentShader(
         'vec2 polarCoords = vec2(sqrt(c.x * c.x + c.y * c.y), atan(c.y, c.x));',
         'vec4 pattern = bgPattern(polarCoords);',
         'diffuseColor = pattern;',
-        // 'gl_FragColor = vec4(polarCoords,0,1);',
-        // 'return;'
     ].join('\n')
 );
 
-
-// console.log(background.fragmentShader);
-
 module.exports.background = background;
+
 
 /* ShadableMixin
    ========================================================================== */
-
 
 function ShadableMixin(SourceMaterial) {
 

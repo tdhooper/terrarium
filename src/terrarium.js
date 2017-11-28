@@ -24,11 +24,6 @@ const Terrarium = function(parent, app) {
     this.soilCursor = soilCursor;
     this.crystalPlanter = crystalPlanter;
 
-    // var planeGeom = new THREE.PlaneGeometry(1, 1);
-    // var plane = new THREE.Mesh(planeGeom, materials.soilBottom);
-    // plane.rotateY(Math.PI / 2);
-    // parent.add(plane);
-
     // Animations
 
     const TWEEN = app.TWEEN;

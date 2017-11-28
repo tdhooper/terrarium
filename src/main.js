@@ -60,11 +60,6 @@ Main.prototype.initApp = function() {
     const history = new History(this.eventMediator);
     const hyperMap = new HyperMap();
 
-    // var boxMaterial = new THREE.MeshBasicMaterial({map:hyperMap.dataTexture});
-    // var boxGeometry2 = new THREE.BoxGeometry( 2, 2, 2 );
-    // var mainBoxObject = new THREE.Mesh(boxGeometry2,boxMaterial);
-    // this.scene.add(mainBoxObject);
-
     materials.addHyperMap(hyperMap);
     this.app = {
         TWEEN: TWEEN,
@@ -112,7 +107,6 @@ Main.prototype.initThree = function() {
     this.renderer.autoClearStencil = false;
     this.renderer.shadowMap.enabled = true;
     this.renderer.setPixelRatio(window.devicePixelRatio);
-    // this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.container = document.createElement('div');
     this.container.classList.add('container');
