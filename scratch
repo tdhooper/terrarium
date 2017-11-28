@@ -1,8 +1,6 @@
 TODO
 
 * On mobile, pause before starting cursor timer
-* fix autospin
-** spins fast when tabbing back to window?
 * Reduce poly count of soil bottom
 
 
@@ -10,23 +8,3 @@ perf tweaks
 
 * Simplify crystal texture
 * Use top-down shadows, and drop update rate
-
-
-Appearance
-
-* Make crystals iridescent on bottom, refractive on top
-** Or allow choosing between two materials
-* Ambient dust/snow billboards
-
-
-Features
-
-* Switch container
-* Switch crystal material
-* Add space creature
-** Floats around the back
-** Moves closer when you plant crystals
-** Eats your crystals when you plant lots
-* Click crystals to make them spin
-** Make the background go progressively crazy too
-* Create an env map with low res fbm texture
