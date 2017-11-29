@@ -1,7 +1,8 @@
 const TWEEN = require('@tweenjs/tween.js');
 
 
-const HyperMap = function(easing) {
+const HyperMap = function(eventMediator) {
+    this.eventMediator = eventMediator;
     // this.waves = [.1, -1, -2, -3, -4];
     this.waves = [];
     this.waveDuration = 3; // seconds
@@ -9,6 +10,12 @@ const HyperMap = function(easing) {
     this.dataTexture = [0,0,0,0];
     this.tapSpeed = 0;
     this.lastTap = 0;
+
+    eventMediator.on('update', delta => {
+        if (delta) {
+            this.update(delta);
+        }
+    });
 };
 
 HyperMap.prototype.addWave = function() {
@@ -48,11 +55,23 @@ HyperMap.prototype.update = function(delta) {
             return true;
         })
         .filter(wave => wave <= 1);
+    var power = 0;
+    var wave;
     this.dataTexture.forEach((v, i) => {
-        this.dataTexture[i] = i < this.waves.length ? this.waves[i] : 0;
+        wave = i < this.waves.length ? this.waves[i] : 0;
+        this.dataTexture[i] = wave;
+        wave = Math.min(1, wave * 1.5);
+        power += (Math.sin(wave * Math.PI * 2 - Math.PI * .5) * .5 + .5) * .75;
     });
+    this.publishPower(Math.min(1, power));
     this.tapSpeed *= .9;
 };
 
+HyperMap.prototype.publishPower = function(power) {
+    if (power !== this.power) {
+        this.eventMediator.emit('hyper-power', power);
+    }
+    this.power = power;
+};
 
 module.exports = HyperMap;

@@ -21,6 +21,7 @@ const QualityAdjust = require('./quality-adjust');
 const Controller = require('./controller');
 const Autorotate = require('./autorotate');
 const HyperMap = require('./hyper-map');
+const Audio = require('./audio');
 
 
 const Main = function() {
@@ -58,7 +59,8 @@ Main.prototype.initApp = function() {
         this.log
     );
     const history = new History(this.eventMediator);
-    const hyperMap = new HyperMap();
+    const hyperMap = new HyperMap(this.eventMediator);
+    new Audio(this.eventMediator);
 
     materials.addHyperMap(hyperMap);
     this.app = {
@@ -212,7 +214,7 @@ Main.prototype.animate = function() {
     // setTimeout(this.animate.bind(this), Math.random() * 70);
     requestAnimationFrame(this.animate.bind(this));
     this.stats.begin();
-    this.eventMediator.emit('update');
+    this.eventMediator.emit('update', this.app.delta, this.app.elapsed);
     TWEEN.update();
     this.render();
     this.stats.end();

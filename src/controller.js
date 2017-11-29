@@ -23,12 +23,6 @@ const Controller = function(app) {
         }
     });
 
-    app.eventMediator.on('update', function() {
-        if (app.delta) {
-            app.hyperMap.update(app.delta);
-        }
-    });
-
     app.eventMediator.on('crystal.click', function() {
         app.hyperMap.addWave();
     });
