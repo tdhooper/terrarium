@@ -13,17 +13,19 @@ const Audio = function(eventMediator) {
 
     var hyper = new howler.Howl({
         src: ['audio/hyper.mp3'],
-        autoplay: true,
         loop: true,
         volume: hyperVolume
     });
 
     eventMediator.on('hyper-power', power => {
         if (hyperVolume === 0) {
-            hyper.seek(0);
+            hyper.play();
         }
         hyper.volume(power);
         hyperVolume = power;
+        if (hyperVolume === 0) {
+            hyper.stop();
+        }
     });
 };
 

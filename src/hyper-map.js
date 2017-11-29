@@ -61,7 +61,7 @@ HyperMap.prototype.update = function(delta) {
         wave = i < this.waves.length ? this.waves[i] : 0;
         this.dataTexture[i] = wave;
         wave = Math.min(1, wave * 1.5);
-        power += (Math.sin(wave * Math.PI * 2 - Math.PI * .5) * .5 + .5) * .75;
+        power += (Math.sin(wave * Math.PI * 2 - Math.PI * .5) * .5 + .5) * .5;
     });
     this.publishPower(Math.min(1, power));
     this.tapSpeed *= .9;
