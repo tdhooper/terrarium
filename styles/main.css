@@ -88,7 +88,7 @@ body {
 }
 
 .controls-control + .controls-control {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .controls-control:not([disabled]):hover,
