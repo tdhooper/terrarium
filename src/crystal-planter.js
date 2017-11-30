@@ -49,6 +49,7 @@ CrystalPlanter.prototype.onMouseUp = function() {
             destroy: this.destroy.bind(this, this.activeCrystal),
             restore: this.restore.bind(this, this.activeCrystal)
         });
+        delete this.activeCrystal;
     }
 };
 
