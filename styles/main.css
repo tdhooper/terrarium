@@ -69,7 +69,7 @@ body {
     position: relative;
     height: 40px;
     width: 40px;
-    background: #fff;
+    background: #dbe9f9;
     border: none;
     border-radius: 50%;
     cursor: pointer;
@@ -120,6 +120,10 @@ body {
     left: 10%;
     width: 80%;
     height: 80%;
+}
+
+.controls-control path {
+    fill: #3b337c;
 }
 
 .controls-mute .off {
