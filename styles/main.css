@@ -52,6 +52,8 @@ body {
     position: fixed;
     bottom: 20px;
     left: 20px;
+    display: flex;
+    flex-direction: column;
     transition-property: transform;
     transition-duration: .25s;
     transition-timing-function: ease-out;
@@ -63,7 +65,7 @@ body {
     transition-timing-function: ease-in;
 }
 
-.controls-undo {
+.controls-control {
     position: relative;
     height: 40px;
     width: 40px;
@@ -85,33 +87,54 @@ body {
     vertical-align: top;
 }
 
-.controls-undo:not([disabled]):hover,
-.controls-undo:not([disabled]):focus {
+.controls-control + .controls-control {
+    margin-top: 20px;
+}
+
+.controls-control:not([disabled]):hover,
+.controls-control:not([disabled]):focus {
     transition-duration: .1s;
     transform: scale(1.1);
     box-shadow: 6px 6px 15px 0px rgba(0,0,0,.2);   
 }
 
-.controls-undo:not([disabled]):active {
+.controls-control:not([disabled]):active {
     transition-duration: .01s;
     transform: scale(1);
     box-shadow: 3px 3px 10px 0px rgba(0,0,0,.2);
 }
 
-.controls-undo:before {
-    content: "";
+.controls-control svg {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url(../images/undo.svg);
-    background-repeat: no-repeat;
-    background-size: 80%;
-    background-position: 50%;
 }
 
-.controls-undo[disabled] {
+.controls-mute svg {
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+}
+
+.controls-undo svg {
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+}
+
+.controls-mute .off {
+    display: none;
+}
+
+.muted .controls-mute .on {
+    display: none;
+}
+
+.muted .controls-mute .off {
+    display: block;
+}
+
+.controls-control[disabled] {
     opacity: .5;
     cursor: default;
 }

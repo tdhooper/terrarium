@@ -42,6 +42,16 @@ const Audio = function(eventMediator) {
             hyper.stop();
         }
     });
+
+    eventMediator.on('mute', () => {
+        ambience.mute(true);
+        hyper.mute(true);
+    });
+
+    eventMediator.on('unmute', () => {
+        ambience.mute(false);
+        hyper.mute(false);
+    });
 };
 
 module.exports = Audio;
