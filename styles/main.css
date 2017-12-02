@@ -160,6 +160,10 @@ body {
     fill: #3b337c;
 }
 
+.controls-control circle {
+    stroke: #3b337c;
+}
+
 .controls-mute .off {
     display: none;
 }
