@@ -6,7 +6,7 @@ const EventEmitter = require('events');
 
 const PerspectiveCamera = require('./lib/square-perspective-camera');
 const TWEEN = require('@tweenjs/tween.js');
-const Stats = require('stats.js');
+// const Stats = require('stats.js');
 
 const ActivityMonitor = require('./activity');
 const materials = require('./materials');
@@ -77,10 +77,10 @@ Main.prototype.initApp = function() {
     };
     const controls = new Controls(document.body, this.app);
 
-    this.stats = new Stats();
-    document.body.appendChild(this.stats.dom);
-    this.stats.dom.style.left = 'auto';
-    this.stats.dom.style.right = 0;
+    // this.stats = new Stats();
+    // document.body.appendChild(this.stats.dom);
+    // this.stats.dom.style.left = 'auto';
+    // this.stats.dom.style.right = 0;
 };
 
 Main.prototype.initScene = function() {
@@ -213,11 +213,11 @@ Main.prototype.animate = function() {
 
     // setTimeout(this.animate.bind(this), Math.random() * 70);
     requestAnimationFrame(this.animate.bind(this));
-    this.stats.begin();
+    // this.stats.begin();
     this.eventMediator.emit('update', this.app.delta, this.app.elapsed);
     TWEEN.update();
     this.render();
-    this.stats.end();
+    // this.stats.end();
     this.adjust.update();
 };
 
