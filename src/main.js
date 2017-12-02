@@ -151,7 +151,7 @@ Main.prototype.initThree = function() {
     this.container.appendChild(this.renderer.domElement);
 
     this.camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
-    this.camera.position.set(3 * 1.2, .5 * 1.2, 0);
+    this.camera.position.set(3 * 1.2, .8 * 1.2, 0);
 
     this.cameraControls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     this.cameraControls.enableDamping = true;

@@ -1,6 +1,7 @@
 var materials = require('./materials');
 const Crystal = require('./crystal');
 const CrystalClick = require('./crystal-click');
+const genRandom = require('random-seed');
 
 
 const CrystalPlanter = function(parent, app) {
@@ -20,6 +21,8 @@ const CrystalPlanter = function(parent, app) {
     sphere.position.set(0,-.6,0);
     this.object.add(sphere);
 
+    this.rand = genRandom(7);
+
     app.eventMediator.on('soil-cursor.down', this.onMouseDown.bind(this));
     app.eventMediator.on('soil-cursor.up', this.onMouseUp.bind(this));
 
@@ -35,7 +38,8 @@ CrystalPlanter.prototype.onMouseDown = function(intersection) {
         this.app,
         position,
         normal,
-        this.material
+        this.material,
+        this.rand.random()
     );
     this.crystals.push(crystal);
     this.activeCrystal = crystal;

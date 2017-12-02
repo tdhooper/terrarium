@@ -2,15 +2,13 @@ const crystalGen = require('./crystal-gen');
 const genRandom = require('random-seed');
 
 
-const Crystal = function(parent, app, position, normal, material) {
+const Crystal = function(parent, app, position, normal, material, seed) {
     this.app = app;
     this.parent = parent;
 
     this.idealNormals = {};
     this.position = position;
     this.normal = normal;
-
-    const seed = Math.random();
 
     this.material = material.clone();
     this.material.uniforms.seed.value = seed;
@@ -23,7 +21,7 @@ const Crystal = function(parent, app, position, normal, material) {
     group.add(mesh);
     parent.add(group);
 
-    const rotation = Math.random();
+    var rotation = seed;
     group.up = new THREE.Vector3(
         Math.sin(rotation),
         0,
