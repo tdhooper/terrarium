@@ -2,25 +2,21 @@ const howler = require('howler');
 
 const Audio = function(eventMediator) {
 
-    var volumeScale = 0;
+    var globalVolume = 0;
+    howler.Howler.volume(globalVolume);
 
     var ambience = new howler.Howl({
         src: ['audio/ambience.mp3'],
         loop: true,
         autoplay: true,
-        volume: 0
+        volume: .5
     });
 
-    var ambienceVolume = 0;
-    var ambienceVolumeSclae = .5;
-
     eventMediator.on('crystal.growth', progress => {
-        var volume = Math.max(progress, ambienceVolume);
-        if (volume !== ambienceVolume) {
-            ambienceVolume = volume;
-
-            volumeScale = Math.pow(volume, 2);
-            ambience.volume(volumeScale * ambienceVolumeSclae);
+        var volume = Math.max(progress, globalVolume);
+        if (volume !== globalVolume) {
+            globalVolume = volume;
+            howler.Howler.volume(Math.pow(volume, 2));
         }
     });
 
@@ -36,7 +32,7 @@ const Audio = function(eventMediator) {
         if (hyperVolume === 0) {
             hyper.play();
         }
-        hyper.volume(power * volumeScale);
+        hyper.volume(power);
         hyperVolume = power;
         if (hyperVolume === 0) {
             hyper.stop();
