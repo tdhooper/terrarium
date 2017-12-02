@@ -10,6 +10,40 @@ body {
     background: linear-gradient(0deg, #5d3277, #4e5fa1);
 }
 
+.hide-canvas .loading {
+    opacity: .5;
+}
+
+.loading {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    height: 26px;
+    width: 26px;
+    margin-top: -13px;
+    margin-left: -13px;
+    border: 3px solid transparent;
+    border-top-color: #fff;
+    border-radius: 50%;
+
+    transition-property: opacity;
+    transition-timing-function: ease-in;
+    transition-duration: .1s;
+    z-index: -1;
+
+    animation-name: rotate;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+
+    opacity: 0;
+}
+
+@keyframes rotate {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
+
 [data-whatintent="mouse"] *:focus {
     outline: none;
 }
