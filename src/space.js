@@ -12,13 +12,15 @@ const Space = function(parent, app) {
     const group = new THREE.Group();
     parent.add(group);
 
+    group.rotateY(Math.PI * .64);
+
     this.group = group;
     this.app = app;
 
     this.addPlanets();
     this.addStars();
 
-    var sphereGeom = new THREE.IcosahedronGeometry(36, 3);
+    var sphereGeom = new THREE.IcosahedronGeometry(36, 4);
     var sphere = new THREE.Mesh(sphereGeom, materials.background);
     sphere.renderOrder = -1;
     group.add(sphere);
@@ -35,7 +37,7 @@ const Space = function(parent, app) {
         .repeat(Infinity);
 
     app.eventMediator.on('start', function() {
-        rotate.start();
+        // rotate.start();
     });
 };
 
@@ -168,6 +170,8 @@ Space.prototype.addPlanets = function() {
         var z = new THREE.Vector3(0,0,1);
         var quatA = new THREE.Quaternion();
         var quatB = new THREE.Quaternion();
+
+        return;
 
         instanced.mesh.onBeforeRender = function() {
             var d = this.app.delta * .025;

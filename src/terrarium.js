@@ -26,29 +26,31 @@ const Terrarium = function(parent, app) {
 
     // Animations
 
-    const TWEEN = app.TWEEN;
+    // const TWEEN = app.TWEEN;
 
-    group.scale.set(.001,.001,.001);
-    const inTween = new TWEEN.Tween(group.scale)
-        .to({x: 1, y: 1, z: 1}, 1250)
-        .easing(TWEEN.Easing.Cubic.Out)
-        .onComplete(() => {
-            app.eventMediator.emit('ready');
-        });
+    // group.scale.set(.001,.001,.001);
+    // const inTween = new TWEEN.Tween(group.scale)
+    //     .to({x: 1, y: 1, z: 1}, 1250)
+    //     .easing(TWEEN.Easing.Cubic.Out)
+    //     .onComplete(() => {
+    //         app.eventMediator.emit('ready');
+    //     });
 
-    this.rotateLock = true;
-    group.rotation.y = -Math.PI;
-    const spinTween = new TWEEN.Tween(group.rotation)
-        .to({y: 0}, 1500)
-        .easing(TWEEN.Easing.Cubic.Out)
-        .onComplete(() => {
-            this.rotateLock = false;
-        });
+    app.eventMediator.emit('ready');
 
-    app.eventMediator.on('start', function() {
-        inTween.start();
-        spinTween.start();
-    });
+    // this.rotateLock = true;
+    // group.rotation.y = -Math.PI;
+    // const spinTween = new TWEEN.Tween(group.rotation)
+    //     .to({y: 0}, 1500)
+    //     .easing(TWEEN.Easing.Cubic.Out)
+    //     .onComplete(() => {
+    //         this.rotateLock = false;
+    //     });
+
+    // app.eventMediator.on('start', function() {
+    //     inTween.start();
+    //     spinTween.start();
+    // });
 };
 
 Terrarium.prototype.setRotation = function(rotation) {

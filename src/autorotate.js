@@ -4,7 +4,7 @@ const Autorotate = function(app, object) {
     this.app = app;
     this.object = object;
 
-    this.speed = .075;
+    this.speed = .75;
     this.time = 0;
     this.rotation = 0;
     this.currentSpeed = 0;
@@ -43,6 +43,7 @@ const Autorotate = function(app, object) {
     });
 
     app.eventMediator.on('crystal.growth', this.crystalGrowth.bind(this));
+    this.crystalGrowth();
 };
 
 Autorotate.prototype.interactBegin = function() {

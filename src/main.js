@@ -49,6 +49,41 @@ const Main = function() {
             }, 1000);
         }, 100);
     }, 100);
+
+    var crystalSpecs = [
+        [[0,0], 1],
+        [[.2,0], .8],
+        [[-.2,.1], .7],
+        [[0,-.18], .65],
+        [[-.15,-.15], .8],
+        [[-.2,-.025], .6],
+        [[0,.2], .63],
+        [[.12,.2], .5],
+
+        [[.4,.4], .5],
+        [[.45,.3], .35],
+
+        [[.0,-.6], .45],
+        [[.12,-.58], .3],
+        [[.05,-.5], .5],
+    ];
+
+    this.eventMediator.on('start', () => {
+        var rayCaster = new THREE.Raycaster();
+        crystalSpecs.forEach(spec => {
+            var xy = spec[0];
+            var size = spec[1];
+            rayCaster.set(new THREE.Vector3(xy[0],1,xy[1]), new THREE.Vector3(0,-1,0));
+            var intersect = rayCaster.intersectObject(this.terrarium.soil.top)[0];
+            intersect.normal = this.terrarium.soilCursor.normalIntersection(intersect);
+            this.terrarium.crystalPlanter.onMouseDown(intersect);
+            this.terrarium.crystalPlanter.activeCrystal.setSize(size);
+        });
+
+        setTimeout(() => {
+            this.app.hyperMap.addWave();
+        }, 5000);
+    });
 };
 
 Main.prototype.initApp = function() {

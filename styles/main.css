@@ -91,6 +91,7 @@ body {
     transition-property: transform;
     transition-duration: .25s;
     transition-timing-function: ease-out;
+    display: none;
 }
 
 .activity-monitor-inactive .controls {
@@ -190,6 +191,7 @@ body {
     letter-spacing: 2px;
     font-size: 10px;
     color: #fff;
+    display: none;
 }
 
 .credit * {

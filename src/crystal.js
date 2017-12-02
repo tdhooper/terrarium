@@ -77,9 +77,9 @@ const Crystal = function(parent, app, position, normal, material) {
             this.setSize(initial.t + size.t * (1 - minSize));
         });
 
-    initialTween.start();
-    this.growTween.start();
-    combinedTween.start();
+    // initialTween.start();
+    // this.growTween.start();
+    // combinedTween.start();
 };
 
 Crystal.prototype.setSize = function(size) {

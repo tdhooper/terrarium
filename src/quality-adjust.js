@@ -17,7 +17,7 @@ QualityAdjust.prototype.enable = function() {
 };
 
 QualityAdjust.prototype.update = function() {
-    this.throttle && this.throttle.update();
+    // this.throttle && this.throttle.update();
 };
 
 QualityAdjust.prototype.adjust = function(quality) {
