@@ -19,7 +19,7 @@ const Lights = require('./lights');
 const Controls = require('./controls');
 const QualityAdjust = require('./quality-adjust');
 const Controller = require('./controller');
-const Autorotate = require('./autorotate');
+// const Autorotate = require('./autorotate');
 const HyperMap = require('./hyper-map');
 const Audio = require('./audio');
 
@@ -80,9 +80,9 @@ const Main = function() {
             this.terrarium.crystalPlanter.activeCrystal.setSize(size);
         });
 
-        setTimeout(() => {
+        setInterval(() => {
             this.app.hyperMap.addWave();
-        }, 8000);
+        }, 7000 / 2);
     });
 };
 
@@ -126,7 +126,7 @@ Main.prototype.initScene = function() {
     this.adjust = new QualityAdjust(this);
     this.app.terrarium = this.terrarium;
     const controller = new Controller(this.app);
-    this.autorotate = new Autorotate(this.app, this.terrarium);
+    // this.autorotate = new Autorotate(this.app, this.terrarium);
 };
 
 Main.prototype.initThree = function() {

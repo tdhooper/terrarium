@@ -26,7 +26,7 @@ const Terrarium = function(parent, app) {
 
     // Animations
 
-    // const TWEEN = app.TWEEN;
+    const TWEEN = app.TWEEN;
 
     // group.scale.set(.001,.001,.001);
     // const inTween = new TWEEN.Tween(group.scale)
@@ -40,13 +40,11 @@ const Terrarium = function(parent, app) {
 
     // this.rotateLock = true;
     // group.rotation.y = -Math.PI;
-    // const spinTween = new TWEEN.Tween(group.rotation)
-    //     .to({y: 0}, 1500)
-    //     .easing(TWEEN.Easing.Cubic.Out)
-    //     .onComplete(() => {
-    //         this.rotateLock = false;
-    //     });
+    const spinTween = new TWEEN.Tween(group.rotation)
+        .to({y: Math.PI * 2}, 7000)
+        .repeat(Infinity);
 
+    spinTween.start();
     // app.eventMediator.on('start', function() {
     //     inTween.start();
     //     spinTween.start();
