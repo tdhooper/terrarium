@@ -3,7 +3,7 @@ var QualityThrottle = require('./quality-throttle');
 
 const QualityAdjust = function(main) {
     this.main = main;
-    this.qualityRange = 5;
+    this.qualityRange = 6;
     this.initialQuality = this.qualityRange - 1;
     this.adjust(this.initialQuality);
 };
