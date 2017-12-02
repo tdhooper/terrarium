@@ -9,7 +9,7 @@ const Autorotate = function(app, object) {
     this.rotation = 0;
     this.currentSpeed = 0;
     this.targetSpeed = 0;
-    this.startAcceleration = 1;
+    this.startAcceleration = 5;
     this.stopAcceleration = 5;
     this.direction = 1;
 

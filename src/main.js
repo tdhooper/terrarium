@@ -82,7 +82,7 @@ const Main = function() {
 
         setTimeout(() => {
             this.app.hyperMap.addWave();
-        }, 5000);
+        }, 8000);
     });
 };
 
