@@ -21,7 +21,7 @@ const Crystal = function(parent, app, position, normal, material, seed) {
     group.add(mesh);
     parent.add(group);
 
-    var rotation = seed;
+    var rotation = seed * 3;
     group.up = new THREE.Vector3(
         Math.sin(rotation),
         0,
@@ -97,6 +97,7 @@ Crystal.prototype.setSize = function(size) {
 };
 
 Crystal.prototype.setDirection = function(normal, animate, delay) {
+    console.log('setDirection', normal, animate, delay)
     if (this.directionTween) {
         this.directionTween.stop();
     }
