@@ -83,7 +83,13 @@ const Main = function() {
 
         setInterval(() => {
             this.app.hyperMap.addWave();
-        }, 7000 / 2);
+            var i = setInterval(() => {
+                this.app.hyperMap.addWave();
+            }, 100);
+            setTimeout(() => {
+                clearInterval(i);
+            }, 5000 / 3);
+        }, 5000);
     });
 };
 

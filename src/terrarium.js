@@ -41,7 +41,7 @@ const Terrarium = function(parent, app) {
     // this.rotateLock = true;
     // group.rotation.y = -Math.PI;
     const spinTween = new TWEEN.Tween(group.rotation)
-        .to({y: Math.PI * 2}, 7000)
+        .to({y: Math.PI * 2}, 5000)
         .repeat(Infinity);
 
     spinTween.start();
