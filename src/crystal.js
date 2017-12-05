@@ -97,7 +97,6 @@ Crystal.prototype.setSize = function(size) {
 };
 
 Crystal.prototype.setDirection = function(normal, animate, delay) {
-    console.log('setDirection', normal, animate, delay)
     if (this.directionTween) {
         this.directionTween.stop();
     }

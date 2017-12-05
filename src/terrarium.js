@@ -24,31 +24,35 @@ const Terrarium = function(parent, app) {
     this.soilCursor = soilCursor;
     this.crystalPlanter = crystalPlanter;
 
+    app.eventMediator.on('update', (delta, elapsed) => {
+        group.rotation.set(0, (elapsed / 2.5) * Math.PI * 2, 0);
+    });
+
     // Animations
 
-    const TWEEN = app.TWEEN;
+    // const TWEEN = app.TWEEN;
 
-    // group.scale.set(.001,.001,.001);
-    // const inTween = new TWEEN.Tween(group.scale)
-    //     .to({x: 1, y: 1, z: 1}, 1250)
-    //     .easing(TWEEN.Easing.Cubic.Out)
-    //     .onComplete(() => {
-    //         app.eventMediator.emit('ready');
-    //     });
+    // // group.scale.set(.001,.001,.001);
+    // // const inTween = new TWEEN.Tween(group.scale)
+    // //     .to({x: 1, y: 1, z: 1}, 1250)
+    // //     .easing(TWEEN.Easing.Cubic.Out)
+    // //     .onComplete(() => {
+    // //         app.eventMediator.emit('ready');
+    // //     });
 
-    app.eventMediator.emit('ready');
+    // app.eventMediator.emit('ready');
 
-    // this.rotateLock = true;
-    // group.rotation.y = -Math.PI;
-    const spinTween = new TWEEN.Tween(group.rotation)
-        .to({y: Math.PI * 2}, 5000)
-        .repeat(Infinity);
+    // // this.rotateLock = true;
+    // // group.rotation.y = -Math.PI;
+    // const spinTween = new TWEEN.Tween(group.rotation)
+    //     .to({y: Math.PI * 2}, 5000)
+    //     .repeat(Infinity);
 
-    spinTween.start();
-    // app.eventMediator.on('start', function() {
-    //     inTween.start();
-    //     spinTween.start();
-    // });
+    // spinTween.start();
+    // // app.eventMediator.on('start', function() {
+    // //     inTween.start();
+    // //     spinTween.start();
+    // // });
 };
 
 Terrarium.prototype.setRotation = function(rotation) {

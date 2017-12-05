@@ -119,7 +119,7 @@ CrystalPlanter.prototype.adjustNormals = function() {
         var delay = distance * 500;
         delay += Math.random() * 500;
         delay = 0;
-        crystal.setDirection(normal, true, delay);
+        crystal.setDirection(normal, false, delay);
     });
 };
 

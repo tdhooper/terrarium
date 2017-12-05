@@ -7,6 +7,8 @@ const EventEmitter = require('events');
 const PerspectiveCamera = require('./lib/square-perspective-camera');
 const TWEEN = require('@tweenjs/tween.js');
 // const Stats = require('stats.js');
+var FileSaver = require('file-saver');
+var pad = require('pad-number');
 
 const ActivityMonitor = require('./activity');
 const materials = require('./materials');
@@ -27,6 +29,7 @@ const Audio = require('./audio');
 const Main = function() {
     // this.log = new InlineLog();
     this.log = console;
+    this.seconds = 0;
 
     new ActivityMonitor();
 
@@ -39,16 +42,15 @@ const Main = function() {
 
     window.addEventListener('resize', this.onResize.bind(this), false);
     this.onResize();
-    setTimeout(() => {
-        this.startTime = Date.now();
-        requestAnimationFrame(this.animate.bind(this));
-        setTimeout(() => {
-            this.eventMediator.emit('start');
-            setTimeout(() => {
-                this.adjust.enable();
-            }, 1000);
-        }, 100);
-    }, 100);
+    // setTimeout(() => {
+        this.startTime = 0;
+        // requestAnimationFrame(this.animate.bind(this));
+        // setTimeout(() => {
+            // setTimeout(() => {
+                // this.adjust.enable();
+    //         // }, 1000);
+    //     }, 100);
+    // }, 100);
 
     var crystalSpecs = [
         [[0,0], 1],
@@ -80,17 +82,15 @@ const Main = function() {
             this.terrarium.crystalPlanter.onMouseDown(intersect);
             this.terrarium.crystalPlanter.activeCrystal.setSize(size);
         });
-
-        setInterval(() => {
-            this.app.hyperMap.addWave();
-            var i = setInterval(() => {
-                this.app.hyperMap.addWave();
-            }, 100);
-            setTimeout(() => {
-                clearInterval(i);
-            }, 5000 / 3);
-        }, 5000);
     });
+
+    this.eventMediator.emit('start');
+
+
+    window.save = this.save.bind(this);
+    window.setTime = this.setTime.bind(this);
+
+    this.animate();
 };
 
 Main.prototype.initApp = function() {
@@ -134,6 +134,19 @@ Main.prototype.initScene = function() {
     this.app.terrarium = this.terrarium;
     const controller = new Controller(this.app);
     // this.autorotate = new Autorotate(this.app, this.terrarium);
+
+    var mat = new THREE.MeshBasicMaterial({
+        vertexColors: THREE.VertexColors
+    });
+    var planeGeom = new THREE.PlaneGeometry(500, 500);
+    var colA = new THREE.Color(0x4e5fa1);
+    var colB = new THREE.Color(0x5d3277);
+    planeGeom.faces[0].vertexColors = [colA, colB, colA];
+    planeGeom.faces[1].vertexColors = [colB, colB, colA];
+    var plane = new THREE.Mesh(planeGeom, mat);
+    plane.lookAt(this.camera.position);
+    plane.translateZ(-500);
+    this.scene.add(plane);
 };
 
 Main.prototype.initThree = function() {
@@ -193,6 +206,9 @@ Main.prototype.render = function() {
 
     this.afterFirstPaint = true;
 
+    this.renderer.render(this.scene, this.camera);
+    return;
+
     if (this.terrarium.soilCursor.renderOnTop) {
 
         // Render background and space only
@@ -244,8 +260,9 @@ Main.prototype.render = function() {
 };
 
 Main.prototype.animate = function() {
-    var now = Date.now();
-    if (this.startTime) {
+    // this.setTime(this.seconds + 1/60);
+    var now = this.seconds * 1000;
+    if (this.startTime !== undefined) {
         this.app.elapsed = (now - this.startTime) / 1000;
         materials.setTime(this.app.elapsed);
     }
@@ -253,19 +270,28 @@ Main.prototype.animate = function() {
     this.app.delta = (now - this.lastNow) / 1000;
     this.lastNow = now;
 
+    // console.log(this.app.elapsed)
+
+    var loop = (this.app.elapsed / 2.5) % 1;
+    // console.log(this.app.elapsed, loop);
+    if (loop > .1 && loop < .2) {
+        this.app.hyperMap.addWave();
+    }
+    // if (loop > .95) {
+    //     return;
+    // }
+
     // setTimeout(this.animate.bind(this), Math.random() * 70);
-    requestAnimationFrame(this.animate.bind(this));
+    // requestAnimationFrame(this.animate.bind(this));
     // this.stats.begin();
     this.eventMediator.emit('update', this.app.delta, this.app.elapsed);
-    TWEEN.update();
+    TWEEN.update(now);
     this.render();
     // this.stats.end();
     this.adjust.update();
 };
 
-Main.prototype.onResize = function() {
-    var width = document.body.clientWidth;
-    var height = document.body.clientHeight;
+Main.prototype.setSize = function(width, height) {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
@@ -275,11 +301,17 @@ Main.prototype.onResize = function() {
 
     // Fixes https://github.com/mrdoob/three.js/issues/9500
     // From https://bugs.webkit.org/show_bug.cgi?id=152556#c2
-    this.container.style.height = (height + 1) + 'px';
-    requestAnimationFrame(() => {
+    // this.container.style.height = (height + 1) + 'px';
+    // requestAnimationFrame(() => {
         this.container.style.width = width + 'px';
         this.container.style.height = height + 'px';
-    });
+    // });
+};
+
+Main.prototype.onResize = function() {
+    var width = document.body.clientWidth;
+    var height = document.body.clientHeight;
+    this.setSize(width, height);
 };
 
 Main.prototype.setPixelRatio = function(value) {
@@ -293,6 +325,41 @@ Main.prototype.setPixelRatio = function(value) {
 
 Main.prototype.fadeIn = function() {
     document.body.classList.remove('hide-canvas');
+};
+
+Main.prototype.setTime = function(seconds) {
+    // console.log(seconds);
+    this.seconds = seconds;
+};
+
+Main.prototype.save = function(prefix, width, height, fps, seconds) {
+
+    width = width || 500;
+    height = height || 500;
+
+    var resolution = [width, height];
+
+    var that = this;
+
+    var totalFrames = fps * seconds;
+
+    that.setSize(width, height);
+
+    function saveFrame(frame) {
+        that.setTime(frame / fps);
+        that.animate();
+
+        that.renderer.domElement.toBlob(function(blob) {
+            var digits = totalFrames.toString().length;
+            var filename = prefix + '-' + pad(frame, digits) + '.png';
+            FileSaver.saveAs(blob, filename);
+            if (frame < totalFrames - 1) {
+                saveFrame(frame + 1);
+            }
+        });
+    }
+
+    saveFrame(0);
 };
 
 module.exports = Main;
